@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Panel pracy — lokalny</title>
+<style>
+/* =========================================================
+   ZMIENNE / TOKENY
+   – łatwa edycja kolorów, odstępów, cieni i zaokrągleń
+   ========================================================= */
+:root{
+  --bg-0:#0e1014;
+  --bg-1:#14171d;
+  --bg-2:#191d24;
+  --bg-3:#222731;
+  --bg-4:#2a3140;
+  --line:#2c333f;
+  --line-soft:#232934;
+  --text:#e6e8ec;
+  --text-dim:#a4abb8;
+  --text-mute:#6b7385;
+  --accent:#7aa2ff;        /* delikatny błękit, niezbyt jaskrawy */
+  --accent-2:#9cffd1;      /* miętowy akcent kontrastowy */
+  --warn:#ffb86b;
+  --danger:#ff6b6b;
+  --ok:#6bd6a4;
+  --tile:#1b2029;
+  --tile-hover:#222837;
+  --shadow-sm:0 1px 0 rgba(255,255,255,.03), 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 4px 12px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.03) inset;
+  --shadow-lg:0 18px 40px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.04) inset;
+  --r-sm:6px;
+  --r-md:10px;
+  --r-lg:14px;
+  --r-xl:18px;
+  --pad:14px;
+  --gap:12px;
+  --nav-h:54px;
+  --bar-h:40px;
+  --side-w:280px;
+  --email-side-w:300px;
+  --t:160ms cubic-bezier(.2,.7,.2,1);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg-0);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Verdana,sans-serif;
+  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit}
+input,textarea,select{font-family:inherit;color:var(--text)}
+::selection{background:rgba(122,162,255,.35);color:#fff}
+
+/* scrollbars */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:#2a3140;border-radius:10px;border:2px solid var(--bg-0)}
+*::-webkit-scrollbar-thumb:hover{background:#384055}
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+.navbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:18px;
+  height:var(--nav-h);padding:0 18px;
+  background:linear-gradient(180deg,#161a21,#11141a);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(140%) blur(6px);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.2px}
+.brand .logo{width:28px;height:28px;color:var(--accent)}
+.brand .name{font-size:14px}
+.brand .name b{color:var(--text)}
+.brand .name span{color:var(--text-mute);font-weight:400;margin-left:6px}
+
+.nav-links{display:flex;gap:4px;margin-left:8px}
+.nav-links a{
+  color:var(--text-dim);padding:8px 12px;border-radius:var(--r-md);
+  font-size:13px;transition:background var(--t),color var(--t);
+}
+.nav-links a:hover{background:var(--bg-3);color:var(--text);text-decoration:none}
+
+.nav-spacer{flex:1}
+
+.timer{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:var(--bg-2);border:1px solid var(--line);
+  font-variant-numeric:tabular-nums;font-size:13px;color:var(--text-dim);
+}
+.timer .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 10px rgba(156,255,209,.6)}
+.timer.warn .dot{background:var(--warn);box-shadow:0 0 10px rgba(255,184,107,.6)}
+.timer .label{color:var(--text-mute)}
+.timer .val{color:var(--text);font-weight:600}
+
+.clock{font-size:12px;color:var(--text-mute);font-variant-numeric:tabular-nums}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--bg-3);color:var(--text);border:1px solid var(--line);
+  padding:8px 12px;border-radius:var(--r-md);cursor:pointer;font-size:13px;
+  transition:background var(--t),border-color var(--t),transform var(--t),color var(--t);
+}
+.btn:hover{background:var(--bg-4);border-color:#3a4255}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:linear-gradient(180deg,#2c4ea8,#22408c);border-color:#3a5bb8;color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.ghost:hover{background:var(--bg-3)}
+.btn.danger{background:#3a1f23;border-color:#5a2b30;color:#ffb1b1}
+.btn.danger:hover{background:#4a262c}
+.btn.sm{padding:5px 9px;font-size:12px;border-radius:7px}
+.btn .ic{width:14px;height:14px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;
+  padding:2px 8px;border-radius:999px;background:var(--bg-3);color:var(--text-dim);
+  border:1px solid var(--line);
+}
+.badge.focus{background:#2a2010;border-color:#5a4520;color:#ffd28a}
+
+/* =========================================================
+   COLLAPSIBLE EMAIL BAR
+   ========================================================= */
+.email-bar{
+  display:flex;align-items:center;gap:10px;
+  height:var(--bar-h);min-height:var(--bar-h);
+  padding:0 16px;background:var(--bg-1);
+  border-bottom:1px solid var(--line);
+  cursor:pointer;user-select:none;
+  transition:background var(--t);
+}
+.email-bar:hover{background:#171b22}
+.email-bar .lbl{font-weight:600;color:var(--text)}
+.email-bar .hint{color:var(--text-mute);font-size:12px}
+.email-bar .chev{
+  margin-left:auto;width:18px;height:18px;color:var(--text-dim);
+  transition:transform var(--t);
+}
+.email.expanded .email-bar .chev{transform:rotate(180deg)}
+.email-bar .ic{width:16px;height:16px;color:var(--text-dim)}
+
+.email-panel{
+  display:none;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#13161c,#10131a);
+}
+.email.expanded .email-panel{display:grid}
+.email-panel{
+  grid-template-columns:var(--email-side-w) 1fr;
+  gap:0;
+}
+
+/* email left */
+.email-side{
+  border-right:1px solid var(--line);
+  padding:14px;min-height:480px;max-height:78vh;overflow:auto;
+}
+.email-side h4{margin:0 0 8px;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text-mute)}
+.search{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:var(--r-md);
+}
+.search input{flex:1;background:transparent;border:0;outline:0;font-size:13px}
+.search .ic{width:14px;height:14px;color:var(--text-mute)}
+
+.section-block{margin-top:14px}
+.section-title{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-mute);margin:6px 2px;
+}
+.section-title .line{flex:1;height:1px;background:var(--line-soft)}
+
+.group{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;
+  padding:9px 10px;border-radius:var(--r-md);
+  background:var(--bg-2);border:1px solid var(--line);
+  margin-bottom:6px;transition:background var(--t),border-color var(--t);
+}
+.group:hover{background:var(--bg-3);border-color:#34394a}
+.group .g-name{font-size:13px;display:flex;align-items:center;gap:8px}
+.group .g-name .count{
+  font-size:11px;color:var(--text-mute);
+  background:var(--bg-4);padding:1px 7px;border-radius:999px;
+}
+.group .g-checks{display:flex;gap:6px}
+.checkbox{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;color:var(--text-dim);
+  padding:3px 7px;border-radius:6px;background:var(--bg-3);
+  border:1px solid var(--line);cursor:pointer;user-select:none;
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.checkbox input{appearance:none;width:11px;height:11px;border-radius:3px;
+  border:1px solid #4a5266;background:#0d1117;cursor:pointer;margin:0;
+  display:inline-grid;place-items:center;transition:all var(--t)}
+.checkbox input:checked{background:var(--accent);border-color:var(--accent)}
+.checkbox:hover{background:var(--bg-4);color:var(--text)}
+.checkbox.on{background:#1c2a45;border-color:#3a5bb8;color:#cfdcff}
+
+.group .empty{color:var(--text-mute);font-size:12px;padding:10px}
+
+.add-group-btn{
+  width:100%;margin-top:14px;justify-content:center;
+}
+
+/* email main */
+.email-main{padding:16px;display:flex;flex-direction:column;gap:12px;min-height:480px;max-height:78vh;overflow:auto}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{position:relative;display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)}
+.field input,.field textarea,.field select{
+  width:100%;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:9px 32px 9px 11px;font-size:13px;outline:0;
+  transition:border-color var(--t),background var(--t);
+}
+.field textarea{padding:11px 32px 11px 11px;min-height:120px;resize:vertical;line-height:1.5}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:#3e5fbf;background:#171c25;
+}
+.field .clear{
+  position:absolute;right:6px;top:24px;
+  width:22px;height:22px;display:grid;place-items:center;
+  background:transparent;border:0;color:var(--text-mute);cursor:pointer;
+  border-radius:6px;transition:background var(--t),color var(--t);
+}
+.field.area .clear{top:28px}
+.field .clear:hover{background:var(--bg-3);color:var(--text)}
+.field .clear svg{width:12px;height:12px}
+
+/* templates row */
+.tmpl-row{
+  display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;
+  padding:10px;background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+}
+.tmpl-row .field{margin:0}
+
+/* suggestion popup */
+.sugg{
+  position:absolute;z-index:20;left:0;right:32px;top:calc(100% + 4px);
+  background:#171c25;border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--shadow-md);max-height:220px;overflow:auto;display:none;
+}
+.sugg.open{display:block}
+.sugg .item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.sugg .item:hover,.sugg .item.active{background:var(--bg-3)}
+.sugg .item .src{font-size:11px;color:var(--text-mute)}
+
+/* smart template trigger */
+.smart-bar{
+  margin-top:6px;padding:8px 12px;border-radius:var(--r-md);
+  background:#1a2230;border:1px solid #2c3a55;color:#cfdcff;
+  display:none;align-items:center;gap:10px;font-size:13px;
+  animation:slideUp .2s ease;
+}
+.smart-bar.show{display:flex}
+@keyframes slideUp{from{transform:translateY(4px);opacity:0}to{transform:none;opacity:1}}
+
+/* =========================================================
+   MAIN LAYOUT
+   ========================================================= */
+.layout{display:grid;grid-template-columns:var(--side-w) 1fr;gap:0;min-height:calc(100vh - var(--nav-h) - var(--bar-h))}
+.layout.focus{grid-template-columns:0 1fr}
+.layout.focus .sidebar{display:none}
+
+.sidebar{
+  border-right:1px solid var(--line);
+  background:var(--bg-1);padding:14px;display:flex;flex-direction:column;gap:14px;
+  overflow:auto;max-height:calc(100vh - var(--nav-h) - var(--bar-h));
+}
+.panel{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-lg);
+  overflow:hidden;
+}
+.panel-h{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;cursor:pointer;user-select:none;
+  background:linear-gradient(180deg,#1c2129,#181c23);
+  border-bottom:1px solid transparent;
+}
+.panel.open .panel-h{border-bottom-color:var(--line-soft)}
+.panel-h .t{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.panel-h .count{margin-left:auto;font-size:11px;color:var(--text-mute);background:var(--bg-4);padding:1px 7px;border-radius:999px}
+.panel-h .chev{width:14px;height:14px;color:var(--text-mute);transition:transform var(--t)}
+.panel.open .panel-h .chev{transform:rotate(180deg)}
+.panel-b{display:none;padding:12px}
+.panel.open .panel-b{display:block}
+
+/* todo */
+.todo-add{display:flex;gap:6px}
+.todo-add input{
+  flex:1;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:8px 10px;outline:0;font-size:13px;
+}
+.todo-add input:focus{border-color:#3e5fbf}
+.todo-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.todo-empty{color:var(--text-mute);font-size:12px;padding:8px;text-align:center}
+.todo-item{
+  display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:8px 10px;
+}
+.todo-item .text{font-size:13px;line-height:1.35}
+.todo-item.done .text{text-decoration:line-through;color:var(--text-mute)}
+.todo-item .meta{font-size:10px;color:var(--text-mute);margin-top:2px}
+.todo-item input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid #4a5266;background:#0d1117;border-radius:4px;cursor:pointer;display:grid;place-items:center;transition:all var(--t)}
+.todo-item input[type=checkbox]:checked{background:var(--ok);border-color:var(--ok)}
+.todo-item input[type=checkbox]:checked::after{content:"";width:6px;height:9px;border:solid #0e1014;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.todo-item .acts{display:flex;gap:4px;opacity:.5;transition:opacity var(--t)}
+.todo-item:hover .acts{opacity:1}
+.icon-btn{
+  width:24px;height:24px;display:grid;place-items:center;
+  background:transparent;border:0;color:var(--text-mute);cursor:pointer;border-radius:6px;
+  transition:background var(--t),color var(--t);
+}
+.icon-btn:hover{background:var(--bg-4);color:var(--text)}
+.icon-btn svg{width:13px;height:13px}
+
+/* sticky note */
+.sticky textarea{
+  width:100%;min-height:90px;background:#26200f;border:1px solid #5b4a1c;
+  color:#ffe8a8;padding:10px;border-radius:var(--r-md);outline:0;font-size:13px;
+  resize:vertical;line-height:1.5;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset;
+}
+.sticky textarea:focus{border-color:#a07e2a}
+
+/* tools */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tools .btn{justify-content:center}
+.tools .full{grid-column:1/-1}
+.tools-out{margin-top:8px;font-size:12px;color:var(--text-mute);min-height:18px}
+
+/* frequent links */
+.flink{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r-md);
+  background:var(--bg-1);border:1px solid var(--line);
+  margin-bottom:6px;font-size:13px;color:var(--text);
+  transition:background var(--t),border-color var(--t),transform var(--t);
+}
+.flink:hover{background:var(--bg-3);border-color:#3a4255;text-decoration:none;transform:translateX(2px)}
+.flink .ic{width:14px;height:14px;color:var(--accent)}
+.flink .desc{margin-left:auto;font-size:11px;color:var(--text-mute)}
+
+/* =========================================================
+   MAIN CONTENT (TILES)
+   ========================================================= */
+.main{padding:22px 26px;overflow:auto;max-height:calc(100vh - var(--nav-h) - var(--bar-h))}
+.main h2{margin:0 0 4px;font-size:18px;font-weight:600;letter-spacing:.2px}
+.main .sub{color:var(--text-mute);font-size:13px;margin-bottom:18px}
+
+.tiles{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;
+}
+.tile{
+  position:relative;
+  background:linear-gradient(180deg,var(--tile),#161a22);
+  border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:14px 14px 12px;cursor:pointer;
+  display:flex;flex-direction:column;gap:6px;min-height:96px;
+  transition:transform var(--t),background var(--t),border-color var(--t),box-shadow var(--t);
+  overflow:hidden;
+  text-decoration:none;color:inherit;
+}
+.tile:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(180deg,var(--tile-hover),#1a2030);
+  border-color:#3a4459;
+  box-shadow:var(--shadow-lg);
+  text-decoration:none;
+}
+.tile .t-head{display:flex;align-items:center;gap:8px}
+.tile .t-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:#222a3a;color:var(--accent);
+  display:grid;place-items:center;flex-shrink:0;
+}
+.tile .t-icon svg{width:16px;height:16px}
+.tile .t-title{font-weight:600;font-size:14px}
+.tile .t-desc{
+  font-size:12px;color:var(--text-mute);
+  max-height:0;overflow:hidden;opacity:0;
+  transition:max-height var(--t),opacity var(--t),margin-top var(--t);
+}
+.tile:hover .t-desc{max-height:60px;opacity:1;margin-top:2px}
+.tile .t-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.tile .tag{
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;color:var(--text-dim);
+  background:var(--bg-3);border:1px solid var(--line);
+}
+.tile .tag.ie{background:#2a1810;border-color:#5a3520;color:#ffb78a}
+.tile .tag.copy{background:#10221c;border-color:#1d4438;color:#9cffd1}
+.tile.copy-tile{cursor:copy}
+.tile.copy-tile .t-value{
+  font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--text-dim);
+  background:var(--bg-1);padding:4px 8px;border-radius:6px;
+  border:1px solid var(--line);align-self:flex-start;
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+.overlay{
+  position:fixed;inset:0;z-index:80;background:rgba(8,10,14,.7);
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(3px);
+}
+.overlay.show{display:flex;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--bg-2);border:1px solid var(--line);
+  border-radius:var(--r-xl);box-shadow:var(--shadow-lg);
+  width:min(640px,100%);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;
+  animation:popIn .18s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes popIn{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal.lg{width:min(820px,100%)}
+.modal-h{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--line);
+}
+.modal-h h3{margin:0;font-size:14px}
+.modal-h .x{margin-left:auto}
+.modal-b{padding:16px;overflow:auto}
+.modal-f{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;background:var(--bg-1)}
+
+.code-block{
+  background:#0c0f14;border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+  color:#cfd6e6;white-space:pre;overflow:auto;max-height:50vh;
+}
+
+/* break popup look */
+.break-modal .modal-b{
+  text-align:center;padding:30px 24px;
+}
+.break-modal h3{font-size:22px;margin:10px 0 6px}
+.break-modal p{color:var(--text-dim);margin:0 0 6px}
+.break-modal .clock-big{font-variant-numeric:tabular-nums;font-size:42px;font-weight:700;color:var(--accent)}
+
+/* form fields inside modals */
+.form-grid{display:flex;flex-direction:column;gap:10px}
+.form-grid .field input, .form-grid .field textarea{padding-right:32px}
+
+/* toast */
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:100;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 14px;font-size:13px;box-shadow:var(--shadow-md);
+  display:flex;align-items:center;gap:10px;min-width:220px;
+  animation:toastIn .18s ease;
+}
+.toast.ok{border-color:#1d4438}
+.toast.ok .ic{color:var(--ok)}
+.toast.err{border-color:#5a2b30}
+.toast.err .ic{color:var(--danger)}
+.toast .ic{width:16px;height:16px}
+@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* responsive */
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:0;border-bottom:1px solid var(--line);max-height:none}
+  .email-panel{grid-template-columns:1fr}
+  .email-side{border-right:0;border-bottom:1px solid var(--line);max-height:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============= NAVBAR ============= -->
+<header class="navbar" role="banner">
+  <div class="brand" data-testid="brand">
+    <!-- Inline SVG logo -->
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#7aa2ff"/>
+          <stop offset="1" stop-color="#9cffd1"/>
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lg)" opacity=".18"/>
+      <path d="M8 22 L14 10 L18 18 L24 10" fill="none" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="24" cy="22" r="2" fill="url(#lg)"/>
+    </svg>
+    <div class="name"><b>WorkDesk</b><span>Lokalny panel</span></div>
+  </div>
+
+  <nav class="nav-links" aria-label="Główne menu">
+    <a href="#" data-testid="nav-pulpit">Pulpit</a>
+    <a href="#" data-testid="nav-narzedzia">Narzędzia</a>
+    <a href="#" data-testid="nav-pomoc">Pomoc</a>
+  </nav>
+
+  <div class="nav-spacer"></div>
+
+  <div class="clock" id="clock" aria-live="polite"></div>
+
+  <div class="timer" id="timer" data-testid="timer-pill" aria-live="polite">
+    <span class="dot"></span>
+    <span class="label">Przerwa za</span>
+    <span class="val" id="timerVal">–</span>
+  </div>
+
+  <span class="badge focus" id="focusBadge" style="display:none" data-testid="focus-badge">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/></svg>
+    Tryb skupienia
+  </span>
+
+  <button class="btn" id="focusBtn" data-testid="focus-toggle">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/></svg>
+    Tryb skupienia
+  </button>
+</header>
+
+<!-- ============= EMAIL BAR ============= -->
+<section class="email" id="email">
+  <div class="email-bar" id="emailBar" data-testid="email-bar" role="button" tabindex="0" aria-expanded="false">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+    </svg>
+    <span class="lbl">Napisz e-mail</span>
+    <span class="hint">— grupy, szablony, generatory JSON</span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+
+  <div class="email-panel">
+    <!-- left -->
+    <aside class="email-side" aria-label="Grupy e-mail">
+      <h4>Wyszukaj grupę</h4>
+      <div class="search">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="grpSearch" type="text" placeholder="Szukaj sekcji lub grupy…" data-testid="group-search"/>
+      </div>
+      <div id="groupsHost" style="margin-top:10px"></div>
+      <button class="btn add-group-btn" id="addGroupBtn" data-testid="add-group-btn">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Dodaj nową grupę
+      </button>
+    </aside>
+
+    <!-- right -->
+    <div class="email-main">
+      <div class="tmpl-row">
+        <div class="field" style="margin:0">
+          <label for="tmplPick">Szablon wiadomości</label>
+          <input id="tmplSearch" type="text" placeholder="Szukaj szablonu…" list="tmplList" data-testid="template-search"/>
+          <datalist id="tmplList"></datalist>
+        </div>
+        <div style="display:flex;align-items:end;gap:8px;grid-column:2/4">
+          <button class="btn primary" id="loadTmplBtn" data-testid="load-template-btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+            Wczytaj
+          </button>
+          <button class="btn" id="genTmplBtn" data-testid="generate-template-btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18 22 12 16 6M8 6 2 12l6 6"/></svg>
+            Generuj kod szablonu
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn primary" id="sendBtn" data-testid="send-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-11 11M22 2 15 22l-4-9-9-4z"/></svg>
+          Wyślij
+        </button>
+        <button class="btn" id="clearBtn" data-testid="clear-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Wyczyść
+        </button>
+        <button class="btn" id="bulkBtn" data-testid="bulk-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="13" height="13" rx="2"/><rect x="8" y="3" width="13" height="13" rx="2"/></svg>
+          Bulk mail
+        </button>
+        <span style="flex:1"></span>
+        <span class="badge" id="charBadge">znaki: 0</span>
+      </div>
+
+      <div class="field" style="position:relative">
+        <label for="fTo">Do</label>
+        <input id="fTo" type="text" autocomplete="off" placeholder="osoba@firma.pl, ..." data-testid="field-to"/>
+        <button class="clear" data-clear="fTo" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggTo" data-suggest="fTo"></div>
+      </div>
+      <div class="field" style="position:relative">
+        <label for="fCc">DW (CC)</label>
+        <input id="fCc" type="text" autocomplete="off" data-testid="field-cc"/>
+        <button class="clear" data-clear="fCc" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggCc" data-suggest="fCc"></div>
+      </div>
+      <div class="field" style="position:relative">
+        <label for="fBcc">UDW (BCC)</label>
+        <input id="fBcc" type="text" autocomplete="off" data-testid="field-bcc"/>
+        <button class="clear" data-clear="fBcc" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggBcc" data-suggest="fBcc"></div>
+      </div>
+      <div class="field">
+        <label for="fSubj">Temat</label>
+        <input id="fSubj" type="text" data-testid="field-subject"/>
+        <button class="clear" data-clear="fSubj" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="field area">
+        <label for="fBody">Treść wiadomości</label>
+        <textarea id="fBody" data-testid="field-body" placeholder="Wpisz treść… (możesz zacząć od nazwy szablonu, aby wczytać ją automatycznie)"></textarea>
+        <button class="clear" data-clear="fBody" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="smart-bar" id="smartBar" data-testid="smart-bar">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          <span id="smartText">Wczytać szablon?</span>
+          <span style="flex:1"></span>
+          <button class="btn sm primary" id="smartLoad">Wczytaj</button>
+          <button class="btn sm ghost" id="smartDismiss">Pomiń</button>
+        </div>
+      </div>
+      <div class="field area">
+        <label for="fSig">Podpis / stopka</label>
+        <textarea id="fSig" data-testid="field-signature"></textarea>
+        <button class="clear" data-clear="fSig" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= MAIN LAYOUT ============= -->
+<div class="layout" id="layout">
+  <!-- ============= LEFT SIDEBAR ============= -->
+  <aside class="sidebar" aria-label="Panel boczny">
+    <!-- TODO -->
+    <div class="panel open" id="todoPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="m9 11 3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span class="t">To Do</span>
+        <span class="count" id="todoCount">0</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="todo-add">
+          <input id="todoInput" type="text" placeholder="Nowe zadanie…" data-testid="todo-input"/>
+          <button class="btn primary sm" id="todoAddBtn" data-testid="todo-add-btn">Dodaj</button>
+        </div>
+        <div class="todo-list" id="todoList"></div>
+      </div>
+    </div>
+
+    <!-- Sticky note -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#ffd28a"><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M9 3h6v4H9z"/></svg>
+        <span class="t">Notatka</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b sticky">
+        <textarea id="stickyNote" placeholder="Szybka notatka — zapisuje się sama…" data-testid="sticky-note"></textarea>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#9cffd1"><path d="M14.7 6.3a4 4 0 1 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 1 1 5.4-5.4l-3 3-2-2 3-3z"/></svg>
+        <span class="t">Narzędzia</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="tools">
+          <button class="btn sm" id="toolClean" data-testid="tool-clean">Wyczyść tekst</button>
+          <button class="btn sm" id="toolCount" data-testid="tool-count">Policz znaki</button>
+          <button class="btn sm" id="toolDatePL" data-testid="tool-date-pl">Data PL</button>
+          <button class="btn sm" id="toolDateISO" data-testid="tool-date-iso">Data ISO</button>
+          <button class="btn sm full" id="toolUpper" data-testid="tool-upper">UPPER / lower (zaznaczenie w treści)</button>
+        </div>
+        <div class="tools-out" id="toolsOut">Gotowe.</div>
+      </div>
+    </div>
+
+    <!-- Frequent links -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+        <span class="t">Częste linki</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b" id="flinksHost"></div>
+    </div>
+  </aside>
+
+  <!-- ============= MAIN ============= -->
+  <main class="main" role="main">
+    <h2>Pulpit</h2>
+    <div class="sub" id="welcome">Miłej pracy. Dziś jest <span id="todayLabel"></span>.</div>
+    <div class="tiles" id="tilesHost"></div>
+  </main>
+</div>
+
+<!-- ============= MODALS ============= -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <!-- Break popup -->
+  <div class="modal break-modal" id="breakModal" role="dialog" aria-labelledby="breakTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="breakTitle">Przerwa</h3>
+      <button class="btn ghost sm x" data-close="breakModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="clock-big" id="breakClock">--:--</div>
+      <h3>Czas na przerwę</h3>
+      <p>Wstań, rozprostuj plecy, spójrz w okno przez 30 sekund.</p>
+      <p style="color:var(--text-mute);font-size:12px">Okno zniknie samo po pełnej godzinie.</p>
+    </div>
+  </div>
+
+  <!-- Generic code modal -->
+  <div class="modal lg" id="codeModal" role="dialog" aria-labelledby="codeTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="codeTitle">Wygenerowany kod</h3>
+      <button class="btn ghost sm x" data-close="codeModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <p style="margin-top:0;color:var(--text-dim)">
+        Skopiuj poniższy fragment i wklej w odpowiednim miejscu wewnątrz <code>index.html</code>.
+      </p>
+      <pre class="code-block" id="codeBlock"></pre>
+    </div>
+    <div class="modal-f">
+      <button class="btn" data-close="codeModal">Zamknij</button>
+      <button class="btn primary" id="copyCodeBtn">Kopiuj kod</button>
+    </div>
+  </div>
+
+  <!-- Add group modal -->
+  <div class="modal" id="groupModal" role="dialog" aria-labelledby="groupTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="groupTitle">Dodaj nową grupę</h3>
+      <button class="btn ghost sm x" data-close="groupModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="form-grid">
+        <div class="field">
+          <label for="ngSection">Sekcja</label>
+          <input id="ngSection" type="text" placeholder="np. Dział handlowy" data-testid="ng-section"/>
+        </div>
+        <div class="field">
+          <label for="ngGroup">Nazwa grupy</label>
+          <input id="ngGroup" type="text" placeholder="np. Klienci kluczowi" data-testid="ng-group"/>
+        </div>
+        <div class="field area">
+          <label for="ngEmails">Adresy e-mail (po przecinku lub w nowej linii)</label>
+          <textarea id="ngEmails" placeholder="anna@firma.pl, jan@firma.pl" data-testid="ng-emails"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" data-close="groupModal">Anuluj</button>
+      <button class="btn primary" id="ngGenerate" data-testid="ng-generate">Generuj JSON</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<!-- ============= SCRIPT ============= -->
+<script>
+/* =========================================================
+   DANE — łatwe do edycji ręcznej.
+   Uwaga: po zmianach wystarczy odświeżyć stronę w Edge.
+   ========================================================= */
+const emailData = {
+
+  // Sekcje -> Grupy -> adresy e-mail
+  sections: [
+    {
+      name: "Wewnętrzne",
+      groups: [
+        { name: "Zarząd",        emails: ["prezes@firma.pl","wiceprezes@firma.pl"] },
+        { name: "IT",            emails: ["it.helpdesk@firma.pl","admin@firma.pl","devops@firma.pl"] },
+        { name: "HR",            emails: ["hr@firma.pl","rekrutacja@firma.pl","kadry@firma.pl"] },
+        { name: "Księgowość",    emails: ["ksiegowosc@firma.pl","faktury@firma.pl"] }
+      ]
+    },
+    {
+      name: "Klienci",
+      groups: [
+        { name: "Klienci kluczowi", emails: ["kontakt@klient-a.pl","biuro@klient-b.pl","office@klient-c.com"] },
+        { name: "Klienci VIP",      emails: ["vip1@example.com","vip2@example.com"] },
+        { name: "Nowi klienci",     emails: ["nowy1@example.com","nowy2@example.com","nowy3@example.com"] }
+      ]
+    },
+    {
+      name: "Dostawcy",
+      groups: [
+        { name: "Logistyka", emails: ["transport@kurier.pl","spedycja@logistyka.pl"] },
+        { name: "Materiały", emails: ["zamowienia@dostawca.pl","biuro@hurtownia.pl"] }
+      ]
+    }
+  ],
+
+  // Szablony — sortowane alfabetycznie przy renderowaniu
+  templates: [
+    {
+      name: "Potwierdzenie spotkania",
+      to: "", cc: "", bcc: "",
+      subject: "Potwierdzenie spotkania – [data]",
+      body: "Dzień dobry,\n\npotwierdzam nasze spotkanie zaplanowane na [data] o godzinie [godzina].\nMiejsce: [miejsce / link do spotkania online].\n\nW razie zmian proszę o informację.\n\nPozdrawiam,",
+      footer: "—\nImię Nazwisko\nDział / Stanowisko\nFirma Sp. z o.o.\ntel. +48 000 000 000"
+    },
+    {
+      name: "Prośba o fakturę",
+      to: "ksiegowosc@firma.pl", cc: "", bcc: "",
+      subject: "Prośba o wystawienie faktury",
+      body: "Dzień dobry,\n\nproszę o wystawienie faktury za usługi z miesiąca [miesiąc].\nDane do faktury w załączeniu / poniżej.\n\nDziękuję,",
+      footer: "—\nImię Nazwisko\nDział / Stanowisko\nFirma Sp. z o.o."
+    },
+    {
+      name: "Urlop – wniosek",
+      to: "hr@firma.pl", cc: "", bcc: "",
+      subject: "Wniosek urlopowy – [data od] / [data do]",
+      body: "Dzień dobry,\n\nzwracam się z prośbą o udzielenie urlopu wypoczynkowego w terminie od [data od] do [data do].\nW okresie nieobecności w sprawach pilnych proszę kontaktować się z [osoba zastępująca].\n\nZ poważaniem,",
+      footer: "—\nImię Nazwisko\nDział / Stanowisko\nFirma Sp. z o.o."
+    },
+    {
+      name: "Wysyłka oferty",
+      to: "", cc: "", bcc: "",
+      subject: "Oferta – [nazwa projektu / klienta]",
+      body: "Dzień dobry,\n\nw załączeniu przesyłam ofertę dotyczącą [temat].\nProszę o potwierdzenie otrzymania oraz informację o ewentualnych pytaniach.\n\nPozdrawiam,",
+      footer: "—\nImię Nazwisko\nDział handlowy\nFirma Sp. z o.o.\ntel. +48 000 000 000"
+    },
+    {
+      name: "Zgłoszenie do IT",
+      to: "it.helpdesk@firma.pl", cc: "", bcc: "",
+      subject: "Zgłoszenie – [krótki opis problemu]",
+      body: "Dzień dobry,\n\nzgłaszam problem techniczny:\n• Co się dzieje: [opis]\n• Kiedy zaczęło się dziać: [data/godzina]\n• Komunikat błędu: [treść]\n• Stanowisko / system: [Windows / Edge / app]\n\nProszę o kontakt w sprawie naprawy.",
+      footer: "—\nImię Nazwisko\nDział / Stanowisko\nFirma Sp. z o.o."
+    }
+  ],
+
+  // Kafelki w głównym pulpicie
+  // type: "link" | "copy"
+  // ie: true   -> otwarcie przez microsoft-edge: (tryb IE)
+  tiles: [
+    { type:"link", title:"Intranet",          url:"http://intranet.firma.local",   desc:"Wewnętrzny portal pracownika.", icon:"globe" },
+    { type:"link", title:"System CRM",        url:"https://crm.firma.pl",          desc:"Klienci, kontakty, lejek sprzedaży.", icon:"briefcase" },
+    { type:"link", title:"Baza wiedzy",       url:"https://wiki.firma.pl",         desc:"Procedury, instrukcje, FAQ.", icon:"book" },
+    { type:"link", title:"Helpdesk IT",       url:"https://helpdesk.firma.pl",     desc:"Zgłoszenia awarii i wniosków.", icon:"life" },
+    { type:"link", title:"Stary panel HR",    url:"http://hr-legacy.firma.local/login.aspx", desc:"Stary system HR – działa w trybie IE.", icon:"users", ie:true },
+    { type:"link", title:"ERP – moduł magazyn", url:"http://erp.firma.local/wms",  desc:"Wymaga trybu zgodności IE.", icon:"box", ie:true },
+    { type:"copy", title:"NIP firmy",         value:"PL0000000000",                desc:"Kliknij, aby skopiować NIP.", icon:"id" },
+    { type:"copy", title:"Numer konta",       value:"PL00 0000 0000 0000 0000 0000 0000", desc:"Kliknij, aby skopiować IBAN.", icon:"bank" },
+    { type:"copy", title:"Adres biura",       value:"Firma Sp. z o.o., ul. Przykładowa 1, 00-000 Warszawa", desc:"Kliknij, aby skopiować adres.", icon:"map" },
+    { type:"copy", title:"ID wewnętrzny",     value:"WD-2026-INTERNAL-001",        desc:"Identyfikator do zgłoszeń wewnętrznych.", icon:"hash" }
+  ],
+
+  // Częste linki w sidebarze
+  frequentLinks: [
+    { title:"Pulpit zarządzania",  url:"http://intranet.firma.local",   note:"intranet" },
+    { title:"Kalendarz zespołu",   url:"https://outlook.office.com/calendar/", note:"outlook" },
+    { title:"Pliki współdzielone", url:"https://firma.sharepoint.com/", note:"sharepoint" },
+    { title:"Ewidencja czasu",     url:"http://intranet.firma.local/timesheet", note:"czas pracy" }
+  ],
+
+  // Pula znanych adresów do podpowiedzi (oprócz tych z grup/szablonów)
+  knownMails: [
+    "anna.kowalska@firma.pl",
+    "jan.nowak@firma.pl",
+    "piotr.zielinski@firma.pl",
+    "biuro@firma.pl",
+    "kontakt@firma.pl"
+  ]
+};
+
+/* =========================================================
+   POMOCNICZE / UTIL
+   ========================================================= */
+const $  = (s,el=document) => el.querySelector(s);
+const $$ = (s,el=document) => Array.from(el.querySelectorAll(s));
+const byAlpha = (a,b) => a.localeCompare(b,"pl",{sensitivity:"base"});
+const uniq = arr => Array.from(new Set(arr));
+const escHTML = s => String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+
+// Toast
+function toast(msg, kind="ok"){
+  const wrap = $("#toasts");
+  const el = document.createElement("div");
+  el.className = "toast "+kind;
+  el.innerHTML = `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      ${kind==="ok"
+        ? '<path d="m5 12 5 5L20 7"/>'
+        : '<circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 17h.01"/>'}
+    </svg><span>${escHTML(msg)}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transform="translateY(6px)"; }, 2400);
+  setTimeout(()=> el.remove(), 2700);
+}
+
+// Clipboard helper
+async function copyToClipboard(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch{
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.left="-9999px";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    let ok=false; try{ ok = document.execCommand("copy"); }catch{}
+    ta.remove(); return ok;
+  }
+}
+
+/* =========================================================
+   INLINE SVG ICONS – proste i jednolite
+   ========================================================= */
+const ICONS = {
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17h15"/></svg>',
+  life: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m4.9 4.9 4.3 4.3M14.8 14.8l4.3 4.3M19.1 4.9l-4.3 4.3M9.2 14.8l-4.3 4.3"/></svg>',
+  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20a5 5 0 0 1 6 0"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+  id: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h4M5 17c1-2 3-2 4-2s3 0 4 2"/></svg>',
+  bank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 9-6 9 6"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/></svg>',
+  map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2z"/><path d="M9 3v16M15 5v16"/></svg>',
+  hash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>'
+};
+function getIcon(k){ return ICONS[k] || ICONS.globe; }
+
+/* =========================================================
+   NAVBAR — zegar, timer, focus mode
+   ========================================================= */
+function pad(n){return String(n).padStart(2,"0")}
+function tickClock(){
+  const d = new Date();
+  $("#clock").textContent = d.toLocaleDateString("pl-PL",{weekday:"short",day:"2-digit",month:"short"})+
+    " · " + pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+  $("#todayLabel").textContent = d.toLocaleDateString("pl-PL",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+}
+setInterval(tickClock,1000); tickClock();
+
+let breakOpenForHour = -1; // żeby pokazać tylko raz na godzinę
+function tickTimer(){
+  const d = new Date();
+  const next = new Date(d); next.setHours(d.getHours()+1,0,0,0);
+  const diff = next - d;
+  const m = Math.floor(diff/60000);
+  const s = Math.floor((diff%60000)/1000);
+  $("#timerVal").textContent = pad(m)+":"+pad(s);
+  const t = $("#timer");
+  if(m<5){ t.classList.add("warn"); } else { t.classList.remove("warn"); }
+
+  // Pokaż popup o XX:55, ukryj po pełnej godzinie
+  if(m<5 && breakOpenForHour !== d.getHours()){
+    breakOpenForHour = d.getHours();
+    showModal("breakModal");
+  }
+  if(m===59 && s>=58){ // sekunda po pełnej godzinie -> reset i schowaj
+    closeModal("breakModal");
+  }
+  $("#breakClock").textContent = pad(m)+":"+pad(s);
+}
+setInterval(tickTimer,1000); tickTimer();
+
+// Focus mode
+$("#focusBtn").addEventListener("click", ()=>{
+  const l = $("#layout");
+  l.classList.toggle("focus");
+  const on = l.classList.contains("focus");
+  $("#focusBadge").style.display = on ? "inline-flex" : "none";
+  toast(on ? "Tryb skupienia włączony" : "Tryb skupienia wyłączony");
+});
+
+/* =========================================================
+   COLLAPSIBLE EMAIL BAR
+   ========================================================= */
+const emailEl = $("#email");
+$("#emailBar").addEventListener("click", toggleEmail);
+$("#emailBar").addEventListener("keydown", e=>{
+  if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleEmail(); }
+});
+function toggleEmail(){
+  const open = emailEl.classList.toggle("expanded");
+  $("#emailBar").setAttribute("aria-expanded", open?"true":"false");
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+const overlay = $("#overlay");
+function showModal(id){
+  $$("#overlay > .modal").forEach(m=>m.style.display="none");
+  $("#"+id).style.display = "flex";
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden","false");
+}
+function closeModal(){ overlay.classList.remove("show"); overlay.setAttribute("aria-hidden","true"); }
+$$("[data-close]").forEach(b=> b.addEventListener("click", closeModal));
+overlay.addEventListener("click", e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+/* =========================================================
+   GROUPS — render, search, To/CC/BCC
+   ========================================================= */
+// Stan: które grupy są zaznaczone w której rubryce
+const groupState = { To:new Set(), Cc:new Set(), Bcc:new Set() };
+// Mapowanie pola na klucz stanu
+const FIELDS = { fTo:"To", fCc:"Cc", fBcc:"Bcc" };
+
+function getAllKnownMails(){
+  const fromGroups = emailData.sections.flatMap(s=> s.groups.flatMap(g=>g.emails));
+  const fromTpls   = emailData.templates.flatMap(t=> [t.to,t.cc,t.bcc].join(",").split(/[,;]/).map(x=>x.trim()).filter(Boolean));
+  return uniq([...fromGroups, ...fromTpls, ...emailData.knownMails]).sort(byAlpha);
+}
+
+function renderGroups(filter=""){
+  const host = $("#groupsHost");
+  host.innerHTML = "";
+  const f = filter.trim().toLowerCase();
+
+  // sekcje wg kolejności w danych, grupy posortowane alfabetycznie
+  const sections = emailData.sections.map(s=>({
+    name:s.name,
+    groups:[...s.groups].sort((a,b)=>byAlpha(a.name,b.name))
+  }));
+
+  let visible = 0;
+  sections.forEach(sec=>{
+    const filtered = sec.groups.filter(g =>
+      !f || g.name.toLowerCase().includes(f) || sec.name.toLowerCase().includes(f)
+    );
+    if(!filtered.length) return;
+
+    const block = document.createElement("div");
+    block.className = "section-block";
+    block.innerHTML = `<div class="section-title"><span>${escHTML(sec.name)}</span><span class="line"></span><span>${filtered.length}</span></div>`;
+
+    filtered.forEach(g=>{
+      visible++;
+      const id = (sec.name+"::"+g.name);
+      const row = document.createElement("div");
+      row.className = "group";
+      row.innerHTML = `
+        <div class="g-name">
+          <span>${escHTML(g.name)}</span>
+          <span class="count">${g.emails.length}</span>
+        </div>
+        <div class="g-checks">
+          ${["To","Cc","Bcc"].map(k=>`
+            <label class="checkbox" data-testid="grp-${k.toLowerCase()}-${escHTML(g.name)}">
+              <input type="checkbox" data-key="${escHTML(id)}" data-kind="${k}"
+                ${groupState[k].has(id) ? "checked":""}/>
+              ${k==="To"?"To":k==="Cc"?"DW":"UDW"}
+            </label>`).join("")}
+        </div>`;
+      block.appendChild(row);
+    });
+    host.appendChild(block);
+  });
+
+  if(!visible){
+    host.innerHTML = `<div class="empty" style="padding:14px;text-align:center;color:var(--text-mute);font-size:12.5px">Brak wyników dla „${escHTML(filter)}”.</div>`;
+  }
+
+  // przypisz handlery
+  $$("#groupsHost input[type=checkbox]").forEach(cb=>{
+    cb.addEventListener("change", onGroupToggle);
+  });
+}
+
+function findGroupById(id){
+  const [secName, grpName] = id.split("::");
+  const sec = emailData.sections.find(s=>s.name===secName);
+  return sec?.groups.find(g=>g.name===grpName);
+}
+
+function fieldFor(kind){
+  return $({To:"#fTo",Cc:"#fCc",Bcc:"#fBcc"}[kind]);
+}
+
+function onGroupToggle(e){
+  const cb = e.currentTarget;
+  const id = cb.dataset.key;
+  const kind = cb.dataset.kind;
+  const grp = findGroupById(id); if(!grp) return;
+  const inp = fieldFor(kind);
+  const current = parseEmails(inp.value);
+
+  if(cb.checked){
+    groupState[kind].add(id);
+    const merged = uniq([...current, ...grp.emails]);
+    inp.value = merged.join(", ");
+  } else {
+    groupState[kind].delete(id);
+    const remove = new Set(grp.emails);
+    inp.value = current.filter(x=>!remove.has(x)).join(", ");
+  }
+  inp.dispatchEvent(new Event("input"));
+  cb.closest(".checkbox").classList.toggle("on", cb.checked);
+}
+
+function parseEmails(str){
+  return str.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+}
+
+$("#grpSearch").addEventListener("input", e=> renderGroups(e.target.value));
+
+/* Add group modal */
+$("#addGroupBtn").addEventListener("click", ()=>{
+  $("#ngSection").value = "";
+  $("#ngGroup").value = "";
+  $("#ngEmails").value = "";
+  showModal("groupModal");
+});
+$("#ngGenerate").addEventListener("click", ()=>{
+  const sec = $("#ngSection").value.trim();
+  const grp = $("#ngGroup").value.trim();
+  const mails = uniq(parseEmails($("#ngEmails").value));
+  if(!sec || !grp || !mails.length){ toast("Uzupełnij sekcję, nazwę i adresy.","err"); return; }
+  const json = {
+    section: sec,
+    group: { name: grp, emails: mails }
+  };
+  const snippet =
+`// Wklej do emailData.sections — do istniejącej sekcji "${sec}" lub jako nowa sekcja.
+// Przykład wklejenia jako nowa grupa w istniejącej sekcji:
+// znajdź sekcję { name: "${sec}", groups: [...] } i dodaj na końcu groups:
+${JSON.stringify(json.section ? { name: grp, emails: mails } : {}, null, 2)}
+
+// Pełna sekcja, jeśli sekcja jeszcze nie istnieje:
+${JSON.stringify({ name: sec, groups: [{ name: grp, emails: mails }] }, null, 2)}`;
+  showCode("Nowa grupa — JSON do wklejenia", snippet);
+});
+
+/* =========================================================
+   TEMPLATES
+   ========================================================= */
+function sortedTemplates(){
+  return [...emailData.templates].sort((a,b)=>byAlpha(a.name,b.name));
+}
+function renderTemplateList(){
+  const dl = $("#tmplList");
+  dl.innerHTML = sortedTemplates().map(t=>`<option value="${escHTML(t.name)}"></option>`).join("");
+}
+function loadTemplateByName(name){
+  const t = emailData.templates.find(x=>x.name===name);
+  if(!t){ toast("Nie znaleziono szablonu.","err"); return false; }
+  $("#fTo").value = t.to || "";
+  $("#fCc").value = t.cc || "";
+  $("#fBcc").value = t.bcc || "";
+  $("#fSubj").value = t.subject || "";
+  $("#fBody").value = t.body || "";
+  $("#fSig").value = t.footer || "";
+  updateCharBadge();
+  toast("Wczytano szablon: "+name);
+  return true;
+}
+$("#loadTmplBtn").addEventListener("click", ()=>{
+  const v = $("#tmplSearch").value.trim();
+  if(!v) return toast("Wybierz szablon z listy.","err");
+  loadTemplateByName(v);
+});
+$("#genTmplBtn").addEventListener("click", ()=>{
+  const obj = {
+    name:    ($("#tmplSearch").value.trim() || $("#fSubj").value.trim() || "Nowy szablon"),
+    to:      $("#fTo").value.trim(),
+    cc:      $("#fCc").value.trim(),
+    bcc:     $("#fBcc").value.trim(),
+    subject: $("#fSubj").value.trim(),
+    body:    $("#fBody").value,
+    footer:  $("#fSig").value
+  };
+  const snippet =
+`// Wklej do tablicy emailData.templates:
+${JSON.stringify(obj, null, 2)}`;
+  showCode("Nowy szablon — JSON do wklejenia", snippet);
+});
+
+/* =========================================================
+   COMPOSER — clear, send, bulk, char badge
+   ========================================================= */
+$$("[data-clear]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const id = b.dataset.clear;
+    $("#"+id).value = "";
+    $("#"+id).dispatchEvent(new Event("input"));
+    $("#"+id).focus();
+  });
+});
+$("#clearBtn").addEventListener("click", ()=>{
+  ["fTo","fCc","fBcc","fSubj","fBody","fSig"].forEach(id=> $("#"+id).value="");
+  Object.keys(groupState).forEach(k=> groupState[k].clear());
+  renderGroups($("#grpSearch").value);
+  updateCharBadge();
+  toast("Wyczyszczono kompozytor.");
+});
+function buildBody(){
+  const body = $("#fBody").value;
+  const sig  = $("#fSig").value;
+  return sig ? (body.replace(/\s+$/,"") + "\n\n" + sig) : body;
+}
+function mailto(to){
+  const params = new URLSearchParams();
+  if($("#fCc").value)  params.set("cc",  $("#fCc").value);
+  if($("#fBcc").value) params.set("bcc", $("#fBcc").value);
+  if($("#fSubj").value)params.set("subject", $("#fSubj").value);
+  params.set("body", buildBody());
+  const qs = params.toString().replace(/\+/g,"%20");
+  return `mailto:${encodeURIComponent(to)}?${qs}`;
+}
+$("#sendBtn").addEventListener("click", ()=>{
+  const to = $("#fTo").value.trim();
+  if(!to) return toast("Pole „Do” jest puste.","err");
+  window.location.href = mailto(to);
+  toast("Otwieram klienta poczty…");
+});
+$("#bulkBtn").addEventListener("click", ()=>{
+  const recipients = parseEmails($("#fTo").value);
+  if(recipients.length<2) return toast("Wpisz co najmniej 2 adresy w polu „Do”.","err");
+  recipients.forEach((r,i)=> setTimeout(()=> window.open(mailto(r), "_blank"), i*250));
+  toast(`Otwieram ${recipients.length} osobnych wiadomości…`);
+});
+
+function updateCharBadge(){
+  $("#charBadge").textContent = "znaki: " + ($("#fBody").value.length);
+}
+$("#fBody").addEventListener("input", ()=>{
+  updateCharBadge();
+  detectSmartTemplate();
+});
+
+/* =========================================================
+   AUTO-SUGGEST e-mail (To/Cc/Bcc)
+   ========================================================= */
+function setupSuggest(inputId){
+  const input = $("#"+inputId);
+  const sugg  = $(`.sugg[data-suggest="${inputId}"]`);
+  let activeIx = -1;
+
+  function currentToken(){
+    const v = input.value;
+    const caret = input.selectionStart ?? v.length;
+    const left = v.slice(0,caret);
+    const m = left.match(/([^,;\s][^,;]*)$/);
+    return { token:(m?m[1]:"").trim(), start: m? left.length-m[0].length : caret };
+  }
+  function close(){ sugg.classList.remove("open"); activeIx=-1; }
+  function open(items){
+    if(!items.length) return close();
+    sugg.innerHTML = items.map((m,i)=>`<div class="item ${i===activeIx?"active":""}" data-v="${escHTML(m)}">
+      <span>${escHTML(m)}</span><span class="src">enter</span></div>`).join("");
+    sugg.classList.add("open");
+    $$(".item",sugg).forEach(it=> it.addEventListener("mousedown", e=>{
+      e.preventDefault();
+      pick(it.dataset.v);
+    }));
+  }
+  function pick(val){
+    const v = input.value;
+    const { start } = currentToken();
+    const before = v.slice(0,start);
+    const afterPart = v.slice(input.selectionStart ?? v.length);
+    const existing = parseEmails(before+afterPart);
+    if(existing.includes(val)){ close(); return; }
+    const head = before.replace(/[,\s]+$/,"");
+    input.value = (head ? head+", " : "") + val + (afterPart? (afterPart.startsWith(",")? afterPart : ", "+afterPart.trimStart()) : ", ");
+    close(); input.focus();
+  }
+
+  input.addEventListener("input", ()=>{
+    const { token } = currentToken();
+    if(token.length<2){ close(); return; }
+    const all = getAllKnownMails();
+    const used = new Set(parseEmails(input.value));
+    const items = all.filter(m=> m.toLowerCase().includes(token.toLowerCase()) && !used.has(m)).slice(0,8);
+    activeIx = items.length?0:-1;
+    open(items);
+  });
+  input.addEventListener("keydown", e=>{
+    if(!sugg.classList.contains("open")) return;
+    const items = $$(".item",sugg);
+    if(e.key==="ArrowDown"){ e.preventDefault(); activeIx=(activeIx+1)%items.length; items.forEach((it,i)=>it.classList.toggle("active",i===activeIx)); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); activeIx=(activeIx-1+items.length)%items.length; items.forEach((it,i)=>it.classList.toggle("active",i===activeIx)); }
+    else if(e.key==="Enter" && activeIx>=0){ e.preventDefault(); pick(items[activeIx].dataset.v); }
+    else if(e.key==="Escape"){ close(); }
+  });
+  input.addEventListener("blur", ()=> setTimeout(close, 120));
+}
+["fTo","fCc","fBcc"].forEach(setupSuggest);
+
+/* =========================================================
+   SMART TEMPLATE TRIGGER w treści
+   ========================================================= */
+let lastSmartName = null;
+function detectSmartTemplate(){
+  const body = $("#fBody").value.toLowerCase();
+  if(body.length<3){ hideSmart(); return; }
+  const hit = sortedTemplates().find(t=> t.name && body.includes(t.name.toLowerCase()));
+  if(!hit){ hideSmart(); return; }
+  if(lastSmartName === hit.name && $("#smartBar").classList.contains("show")) return;
+  lastSmartName = hit.name;
+  $("#smartText").textContent = `Wczytać szablon „${hit.name}”?`;
+  $("#smartBar").classList.add("show");
+  $("#smartLoad").onclick = ()=>{
+    if(loadTemplateByName(hit.name)) hideSmart();
+  };
+  $("#smartDismiss").onclick = hideSmart;
+}
+function hideSmart(){ $("#smartBar").classList.remove("show"); lastSmartName=null; }
+
+/* =========================================================
+   TODO – localStorage
+   ========================================================= */
+const TODO_KEY = "wd.todos.v1";
+function loadTodos(){ try{ return JSON.parse(localStorage.getItem(TODO_KEY)||"[]"); }catch{return []} }
+function saveTodos(t){ localStorage.setItem(TODO_KEY, JSON.stringify(t)); }
+let todos = loadTodos();
+
+function renderTodos(){
+  const host = $("#todoList"); host.innerHTML = "";
+  if(!todos.length){ host.innerHTML = `<div class="todo-empty">Brak zadań — dodaj pierwsze powyżej ✓</div>`; }
+  todos.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "todo-item"+(t.done?" done":"");
+    el.innerHTML = `
+      <input type="checkbox" ${t.done?"checked":""} aria-label="Oznacz wykonane"/>
+      <div>
+        <div class="text" contenteditable="false">${escHTML(t.text)}</div>
+        <div class="meta">${new Date(t.createdAt).toLocaleString("pl-PL")}</div>
+      </div>
+      <div class="acts">
+        <button class="icon-btn" data-act="edit" aria-label="Edytuj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 4 5 5-11 11H4v-5z"/></svg></button>
+        <button class="icon-btn" data-act="del"  aria-label="Usuń"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      </div>`;
+    el.querySelector("input[type=checkbox]").addEventListener("change", e=>{
+      t.done = e.target.checked; saveTodos(todos); renderTodos();
+    });
+    el.querySelector('[data-act="del"]').addEventListener("click", ()=>{
+      todos = todos.filter(x=>x.id!==t.id); saveTodos(todos); renderTodos();
+    });
+    el.querySelector('[data-act="edit"]').addEventListener("click", ()=>{
+      const txt = el.querySelector(".text");
+      txt.contentEditable = "true"; txt.focus();
+      const r = document.createRange(); r.selectNodeContents(txt); r.collapse(false);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      const finish = ()=>{
+        txt.contentEditable = "false";
+        t.text = txt.textContent.trim() || t.text;
+        saveTodos(todos); renderTodos();
+      };
+      txt.addEventListener("blur", finish, {once:true});
+      txt.addEventListener("keydown", ev=>{
+        if(ev.key==="Enter"){ ev.preventDefault(); txt.blur(); }
+      });
+    });
+    host.appendChild(el);
+  });
+  $("#todoCount").textContent = todos.filter(t=>!t.done).length;
+}
+$("#todoAddBtn").addEventListener("click", addTodo);
+$("#todoInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
+function addTodo(){
+  const v = $("#todoInput").value.trim(); if(!v) return;
+  todos.unshift({ id: Date.now()+"_"+Math.random().toString(36).slice(2,7), text:v, done:false, createdAt:Date.now() });
+  saveTodos(todos); $("#todoInput").value=""; renderTodos();
+}
+
+/* Sticky note */
+const NOTE_KEY = "wd.note.v1";
+$("#stickyNote").value = localStorage.getItem(NOTE_KEY) || "";
+$("#stickyNote").addEventListener("input", e=> localStorage.setItem(NOTE_KEY, e.target.value));
+
+/* Tools */
+function setOut(s){ $("#toolsOut").textContent = s; }
+$("#toolClean").addEventListener("click", ()=>{
+  const t = $("#fBody"); const before = t.value.length;
+  t.value = t.value
+    .replace(/[ \t]+\n/g,"\n")
+    .replace(/\n{3,}/g,"\n\n")
+    .replace(/[ \t]{2,}/g," ")
+    .replace(/^\s+|\s+$/g,"");
+  updateCharBadge();
+  setOut(`Wyczyszczono treść (− ${before - t.value.length} znaków).`);
+  toast("Tekst uporządkowany.");
+});
+$("#toolCount").addEventListener("click", ()=>{
+  const t = $("#fBody").value;
+  const words = (t.match(/\S+/g)||[]).length;
+  setOut(`Znaki: ${t.length} · słowa: ${words} · linie: ${t.split("\n").length}`);
+});
+$("#toolDatePL").addEventListener("click", async ()=>{
+  const d = new Date();
+  const v = pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear();
+  if(await copyToClipboard(v)){ setOut("Skopiowano: "+v); toast("Skopiowano "+v); }
+});
+$("#toolDateISO").addEventListener("click", async ()=>{
+  const d = new Date();
+  const v = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  if(await copyToClipboard(v)){ setOut("Skopiowano: "+v); toast("Skopiowano "+v); }
+});
+$("#toolUpper").addEventListener("click", ()=>{
+  const t = $("#fBody");
+  const s = t.selectionStart, e = t.selectionEnd;
+  if(s===e){ setOut("Zaznacz fragment w treści, aby zmienić wielkość liter."); return; }
+  const part = t.value.slice(s,e);
+  const allUpper = part===part.toUpperCase();
+  const replaced = allUpper ? part.toLowerCase() : part.toUpperCase();
+  t.value = t.value.slice(0,s) + replaced + t.value.slice(e);
+  t.focus(); t.setSelectionRange(s, s+replaced.length);
+  updateCharBadge();
+  setOut(allUpper ? "Zamieniono na małe litery." : "Zamieniono na WIELKIE litery.");
+});
+
+/* Frequent links */
+function renderFlinks(){
+  const host = $("#flinksHost");
+  host.innerHTML = emailData.frequentLinks.map(l=>`
+    <a class="flink" href="${escHTML(l.url)}" target="_blank" rel="noopener">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7"/><path d="M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+      <span>${escHTML(l.title)}</span>
+      <span class="desc">${escHTML(l.note||"")}</span>
+    </a>`).join("");
+}
+
+/* =========================================================
+   PANEL TOGGLE (sidebar)
+   ========================================================= */
+$$('[data-toggle]').forEach(h=>{
+  h.addEventListener("click", ()=>{
+    h.parentElement.classList.toggle("open");
+  });
+});
+
+/* =========================================================
+   TILES
+   ========================================================= */
+function ieUrl(url){
+  // Wzorzec dla trybu IE w Edge: microsoft-edge:<url>
+  // Niektóre środowiska używają również: read:<url>?redirect=true
+  return "microsoft-edge:" + url;
+}
+function renderTiles(){
+  const host = $("#tilesHost");
+  host.innerHTML = "";
+  emailData.tiles.forEach(t=>{
+    const el = document.createElement(t.type==="copy" ? "div" : "a");
+    el.className = "tile" + (t.type==="copy" ? " copy-tile" : "");
+    if(t.type!=="copy"){
+      el.href = t.ie ? ieUrl(t.url) : t.url;
+      el.target = "_blank"; el.rel = "noopener";
+    }
+    el.setAttribute("data-testid", "tile-"+(t.title.toLowerCase().replace(/[^a-z0-9]+/g,"-")));
+    const tags = [];
+    if(t.ie) tags.push('<span class="tag ie">IE MODE</span>');
+    if(t.type==="copy") tags.push('<span class="tag copy">KOPIUJ</span>');
+    el.innerHTML = `
+      <div class="t-head">
+        <div class="t-icon">${getIcon(t.icon)}</div>
+        <div class="t-title">${escHTML(t.title)}</div>
+      </div>
+      <div class="t-desc">${escHTML(t.desc||"")}</div>
+      ${t.type==="copy" ? `<div class="t-value">${escHTML(t.value)}</div>` : ""}
+      <div class="t-tags">${tags.join("")}</div>
+    `;
+    if(t.type==="copy"){
+      el.addEventListener("click", async ()=>{
+        const ok = await copyToClipboard(t.value);
+        if(ok){
+          el.style.outline = "2px solid var(--ok)";
+          setTimeout(()=> el.style.outline="", 600);
+          toast(`Skopiowano: ${t.title}`);
+        } else {
+          toast("Nie udało się skopiować.","err");
+        }
+      });
+    }
+    host.appendChild(el);
+  });
+}
+
+/* =========================================================
+   CODE MODAL (uniwersalny)
+   ========================================================= */
+function showCode(title, code){
+  $("#codeTitle").textContent = title;
+  $("#codeBlock").textContent = code;
+  showModal("codeModal");
+}
+$("#copyCodeBtn").addEventListener("click", async ()=>{
+  const ok = await copyToClipboard($("#codeBlock").textContent);
+  toast(ok?"Skopiowano kod do schowka.":"Nie udało się skopiować.", ok?"ok":"err");
+});
+
+/* =========================================================
+   INIT — pierwsze renderowanie + ustawienie domyślnej stopki
+   ========================================================= */
+function setDefaultSignature(){
+  if(!$("#fSig").value){
+    $("#fSig").value =
+`—
+Imię Nazwisko
+Dział / Stanowisko
+Firma Sp. z o.o.
+ul. Przykładowa 1, 00-000 Warszawa
+tel. +48 000 000 000 · www.firma.pl
+
+Niniejsza wiadomość może zawierać informacje poufne.
+Jeśli otrzymali ją Państwo omyłkowo, proszę o jej skasowanie.`;
+  }
+}
+
+renderGroups();
+renderTemplateList();
+renderFlinks();
+renderTiles();
+renderTodos();
+setDefaultSignature();
+updateCharBadge();
+</script>
+</body>
+</html>
