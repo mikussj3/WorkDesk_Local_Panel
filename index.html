@@ -475,6 +475,34 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   .email-panel{grid-template-columns:1fr}
   .email-side{border-right:0;border-bottom:1px solid var(--line);max-height:none}
 }
+
+/* =========================================================
+   DRAG & DROP OVERLAY (import danych)
+   ========================================================= */
+.drop-overlay{
+  position:fixed;inset:0;z-index:90;
+  background:rgba(8,10,14,.78);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+  animation:fadeIn .12s ease;
+  pointer-events:none; /* przepuszczaj zdarzenia drag — dragleave musi działać */
+}
+.drop-overlay.show{display:flex}
+.drop-card{
+  border:2px dashed var(--accent-2);
+  background:var(--bg-2);
+  border-radius:var(--r-xl);
+  padding:42px 56px;text-align:center;color:var(--text);
+  box-shadow:var(--shadow-lg);
+  max-width:480px;
+}
+.drop-card .drop-ic{width:48px;height:48px;color:var(--accent-2);margin-bottom:10px}
+.drop-card .drop-title{font-size:18px;font-weight:600;margin-bottom:6px}
+.drop-card .drop-sub{color:var(--text-mute);font-size:12.5px;line-height:1.5}
+.drop-card code{background:var(--bg-3);padding:1px 6px;border-radius:6px;font-size:11.5px}
+
+/* badge "edytowane" w panelu Dane */
+#dataState.dirty{background:#2a2010;border-color:#5a4520;color:#ffd28a}
 </style>
 </head>
 <body>
@@ -704,6 +732,28 @@ input,textarea,select{font-family:inherit;color:var(--text)}
       </div>
       <div class="panel-b" id="flinksHost"></div>
     </div>
+
+    <!-- Dane: export / import / reset -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent-2)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+        <span class="t">Dane (JSON)</span>
+        <span class="count" id="dataState">domyślne</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="tools">
+          <button class="btn sm" id="dataExport" data-testid="data-export" title="Pobierz aktualne dane jako plik JSON">Eksportuj</button>
+          <button class="btn sm" id="dataImport" data-testid="data-import" title="Wczytaj plik JSON z dysku">Importuj…</button>
+          <button class="btn sm full" id="dataReset" data-testid="data-reset" title="Wróć do danych wbudowanych w plik">Przywróć domyślne</button>
+        </div>
+        <div class="tools-out" style="margin-top:8px;line-height:1.45">
+          Możesz też <b>przeciągnąć</b> plik <code>.json</code> w dowolne miejsce okna.
+        </div>
+        <!-- hidden input używany przez "Importuj…" -->
+        <input id="dataFile" type="file" accept="application/json,.json" style="display:none"/>
+      </div>
+    </div>
   </aside>
 
   <!-- ============= MAIN ============= -->
@@ -785,8 +835,39 @@ input,textarea,select{font-family:inherit;color:var(--text)}
 
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 
+<!-- ============= DRAG & DROP OVERLAY (import danych JSON) ============= -->
+<div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+  <div class="drop-card">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="drop-ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+    <div class="drop-title">Upuść plik JSON, aby zaimportować dane</div>
+    <div class="drop-sub">Oczekiwana struktura: <code>{ sections, templates, tiles, frequentLinks, knownMails }</code></div>
+  </div>
+</div>
+
 <!-- ============= SCRIPT ============= -->
 <script>
+/**
+ * @file WorkDesk — lokalny panel produktywny.
+ * Pojedynczy plik HTML/CSS/JS bez zewnętrznych zależności.
+ * Edytuj sekcję {@link emailData} u góry skryptu, aby dostosować dane.
+ *
+ * Sekcje skryptu:
+ *  1) DANE             — emailData (grupy, szablony, kafelki, częste linki, znane adresy)
+ *  2) UTIL             — selektory, escape, toast, schowek
+ *  3) IKONY            — inline SVG (ICONS)
+ *  4) NAVBAR           — zegar, timer godzinny, popup przerwy, tryb skupienia
+ *  5) EMAIL BAR        — zwijany pasek e-mail
+ *  6) MODALE           — showModal / closeModal / Escape / klik poza modalem
+ *  7) GRUPY            — render z filtrem, To/CC/BCC, generator JSON nowej grupy
+ *  8) SZABLONY         — render, wczytywanie, generator JSON szablonu
+ *  9) KOMPOZYTOR       — wyślij / wyczyść / bulk / budowa treści z stopką
+ * 10) AUTO-SUGGEST     — podpowiedzi adresów z klawiaturą
+ * 11) SMART TEMPLATE   — wykrywanie nazwy szablonu w treści
+ * 12) TODO             — localStorage, edycja inline, oznaczanie wykonanych
+ * 13) NARZĘDZIA        — clean text, zliczanie, data PL/ISO, zmiana wielkości
+ * 14) KAFELKI          — link / IE MODE (microsoft-edge:) / copy
+ * 15) INIT             — pierwsze renderowanie + domyślna stopka
+ */
 /* =========================================================
    DANE — łatwe do edycji ręcznej.
    Uwaga: po zmianach wystarczy odświeżyć stronę w Edge.
@@ -897,13 +978,23 @@ const emailData = {
 /* =========================================================
    POMOCNICZE / UTIL
    ========================================================= */
+/** Shorthand for `el.querySelector`. @param {string} s @param {ParentNode} [el=document] @returns {Element|null} */
 const $  = (s,el=document) => el.querySelector(s);
+/** Shorthand for `el.querySelectorAll` returning an Array. @param {string} s @param {ParentNode} [el=document] @returns {Element[]} */
 const $$ = (s,el=document) => Array.from(el.querySelectorAll(s));
+/** Locale-aware Polish alphabetical comparator (case-insensitive). @param {string} a @param {string} b @returns {number} */
 const byAlpha = (a,b) => a.localeCompare(b,"pl",{sensitivity:"base"});
+/** Return a new array with duplicates removed (insertion order preserved). @template T @param {T[]} arr @returns {T[]} */
 const uniq = arr => Array.from(new Set(arr));
+/** Escape a value for safe interpolation into HTML. @param {*} s @returns {string} */
 const escHTML = s => String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
 
-// Toast
+/**
+ * Show a transient toast notification in the bottom-right corner.
+ * @param {string} msg Message text.
+ * @param {"ok"|"err"} [kind="ok"] Visual variant.
+ * @returns {void}
+ */
 function toast(msg, kind="ok"){
   const wrap = $("#toasts");
   const el = document.createElement("div");
@@ -918,7 +1009,12 @@ function toast(msg, kind="ok"){
   setTimeout(()=> el.remove(), 2700);
 }
 
-// Clipboard helper
+/**
+ * Copy text to the clipboard using the modern API with a textarea fallback.
+ * Works on file:// origins where navigator.clipboard may be unavailable.
+ * @param {string} text
+ * @returns {Promise<boolean>} true if the copy succeeded.
+ */
 async function copyToClipboard(text){
   try{
     await navigator.clipboard.writeText(text);
@@ -947,12 +1043,28 @@ const ICONS = {
   map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2z"/><path d="M9 3v16M15 5v16"/></svg>',
   hash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>'
 };
+/**
+ * Lookup an inline SVG icon markup by key, with a globe fallback.
+ * @param {string} k Icon key, see {@link ICONS}.
+ * @returns {string} SVG markup string.
+ */
 function getIcon(k){ return ICONS[k] || ICONS.globe; }
 
 /* =========================================================
    NAVBAR — zegar, timer, focus mode
    ========================================================= */
+/**
+ * Zero-pad a number to two digits.
+ * @param {number} n
+ * @returns {string}
+ */
 function pad(n){return String(n).padStart(2,"0")}
+
+/**
+ * Update the navbar clock and the "today" label below the page title.
+ * Called every second by an interval.
+ * @returns {void}
+ */
 function tickClock(){
   const d = new Date();
   $("#clock").textContent = d.toLocaleDateString("pl-PL",{weekday:"short",day:"2-digit",month:"short"})+
@@ -962,6 +1074,12 @@ function tickClock(){
 setInterval(tickClock,1000); tickClock();
 
 let breakOpenForHour = -1; // żeby pokazać tylko raz na godzinę
+
+/**
+ * Update the hourly countdown pill and trigger the break modal at XX:55.
+ * Auto-resets at the top of the hour. Called every second by an interval.
+ * @returns {void}
+ */
 function tickTimer(){
   const d = new Date();
   const next = new Date(d); next.setHours(d.getHours()+1,0,0,0);
@@ -1001,6 +1119,10 @@ $("#emailBar").addEventListener("click", toggleEmail);
 $("#emailBar").addEventListener("keydown", e=>{
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleEmail(); }
 });
+/**
+ * Toggle the expanded state of the email workspace and update aria-expanded.
+ * @returns {void}
+ */
 function toggleEmail(){
   const open = emailEl.classList.toggle("expanded");
   $("#emailBar").setAttribute("aria-expanded", open?"true":"false");
@@ -1010,12 +1132,19 @@ function toggleEmail(){
    MODALS
    ========================================================= */
 const overlay = $("#overlay");
+/**
+ * Show a modal by id; hides all other modals inside #overlay first.
+ * @param {string} id DOM id of the .modal element.
+ * @returns {void}
+ */
 function showModal(id){
   $$("#overlay > .modal").forEach(m=>m.style.display="none");
   $("#"+id).style.display = "flex";
   overlay.classList.add("show");
   overlay.setAttribute("aria-hidden","false");
 }
+
+/** Hide the modal overlay (closes whichever modal is currently shown). */
 function closeModal(){ overlay.classList.remove("show"); overlay.setAttribute("aria-hidden","true"); }
 $$("[data-close]").forEach(b=> b.addEventListener("click", closeModal));
 overlay.addEventListener("click", e=>{ if(e.target===overlay) closeModal(); });
@@ -1029,77 +1158,143 @@ const groupState = { To:new Set(), Cc:new Set(), Bcc:new Set() };
 // Mapowanie pola na klucz stanu
 const FIELDS = { fTo:"To", fCc:"Cc", fBcc:"Bcc" };
 
+/**
+ * Build a deduplicated, alphabetically sorted pool of every known email address.
+ * Sources: section groups, template To/Cc/Bcc fields and the {@link emailData.knownMails} list.
+ * @returns {string[]}
+ */
 function getAllKnownMails(){
   const fromGroups = emailData.sections.flatMap(s=> s.groups.flatMap(g=>g.emails));
   const fromTpls   = emailData.templates.flatMap(t=> [t.to,t.cc,t.bcc].join(",").split(/[,;]/).map(x=>x.trim()).filter(Boolean));
   return uniq([...fromGroups, ...fromTpls, ...emailData.knownMails]).sort(byAlpha);
 }
 
+/**
+ * Render all email groups in the left email panel, optionally filtered.
+ * Sections keep source order; groups inside each section are sorted alphabetically.
+ * @param {string} [filter=""] Case-insensitive substring matched against group/section name.
+ * @returns {void}
+ */
 function renderGroups(filter=""){
   const host = $("#groupsHost");
   host.innerHTML = "";
-  const f = filter.trim().toLowerCase();
-
-  // sekcje wg kolejności w danych, grupy posortowane alfabetycznie
-  const sections = emailData.sections.map(s=>({
-    name:s.name,
-    groups:[...s.groups].sort((a,b)=>byAlpha(a.name,b.name))
-  }));
+  const f = (filter || "").trim().toLowerCase();
 
   let visible = 0;
-  sections.forEach(sec=>{
-    const filtered = sec.groups.filter(g =>
-      !f || g.name.toLowerCase().includes(f) || sec.name.toLowerCase().includes(f)
-    );
-    if(!filtered.length) return;
-
-    const block = document.createElement("div");
-    block.className = "section-block";
-    block.innerHTML = `<div class="section-title"><span>${escHTML(sec.name)}</span><span class="line"></span><span>${filtered.length}</span></div>`;
-
-    filtered.forEach(g=>{
-      visible++;
-      const id = (sec.name+"::"+g.name);
-      const row = document.createElement("div");
-      row.className = "group";
-      row.innerHTML = `
-        <div class="g-name">
-          <span>${escHTML(g.name)}</span>
-          <span class="count">${g.emails.length}</span>
-        </div>
-        <div class="g-checks">
-          ${["To","Cc","Bcc"].map(k=>`
-            <label class="checkbox" data-testid="grp-${k.toLowerCase()}-${escHTML(g.name)}">
-              <input type="checkbox" data-key="${escHTML(id)}" data-kind="${k}"
-                ${groupState[k].has(id) ? "checked":""}/>
-              ${k==="To"?"To":k==="Cc"?"DW":"UDW"}
-            </label>`).join("")}
-        </div>`;
-      block.appendChild(row);
-    });
-    host.appendChild(block);
+  sortedSectionsForRender().forEach(sec=>{
+    const groups = sec.groups.filter(g => matchesGroupFilter(g, sec, f));
+    if(!groups.length) return;
+    visible += groups.length;
+    host.appendChild(buildSectionBlock(sec, groups));
   });
 
-  if(!visible){
-    host.innerHTML = `<div class="empty" style="padding:14px;text-align:center;color:var(--text-mute);font-size:12.5px">Brak wyników dla „${escHTML(filter)}”.</div>`;
-  }
-
-  // przypisz handlery
-  $$("#groupsHost input[type=checkbox]").forEach(cb=>{
-    cb.addEventListener("change", onGroupToggle);
-  });
+  if(!visible) host.innerHTML = emptyGroupsHTML(filter);
+  bindGroupCheckboxes();
 }
 
+/**
+ * Returns sections in source order, with each section's groups sorted alphabetically.
+ * @returns {{name:string,groups:{name:string,emails:string[]}[]}[]}
+ */
+function sortedSectionsForRender(){
+  return emailData.sections.map(s => ({
+    name: s.name,
+    groups: [...s.groups].sort((a,b) => byAlpha(a.name, b.name))
+  }));
+}
+
+/**
+ * Whether a group matches the (already lowercased) filter,
+ * either by its own name or by the parent section name.
+ * @param {{name:string}} group
+ * @param {{name:string}} section
+ * @param {string} f Already lowercased filter (empty string = match all).
+ * @returns {boolean}
+ */
+function matchesGroupFilter(group, section, f){
+  if(!f) return true;
+  return group.name.toLowerCase().includes(f) || section.name.toLowerCase().includes(f);
+}
+
+/**
+ * Build a DOM block for a single section with its visible groups.
+ * @param {{name:string}} sec
+ * @param {{name:string,emails:string[]}[]} groups
+ * @returns {HTMLDivElement}
+ */
+function buildSectionBlock(sec, groups){
+  const block = document.createElement("div");
+  block.className = "section-block";
+  block.innerHTML = `<div class="section-title"><span>${escHTML(sec.name)}</span><span class="line"></span><span>${groups.length}</span></div>`;
+  groups.forEach(g => block.appendChild(buildGroupRow(sec.name, g)));
+  return block;
+}
+
+/**
+ * Build one group row with name, email count and To/CC/BCC checkboxes.
+ * @param {string} sectionName Used to compose a stable group id ("section::group").
+ * @param {{name:string,emails:string[]}} g
+ * @returns {HTMLDivElement}
+ */
+function buildGroupRow(sectionName, g){
+  const id = sectionName + "::" + g.name;
+  const row = document.createElement("div");
+  row.className = "group";
+  row.innerHTML = `
+    <div class="g-name">
+      <span>${escHTML(g.name)}</span>
+      <span class="count">${g.emails.length}</span>
+    </div>
+    <div class="g-checks">
+      ${["To","Cc","Bcc"].map(k=>`
+        <label class="checkbox" data-testid="grp-${k.toLowerCase()}-${escHTML(g.name)}">
+          <input type="checkbox" data-key="${escHTML(id)}" data-kind="${k}"
+            ${groupState[k].has(id) ? "checked":""}/>
+          ${k==="To"?"To":k==="Cc"?"DW":"UDW"}
+        </label>`).join("")}
+    </div>`;
+  return row;
+}
+
+/**
+ * HTML for the "no results" empty state in the groups panel.
+ * @param {string} filter Original (non-lowercased) filter shown to the user.
+ * @returns {string}
+ */
+function emptyGroupsHTML(filter){
+  return `<div class="empty" style="padding:14px;text-align:center;color:var(--text-mute);font-size:12.5px">Brak wyników dla „${escHTML(filter)}".</div>`;
+}
+
+/** Wire change handlers on all currently rendered group checkboxes. */
+function bindGroupCheckboxes(){
+  $$("#groupsHost input[type=checkbox]").forEach(cb => cb.addEventListener("change", onGroupToggle));
+}
+
+/**
+ * Find a group by its composite "section::group" id.
+ * @param {string} id
+ * @returns {{name:string,emails:string[]}|undefined}
+ */
 function findGroupById(id){
   const [secName, grpName] = id.split("::");
   const sec = emailData.sections.find(s=>s.name===secName);
   return sec?.groups.find(g=>g.name===grpName);
 }
 
+/**
+ * Get the composer input element corresponding to a recipient kind.
+ * @param {"To"|"Cc"|"Bcc"} kind
+ * @returns {HTMLInputElement}
+ */
 function fieldFor(kind){
   return $({To:"#fTo",Cc:"#fCc",Bcc:"#fBcc"}[kind]);
 }
 
+/**
+ * Change handler for group To/CC/BCC checkboxes — appends or removes
+ * the group's emails from the corresponding composer field (no duplicates).
+ * @param {Event} e
+ */
 function onGroupToggle(e){
   const cb = e.currentTarget;
   const id = cb.dataset.key;
@@ -1121,6 +1316,11 @@ function onGroupToggle(e){
   cb.closest(".checkbox").classList.toggle("on", cb.checked);
 }
 
+/**
+ * Split a comma/semicolon/newline-separated string into a trimmed, non-empty email list.
+ * @param {string} str
+ * @returns {string[]}
+ */
 function parseEmails(str){
   return str.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
 }
@@ -1157,13 +1357,25 @@ ${JSON.stringify({ name: sec, groups: [{ name: grp, emails: mails }] }, null, 2)
 /* =========================================================
    TEMPLATES
    ========================================================= */
+/**
+ * Return all templates sorted alphabetically by name (does not mutate source).
+ * @returns {Array}
+ */
 function sortedTemplates(){
   return [...emailData.templates].sort((a,b)=>byAlpha(a.name,b.name));
 }
+
+/** Populate the template <datalist> with alphabetically sorted template names. */
 function renderTemplateList(){
   const dl = $("#tmplList");
   dl.innerHTML = sortedTemplates().map(t=>`<option value="${escHTML(t.name)}"></option>`).join("");
 }
+
+/**
+ * Load a template into the composer fields by name.
+ * @param {string} name
+ * @returns {boolean} true on success, false if not found.
+ */
 function loadTemplateByName(name){
   const t = emailData.templates.find(x=>x.name===name);
   if(!t){ toast("Nie znaleziono szablonu.","err"); return false; }
@@ -1216,11 +1428,22 @@ $("#clearBtn").addEventListener("click", ()=>{
   updateCharBadge();
   toast("Wyczyszczono kompozytor.");
 });
+/**
+ * Compose the final outgoing email body = body + blank line + signature/footer.
+ * @returns {string}
+ */
 function buildBody(){
   const body = $("#fBody").value;
   const sig  = $("#fSig").value;
   return sig ? (body.replace(/\s+$/,"") + "\n\n" + sig) : body;
 }
+
+/**
+ * Build a mailto: URL for a single recipient using current composer values
+ * (CC/BCC/subject are taken from inputs; body uses {@link buildBody}).
+ * @param {string} to
+ * @returns {string}
+ */
 function mailto(to){
   const params = new URLSearchParams();
   if($("#fCc").value)  params.set("cc",  $("#fCc").value);
@@ -1243,6 +1466,7 @@ $("#bulkBtn").addEventListener("click", ()=>{
   toast(`Otwieram ${recipients.length} osobnych wiadomości…`);
 });
 
+/** Refresh the "znaki: N" badge based on the current body length. */
 function updateCharBadge(){
   $("#charBadge").textContent = "znaki: " + ($("#fBody").value.length);
 }
@@ -1254,59 +1478,105 @@ $("#fBody").addEventListener("input", ()=>{
 /* =========================================================
    AUTO-SUGGEST e-mail (To/Cc/Bcc)
    ========================================================= */
+/**
+ * Attach Gmail-like email auto-suggestions to a comma-separated email input.
+ * Builds the suggestion pool from groups, templates and knownMails.
+ * Keyboard: ArrowUp/Down to navigate, Enter to pick, Escape to close.
+ * @param {"fTo"|"fCc"|"fBcc"|string} inputId DOM id of the input field (without #).
+ * @returns {void}
+ */
 function setupSuggest(inputId){
   const input = $("#"+inputId);
   const sugg  = $(`.sugg[data-suggest="${inputId}"]`);
-  let activeIx = -1;
+  const ctx = { input, sugg, activeIx: -1 };
 
-  function currentToken(){
-    const v = input.value;
-    const caret = input.selectionStart ?? v.length;
-    const left = v.slice(0,caret);
-    const m = left.match(/([^,;\s][^,;]*)$/);
-    return { token:(m?m[1]:"").trim(), start: m? left.length-m[0].length : caret };
-  }
-  function close(){ sugg.classList.remove("open"); activeIx=-1; }
-  function open(items){
-    if(!items.length) return close();
-    sugg.innerHTML = items.map((m,i)=>`<div class="item ${i===activeIx?"active":""}" data-v="${escHTML(m)}">
+  input.addEventListener("input",   () => onSuggInput(ctx));
+  input.addEventListener("keydown", e  => onSuggKey(ctx, e));
+  input.addEventListener("blur",    () => setTimeout(() => closeSugg(ctx), 120));
+}
+
+/**
+ * Get the email token currently being typed (delimited by comma/semicolon/newline).
+ * @param {HTMLInputElement} input
+ * @returns {{token:string,start:number}}
+ */
+function getCurrentToken(input){
+  const v = input.value;
+  const caret = input.selectionStart ?? v.length;
+  const left = v.slice(0, caret);
+  const m = left.match(/([^,;\s][^,;]*)$/);
+  return { token: (m ? m[1] : "").trim(), start: m ? left.length - m[0].length : caret };
+}
+
+/**
+ * Hide the suggestion popup and reset the active index.
+ * @param {{sugg:HTMLElement, activeIx:number}} ctx
+ */
+function closeSugg(ctx){ ctx.sugg.classList.remove("open"); ctx.activeIx = -1; }
+
+/**
+ * Render and show suggestion items in the popup.
+ * @param {{sugg:HTMLElement, activeIx:number}} ctx
+ * @param {string[]} items
+ */
+function openSugg(ctx, items){
+  if(!items.length) return closeSugg(ctx);
+  ctx.sugg.innerHTML = items.map((m,i)=>`<div class="item ${i===ctx.activeIx?"active":""}" data-v="${escHTML(m)}">
       <span>${escHTML(m)}</span><span class="src">enter</span></div>`).join("");
-    sugg.classList.add("open");
-    $$(".item",sugg).forEach(it=> it.addEventListener("mousedown", e=>{
-      e.preventDefault();
-      pick(it.dataset.v);
-    }));
-  }
-  function pick(val){
-    const v = input.value;
-    const { start } = currentToken();
-    const before = v.slice(0,start);
-    const afterPart = v.slice(input.selectionStart ?? v.length);
-    const existing = parseEmails(before+afterPart);
-    if(existing.includes(val)){ close(); return; }
-    const head = before.replace(/[,\s]+$/,"");
-    input.value = (head ? head+", " : "") + val + (afterPart? (afterPart.startsWith(",")? afterPart : ", "+afterPart.trimStart()) : ", ");
-    close(); input.focus();
-  }
+  ctx.sugg.classList.add("open");
+  $$(".item", ctx.sugg).forEach(it => it.addEventListener("mousedown", e => {
+    e.preventDefault();
+    pickSugg(ctx, it.dataset.v);
+  }));
+}
 
-  input.addEventListener("input", ()=>{
-    const { token } = currentToken();
-    if(token.length<2){ close(); return; }
-    const all = getAllKnownMails();
-    const used = new Set(parseEmails(input.value));
-    const items = all.filter(m=> m.toLowerCase().includes(token.toLowerCase()) && !used.has(m)).slice(0,8);
-    activeIx = items.length?0:-1;
-    open(items);
-  });
-  input.addEventListener("keydown", e=>{
-    if(!sugg.classList.contains("open")) return;
-    const items = $$(".item",sugg);
-    if(e.key==="ArrowDown"){ e.preventDefault(); activeIx=(activeIx+1)%items.length; items.forEach((it,i)=>it.classList.toggle("active",i===activeIx)); }
-    else if(e.key==="ArrowUp"){ e.preventDefault(); activeIx=(activeIx-1+items.length)%items.length; items.forEach((it,i)=>it.classList.toggle("active",i===activeIx)); }
-    else if(e.key==="Enter" && activeIx>=0){ e.preventDefault(); pick(items[activeIx].dataset.v); }
-    else if(e.key==="Escape"){ close(); }
-  });
-  input.addEventListener("blur", ()=> setTimeout(close, 120));
+/**
+ * Insert a suggested email at the current caret position with deduplication.
+ * @param {{input:HTMLInputElement, sugg:HTMLElement, activeIx:number}} ctx
+ * @param {string} val
+ */
+function pickSugg(ctx, val){
+  const { input } = ctx;
+  const v = input.value;
+  const { start } = getCurrentToken(input);
+  const before    = v.slice(0, start);
+  const afterPart = v.slice(input.selectionStart ?? v.length);
+  if(parseEmails(before + afterPart).includes(val)){ closeSugg(ctx); return; }
+  const head = before.replace(/[,\s]+$/, "");
+  const tail = afterPart ? (afterPart.startsWith(",") ? afterPart : ", " + afterPart.trimStart()) : ", ";
+  input.value = (head ? head + ", " : "") + val + tail;
+  closeSugg(ctx);
+  input.focus();
+}
+
+/**
+ * Recompute and show suggestions after the user types (>=2 chars in current token).
+ * @param {object} ctx
+ */
+function onSuggInput(ctx){
+  const { token } = getCurrentToken(ctx.input);
+  if(token.length < 2){ closeSugg(ctx); return; }
+  const used  = new Set(parseEmails(ctx.input.value));
+  const items = getAllKnownMails()
+    .filter(m => m.toLowerCase().includes(token.toLowerCase()) && !used.has(m))
+    .slice(0, 8);
+  ctx.activeIx = items.length ? 0 : -1;
+  openSugg(ctx, items);
+}
+
+/**
+ * Keyboard navigation handler for the suggestion popup.
+ * @param {object} ctx
+ * @param {KeyboardEvent} e
+ */
+function onSuggKey(ctx, e){
+  if(!ctx.sugg.classList.contains("open")) return;
+  const items = $$(".item", ctx.sugg);
+  if(e.key === "ArrowDown"){ e.preventDefault(); ctx.activeIx = (ctx.activeIx + 1) % items.length; }
+  else if(e.key === "ArrowUp"){ e.preventDefault(); ctx.activeIx = (ctx.activeIx - 1 + items.length) % items.length; }
+  else if(e.key === "Enter" && ctx.activeIx >= 0){ e.preventDefault(); pickSugg(ctx, items[ctx.activeIx].dataset.v); return; }
+  else if(e.key === "Escape"){ closeSugg(ctx); return; }
+  items.forEach((it,i) => it.classList.toggle("active", i === ctx.activeIx));
 }
 ["fTo","fCc","fBcc"].forEach(setupSuggest);
 
@@ -1314,6 +1584,12 @@ function setupSuggest(inputId){
    SMART TEMPLATE TRIGGER w treści
    ========================================================= */
 let lastSmartName = null;
+
+/**
+ * Detect a known template name inside the body text and show a subtle
+ * "Load template?" bar with action buttons. Idempotent — does not re-show
+ * the bar for the same template.
+ */
 function detectSmartTemplate(){
   const body = $("#fBody").value.toLowerCase();
   if(body.length<3){ hideSmart(); return; }
@@ -1328,23 +1604,45 @@ function detectSmartTemplate(){
   };
   $("#smartDismiss").onclick = hideSmart;
 }
+
+/** Hide the smart-template suggestion bar. */
 function hideSmart(){ $("#smartBar").classList.remove("show"); lastSmartName=null; }
 
 /* =========================================================
    TODO – localStorage
    ========================================================= */
 const TODO_KEY = "wd.todos.v1";
+/** @returns {Array<{id:string,text:string,done:boolean,createdAt:number}>} Stored to-dos, or [] on parse error. */
 function loadTodos(){ try{ return JSON.parse(localStorage.getItem(TODO_KEY)||"[]"); }catch{return []} }
+
+/** Persist the current to-do list to localStorage. @param {Array} t */
 function saveTodos(t){ localStorage.setItem(TODO_KEY, JSON.stringify(t)); }
 let todos = loadTodos();
 
+/**
+ * Render the entire to-do list and update the active count badge.
+ * @returns {void}
+ */
 function renderTodos(){
-  const host = $("#todoList"); host.innerHTML = "";
-  if(!todos.length){ host.innerHTML = `<div class="todo-empty">Brak zadań — dodaj pierwsze powyżej ✓</div>`; }
-  todos.forEach(t=>{
-    const el = document.createElement("div");
-    el.className = "todo-item"+(t.done?" done":"");
-    el.innerHTML = `
+  const host = $("#todoList");
+  host.innerHTML = "";
+  if(!todos.length){
+    host.innerHTML = `<div class="todo-empty">Brak zadań — dodaj pierwsze powyżej ✓</div>`;
+  } else {
+    todos.forEach(t => host.appendChild(createTodoElement(t)));
+  }
+  $("#todoCount").textContent = todos.filter(t => !t.done).length;
+}
+
+/**
+ * Build a single to-do row DOM element and wire up its event handlers.
+ * @param {{id:string,text:string,done:boolean,createdAt:number}} t
+ * @returns {HTMLDivElement}
+ */
+function createTodoElement(t){
+  const el = document.createElement("div");
+  el.className = "todo-item" + (t.done ? " done" : "");
+  el.innerHTML = `
       <input type="checkbox" ${t.done?"checked":""} aria-label="Oznacz wykonane"/>
       <div>
         <div class="text" contenteditable="false">${escHTML(t.text)}</div>
@@ -1354,33 +1652,52 @@ function renderTodos(){
         <button class="icon-btn" data-act="edit" aria-label="Edytuj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 4 5 5-11 11H4v-5z"/></svg></button>
         <button class="icon-btn" data-act="del"  aria-label="Usuń"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
       </div>`;
-    el.querySelector("input[type=checkbox]").addEventListener("change", e=>{
-      t.done = e.target.checked; saveTodos(todos); renderTodos();
-    });
-    el.querySelector('[data-act="del"]').addEventListener("click", ()=>{
-      todos = todos.filter(x=>x.id!==t.id); saveTodos(todos); renderTodos();
-    });
-    el.querySelector('[data-act="edit"]').addEventListener("click", ()=>{
-      const txt = el.querySelector(".text");
-      txt.contentEditable = "true"; txt.focus();
-      const r = document.createRange(); r.selectNodeContents(txt); r.collapse(false);
-      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-      const finish = ()=>{
-        txt.contentEditable = "false";
-        t.text = txt.textContent.trim() || t.text;
-        saveTodos(todos); renderTodos();
-      };
-      txt.addEventListener("blur", finish, {once:true});
-      txt.addEventListener("keydown", ev=>{
-        if(ev.key==="Enter"){ ev.preventDefault(); txt.blur(); }
-      });
-    });
-    host.appendChild(el);
+  bindTodoEvents(el, t);
+  return el;
+}
+
+/**
+ * Wire toggle/delete/edit handlers for a single to-do row.
+ * @param {HTMLElement} el
+ * @param {{id:string,done:boolean}} t
+ */
+function bindTodoEvents(el, t){
+  el.querySelector("input[type=checkbox]").addEventListener("change", e => {
+    t.done = e.target.checked; saveTodos(todos); renderTodos();
   });
-  $("#todoCount").textContent = todos.filter(t=>!t.done).length;
+  el.querySelector('[data-act="del"]').addEventListener("click", () => {
+    todos = todos.filter(x => x.id !== t.id); saveTodos(todos); renderTodos();
+  });
+  el.querySelector('[data-act="edit"]').addEventListener("click", () => startTodoEdit(el, t));
+}
+
+/**
+ * Make a to-do row's text editable inline. Persists changes on blur or Enter.
+ * @param {HTMLElement} el
+ * @param {{text:string}} t
+ */
+function startTodoEdit(el, t){
+  const txt = el.querySelector(".text");
+  txt.contentEditable = "true";
+  txt.focus();
+  const r = document.createRange(); r.selectNodeContents(txt); r.collapse(false);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  const finish = () => {
+    txt.contentEditable = "false";
+    t.text = txt.textContent.trim() || t.text;
+    saveTodos(todos); renderTodos();
+  };
+  txt.addEventListener("blur", finish, { once: true });
+  txt.addEventListener("keydown", ev => {
+    if(ev.key === "Enter"){ ev.preventDefault(); txt.blur(); }
+  });
 }
 $("#todoAddBtn").addEventListener("click", addTodo);
 $("#todoInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addTodo(); });
+/**
+ * Read the to-do input, create a new task with a unique id and prepend it.
+ * No-op when the input is empty.
+ */
 function addTodo(){
   const v = $("#todoInput").value.trim(); if(!v) return;
   todos.unshift({ id: Date.now()+"_"+Math.random().toString(36).slice(2,7), text:v, done:false, createdAt:Date.now() });
@@ -1393,6 +1710,7 @@ $("#stickyNote").value = localStorage.getItem(NOTE_KEY) || "";
 $("#stickyNote").addEventListener("input", e=> localStorage.setItem(NOTE_KEY, e.target.value));
 
 /* Tools */
+/** Set the small status line under the Tools panel. @param {string} s */
 function setOut(s){ $("#toolsOut").textContent = s; }
 $("#toolClean").addEventListener("click", ()=>{
   const t = $("#fBody"); const before = t.value.length;
@@ -1434,6 +1752,7 @@ $("#toolUpper").addEventListener("click", ()=>{
 });
 
 /* Frequent links */
+/** Render the "Częste linki" panel from {@link emailData.frequentLinks}. */
 function renderFlinks(){
   const host = $("#flinksHost");
   host.innerHTML = emailData.frequentLinks.map(l=>`
@@ -1456,11 +1775,19 @@ $$('[data-toggle]').forEach(h=>{
 /* =========================================================
    TILES
    ========================================================= */
+/**
+ * Wrap a URL with the "microsoft-edge:" protocol so it opens in Edge's
+ * IE-compatibility flow (used by IE-mode tiles).
+ * @param {string} url
+ * @returns {string}
+ */
 function ieUrl(url){
   // Wzorzec dla trybu IE w Edge: microsoft-edge:<url>
   // Niektóre środowiska używają również: read:<url>?redirect=true
   return "microsoft-edge:" + url;
 }
+
+/** Render the main tile dashboard from {@link emailData.tiles}. */
 function renderTiles(){
   const host = $("#tilesHost");
   host.innerHTML = "";
@@ -1503,6 +1830,11 @@ function renderTiles(){
 /* =========================================================
    CODE MODAL (uniwersalny)
    ========================================================= */
+/**
+ * Open the universal code preview modal with a title and a pre-formatted code block.
+ * @param {string} title
+ * @param {string} code
+ */
 function showCode(title, code){
   $("#codeTitle").textContent = title;
   $("#codeBlock").textContent = code;
@@ -1514,8 +1846,199 @@ $("#copyCodeBtn").addEventListener("click", async ()=>{
 });
 
 /* =========================================================
+   DANE — EXPORT / IMPORT / RESET (JSON, drag&drop)
+   --------------------------------------------------------
+   Zmiany są zachowywane w localStorage pod kluczem DATA_KEY,
+   aby zespół mógł wymieniać się jednym plikiem .json bez
+   edytowania index.html. „Przywróć domyślne" usuwa wpis
+   z localStorage i przywraca dane wbudowane w plik.
+   ========================================================= */
+const DATA_KEY = "wd.data.v1";
+
+/** Snapshot oryginalnych danych z pliku — używany przy „Przywróć domyślne". @type {object} */
+const defaultEmailData = JSON.parse(JSON.stringify(emailData));
+
+/** Klucze obowiązkowe i opcjonalne w pliku JSON danych. */
+const REQUIRED_DATA_KEYS = ["sections","templates","tiles","frequentLinks","knownMails"];
+
+/**
+ * Czy struktura odpowiada formatowi emailData.
+ * @param {*} d
+ * @returns {boolean}
+ */
+function isValidEmailData(d){
+  if(!d || typeof d !== "object") return false;
+  return REQUIRED_DATA_KEYS.every(k => Array.isArray(d[k]));
+}
+
+/**
+ * Nadpisz właściwości obiektu emailData wartościami z `next`.
+ * Mutujemy ten sam obiekt, żeby wszystkie funkcje nadal widziały aktualne dane.
+ * @param {object} next
+ */
+function applyEmailData(next){
+  REQUIRED_DATA_KEYS.forEach(k => { emailData[k] = next[k]; });
+}
+
+/** Czy w localStorage znajdują się zaimportowane dane (zmodyfikowane). @returns {boolean} */
+function hasCustomData(){ return !!localStorage.getItem(DATA_KEY); }
+
+/** Aktualizuje wskaźnik „domyślne / edytowane" w panelu Dane. */
+function refreshDataBadge(){
+  const el = $("#dataState");
+  if(hasCustomData()){
+    el.textContent = "edytowane";
+    el.classList.add("dirty");
+  } else {
+    el.textContent = "domyślne";
+    el.classList.remove("dirty");
+  }
+}
+
+/** Pobiera aktualne dane z localStorage. Zwraca null, jeśli brak lub nieprawidłowe. */
+function loadStoredData(){
+  try{
+    const raw = localStorage.getItem(DATA_KEY);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    return isValidEmailData(obj) ? obj : null;
+  }catch{ return null; }
+}
+
+/** Zapisuje aktualny stan emailData w localStorage. */
+function persistData(){
+  const snap = {};
+  REQUIRED_DATA_KEYS.forEach(k => { snap[k] = emailData[k]; });
+  localStorage.setItem(DATA_KEY, JSON.stringify(snap));
+}
+
+/** Wymuś przerenderowanie wszystkich części UI zależnych od emailData. */
+function rerenderAllFromData(){
+  // wyczyść stan zaznaczonych grup (klucze "Sekcja::Grupa" mogą już nie istnieć)
+  Object.keys(groupState).forEach(k => groupState[k].clear());
+  renderGroups($("#grpSearch").value || "");
+  renderTemplateList();
+  renderTiles();
+  renderFlinks();
+  refreshDataBadge();
+}
+
+/**
+ * Eksportuj aktualne dane jako plik JSON pobierany przez przeglądarkę.
+ * Nazwa: workdesk-data-YYYY-MM-DD.json
+ */
+function exportData(){
+  const snap = {};
+  REQUIRED_DATA_KEYS.forEach(k => { snap[k] = emailData[k]; });
+  const blob = new Blob([JSON.stringify(snap, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const d = new Date();
+  const fname = `workdesk-data-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  const a = document.createElement("a");
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  toast("Wyeksportowano: "+fname);
+}
+
+/**
+ * Importuj dane z pliku JSON. Pyta o potwierdzenie nadpisania.
+ * @param {File} file
+ */
+function importDataFromFile(file){
+  if(!file) return;
+  if(!/\.json$|application\/json/i.test(file.type + " " + file.name)){
+    return toast("Wybierz plik .json","err");
+  }
+  const reader = new FileReader();
+  reader.onerror = () => toast("Nie udało się odczytać pliku.","err");
+  reader.onload = () => importDataFromText(String(reader.result || ""), file.name);
+  reader.readAsText(file);
+}
+
+/**
+ * Importuj dane z surowego tekstu JSON.
+ * @param {string} text
+ * @param {string} [srcName="(schowek)"]
+ */
+function importDataFromText(text, srcName="(schowek)"){
+  let parsed;
+  try{ parsed = JSON.parse(text); }
+  catch{ return toast("Plik nie jest poprawnym JSON.","err"); }
+  if(!isValidEmailData(parsed)){
+    return toast("Brakuje wymaganych pól: " + REQUIRED_DATA_KEYS.join(", "), "err");
+  }
+  const ok = confirm(`Zaimportować dane z „${srcName}"?\nObecne grupy, szablony i kafelki zostaną zastąpione.`);
+  if(!ok) return;
+  applyEmailData(parsed);
+  persistData();
+  rerenderAllFromData();
+  toast("Zaimportowano dane z: "+srcName);
+}
+
+/**
+ * Przywróć dane wbudowane w plik (czyści wpis w localStorage).
+ */
+function resetData(){
+  if(!confirm("Przywrócić dane wbudowane w index.html?\nWszystkie zaimportowane zmiany zostaną utracone.")) return;
+  localStorage.removeItem(DATA_KEY);
+  applyEmailData(JSON.parse(JSON.stringify(defaultEmailData)));
+  rerenderAllFromData();
+  toast("Przywrócono dane domyślne.");
+}
+
+/* --- bindings --- */
+$("#dataExport").addEventListener("click", exportData);
+$("#dataReset").addEventListener("click", resetData);
+$("#dataImport").addEventListener("click", () => $("#dataFile").click());
+$("#dataFile").addEventListener("change", e => {
+  const f = e.target.files?.[0];
+  if(f) importDataFromFile(f);
+  e.target.value = ""; // żeby ten sam plik dało się wybrać ponownie
+});
+
+/* --- drag & drop na całym oknie --- */
+(function setupDropZone(){
+  const ov = $("#dropOverlay");
+  let depth = 0; // licznik zagnieżdżeń dragenter/leave
+
+  /** Czy dataTransfer zawiera plik (a nie np. tekst z innej karty). */
+  const hasFiles = dt => dt && Array.from(dt.types || []).includes("Files");
+
+  window.addEventListener("dragenter", e => {
+    if(!hasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    depth++;
+    ov.classList.add("show");
+    ov.setAttribute("aria-hidden","false");
+  });
+  window.addEventListener("dragover", e => {
+    if(!hasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  });
+  window.addEventListener("dragleave", e => {
+    if(!hasFiles(e.dataTransfer)) return;
+    depth = Math.max(0, depth-1);
+    if(depth === 0){ ov.classList.remove("show"); ov.setAttribute("aria-hidden","true"); }
+  });
+  window.addEventListener("drop", e => {
+    if(!hasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    depth = 0;
+    ov.classList.remove("show"); ov.setAttribute("aria-hidden","true");
+    const f = e.dataTransfer.files?.[0];
+    if(f) importDataFromFile(f);
+  });
+})();
+
+/* =========================================================
    INIT — pierwsze renderowanie + ustawienie domyślnej stopki
    ========================================================= */
+/**
+ * Initialize the signature field with a sensible default footer
+ * if the user hasn't typed anything yet.
+ */
 function setDefaultSignature(){
   if(!$("#fSig").value){
     $("#fSig").value =
@@ -1538,6 +2061,11 @@ renderTiles();
 renderTodos();
 setDefaultSignature();
 updateCharBadge();
+
+// jeśli w localStorage są zaimportowane dane — wczytaj i przerenderuj
+const _stored = loadStoredData();
+if(_stored){ applyEmailData(_stored); rerenderAllFromData(); }
+else { refreshDataBadge(); }
 </script>
 </body>
 </html>
