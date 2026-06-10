@@ -825,6 +825,40 @@ kbd{
 .backup-list .b-size{color:var(--text-mute);font-size:11.5px}
 .backup-list .b-acts{display:flex;gap:4px}
 .backup-empty{padding:30px;text-align:center;color:var(--text-mute);font-size:13px}
+
+/* =========================================================
+   CSV IMPORT PREVIEW
+   ========================================================= */
+.csv-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;
+}
+.csv-stats .stat{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 12px;
+}
+.csv-stats .stat .v{font-size:18px;font-weight:600;color:var(--text)}
+.csv-stats .stat.ok .v{color:var(--ok)}
+.csv-stats .stat.warn .v{color:var(--warn)}
+.csv-stats .stat.err .v{color:var(--danger)}
+.csv-stats .stat .l{font-size:11px;color:var(--text-mute);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+
+.csv-preview{
+  max-height:42vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r-md);
+}
+.csv-preview table{width:100%;border-collapse:collapse;font-size:12.5px}
+.csv-preview th{
+  position:sticky;top:0;background:var(--bg-1);color:var(--text-mute);
+  font-size:11px;letter-spacing:.05em;text-transform:uppercase;text-align:left;
+  padding:8px 10px;border-bottom:1px solid var(--line);font-weight:500;
+}
+.csv-preview td{padding:6px 10px;border-bottom:1px solid var(--line-soft)}
+.csv-preview tr.dup td{color:var(--text-mute);background:var(--bg-1);font-style:italic}
+.csv-preview tr.bad td{background:#1c1416;color:#ff8a8a}
+.csv-preview tr.new td{color:var(--text)}
+.csv-preview .row-tag{font-size:10px;padding:1px 6px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
+.csv-preview .row-tag.new{background:#10221c;color:#9cffd1;border:1px solid #1d4438}
+.csv-preview .row-tag.dup{background:var(--bg-3);color:var(--text-mute);border:1px solid var(--line)}
+.csv-preview .row-tag.bad{background:#3a1f23;color:#ff8a8a;border:1px solid #5a2b30}
 </style>
 </head>
 <body>
@@ -926,6 +960,11 @@ kbd{
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
         Eksport CSV grup
       </button>
+      <button class="btn sm full" id="csvImportBtn" data-testid="csv-import-btn" style="margin-top:6px" title="Wczytaj plik CSV z kolumnami Sekcja,Grupa,Email">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+        Importuj CSV…
+      </button>
+      <input id="csvImportFile" type="file" accept="text/csv,.csv" style="display:none"/>
     </aside>
 
     <!-- right -->
@@ -1440,6 +1479,28 @@ kbd{
     <div class="modal-f">
       <button class="btn" data-close="idModal">Zamknij</button>
       <button class="btn primary" id="idCopy" data-testid="id-copy">Kopiuj</button>
+    </div>
+  </div>
+
+  <!-- CSV import preview modal -->
+  <div class="modal lg" id="csvImportModal" role="dialog" aria-labelledby="csvImportTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="csvImportTitle">Import CSV — podgląd</h3>
+      <button class="btn ghost sm x" data-close="csvImportModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <p style="margin-top:0;color:var(--text-dim);font-size:12.5px">
+        Oczekiwany format: <code>Sekcja,Grupa,Email</code> (z nagłówkiem lub bez). Obsługa <code>,</code> i <code>;</code> jako separatora.
+        Duplikaty są pomijane, brakujące sekcje/grupy są tworzone.
+      </p>
+      <div class="csv-stats" id="csvStats"></div>
+      <div class="csv-preview" id="csvPreview"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" data-close="csvImportModal">Anuluj</button>
+      <button class="btn primary" id="csvImportApply" data-testid="csv-import-apply">Zaimportuj</button>
     </div>
   </div>
 
@@ -4178,6 +4239,190 @@ function exportGroupsCSV(){
 }
 
 $("#csvExportBtn").addEventListener("click", exportGroupsCSV);
+
+/* =========================================================
+   CSV IMPORT GRUP (drugi kierunek do C1)
+   --------------------------------------------------------
+   Akceptuje pliki z dowolnym z separatorów , lub ; oraz BOM.
+   Kolumny: Sekcja, Grupa, Email (z nagłówkiem lub bez).
+   Łączy dane z istniejącym emailData (nie nadpisuje):
+     • brakujące sekcje są dopisywane,
+     • brakujące grupy są dopisywane do sekcji,
+     • duplikaty adresów (case-insensitive) są pomijane,
+     • niepoprawne e-maile są oznaczone i ignorowane.
+   ========================================================= */
+let csvPending = null; // {rows:[{section,group,email,status:"new"|"dup"|"bad"}], stats:{...}}
+
+/**
+ * Parsuje CSV (auto-detect , vs ;, obsługa "..." i podwójnych "").
+ * @param {string} text
+ * @returns {string[][]} array of rows of fields
+ */
+function parseCSV(text){
+  text = text.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  // wykryj separator z pierwszej niepustej linii
+  const firstLine = text.split("\n").find(l => l.trim()) || "";
+  const sep = (firstLine.match(/;/g)?.length || 0) > (firstLine.match(/,/g)?.length || 0) ? ";" : ",";
+
+  const rows = [];
+  let row = [], cell = "", quoted = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(quoted){
+      if(c === '"'){
+        if(text[i+1] === '"'){ cell += '"'; i++; }
+        else quoted = false;
+      } else cell += c;
+    } else {
+      if(c === '"'){ quoted = true; }
+      else if(c === sep){ row.push(cell); cell = ""; }
+      else if(c === "\n"){ row.push(cell); rows.push(row); row = []; cell = ""; }
+      else cell += c;
+    }
+  }
+  if(cell.length || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r => r.length && r.some(f => f.trim()));
+}
+
+/** Czy wiersz wygląda jak nagłówek (zawiera słowa "sekcja"/"grupa"/"email"). */
+function looksLikeHeader(row){
+  const j = row.map(c => c.toLowerCase()).join("|");
+  return j.includes("sekcja") || j.includes("grupa") || j.includes("email") || j.includes("e-mail");
+}
+
+/**
+ * Otwórz file picker → parsuj → wyświetl podgląd.
+ */
+function importGroupsCSV(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onerror = () => toast("Nie udało się odczytać pliku CSV.", "err");
+  reader.onload = () => prepareCsvPreview(String(reader.result || ""), file.name);
+  reader.readAsText(file, "utf-8");
+}
+
+/** Buduje listę wierszy do importu z surowego tekstu CSV i otwiera modal podglądu. */
+function prepareCsvPreview(text, srcName){
+  const raw = parseCSV(text);
+  if(!raw.length){ toast("Plik CSV jest pusty.", "err"); return; }
+
+  // pomiń nagłówek jeśli wygląda jak nagłówek
+  const dataRows = looksLikeHeader(raw[0]) ? raw.slice(1) : raw;
+
+  // istniejące adresy (lowercase) per sekcja+grupa, do detekcji duplikatów
+  const existingByGroup = new Map(); // key "sec::grp" => Set<emailLower>
+  emailData.sections.forEach(sec => sec.groups.forEach(g => {
+    existingByGroup.set(sec.name + "::" + g.name, new Set(g.emails.map(e => e.toLowerCase())));
+  }));
+
+  const seenInImport = new Set(); // dedup w samym CSV
+  const out = [];
+  let nNew = 0, nDup = 0, nBad = 0;
+  const newGroupKeys = new Set();
+  const newSectionNames = new Set();
+  const existingSecNames = new Set(emailData.sections.map(s => s.name));
+
+  for(const r of dataRows){
+    const sec = (r[0] || "").trim();
+    const grp = (r[1] || "").trim();
+    const email = (r[2] || "").trim();
+    if(!sec && !grp && !email) continue;
+
+    if(!sec || !grp || !email){
+      out.push({ section:sec, group:grp, email, status:"bad", reason:"Brakujące pole" });
+      nBad++; continue;
+    }
+    if(!EMAIL_RE.test(email)){
+      out.push({ section:sec, group:grp, email, status:"bad", reason:"Niepoprawny e-mail" });
+      nBad++; continue;
+    }
+    const key = sec + "::" + grp;
+    const elc = email.toLowerCase();
+    const dupHere = seenInImport.has(key + "||" + elc);
+    const dupExisting = existingByGroup.get(key)?.has(elc);
+    if(dupHere || dupExisting){
+      out.push({ section:sec, group:grp, email, status:"dup", reason: dupExisting ? "Już istnieje" : "Duplikat w pliku" });
+      nDup++; continue;
+    }
+    seenInImport.add(key + "||" + elc);
+    if(!existingByGroup.has(key)) newGroupKeys.add(key);
+    if(!existingSecNames.has(sec)) newSectionNames.add(sec);
+    out.push({ section:sec, group:grp, email, status:"new" });
+    nNew++;
+  }
+
+  csvPending = {
+    rows: out,
+    stats: { total: out.length, nNew, nDup, nBad, newSections: newSectionNames.size, newGroups: newGroupKeys.size }
+  };
+
+  renderCsvPreview(srcName);
+  showModal("csvImportModal");
+}
+
+/** Wyrenderuj tabelę podglądu i panel statystyk. */
+function renderCsvPreview(srcName){
+  const { rows, stats } = csvPending;
+  $("#csvImportTitle").textContent = `Import CSV — ${srcName || "podgląd"}`;
+  $("#csvStats").innerHTML = `
+    <div class="stat ok"><div class="v">${stats.nNew}</div><div class="l">nowych adresów</div></div>
+    <div class="stat warn"><div class="v">${stats.nDup}</div><div class="l">duplikatów</div></div>
+    <div class="stat err"><div class="v">${stats.nBad}</div><div class="l">błędnych</div></div>
+    <div class="stat"><div class="v">+${stats.newSections} / +${stats.newGroups}</div><div class="l">sekcje / grupy</div></div>`;
+
+  // pokaż do 200 wierszy, reszta info
+  const limit = 200;
+  const list = rows.slice(0, limit);
+  const trs = list.map(r => `
+    <tr class="${r.status}">
+      <td><span class="row-tag ${r.status}">${r.status === "new" ? "Nowy" : r.status === "dup" ? "Dup" : "Błąd"}</span></td>
+      <td>${escHTML(r.section)}</td>
+      <td>${escHTML(r.group)}</td>
+      <td>${escHTML(r.email)}</td>
+      <td style="color:var(--text-mute);font-size:11px">${escHTML(r.reason || "")}</td>
+    </tr>`).join("");
+  const overflow = rows.length > limit ? `<p style="color:var(--text-mute);font-size:12px;margin:8px 0 0">…i ${rows.length - limit} więcej (zostaną zaimportowane).</p>` : "";
+
+  $("#csvPreview").innerHTML = `
+    <table>
+      <thead><tr><th>Status</th><th>Sekcja</th><th>Grupa</th><th>E-mail</th><th>Uwagi</th></tr></thead>
+      <tbody>${trs}</tbody>
+    </table>${overflow}`;
+
+  // Wyłącz przycisk Apply, gdy nic nie nowego
+  $("#csvImportApply").disabled = stats.nNew === 0;
+  $("#csvImportApply").textContent = stats.nNew ? `Zaimportuj (${stats.nNew})` : "Brak nowych do importu";
+}
+
+/** Zastosuj zmiany w emailData i odśwież UI. */
+function applyCsvImport(){
+  if(!csvPending) return;
+  const { rows } = csvPending;
+  const secMap = new Map(emailData.sections.map(s => [s.name, s]));
+  let added = 0;
+  for(const r of rows){
+    if(r.status !== "new") continue;
+    let sec = secMap.get(r.section);
+    if(!sec){ sec = { name: r.section, groups: [] }; emailData.sections.push(sec); secMap.set(r.section, sec); }
+    let grp = sec.groups.find(g => g.name === r.group);
+    if(!grp){ grp = { name: r.group, emails: [] }; sec.groups.push(grp); }
+    grp.emails.push(r.email);
+    added++;
+  }
+  persistData();
+  rerenderAllFromData();
+  closeModal();
+  csvPending = null;
+  toast(`Zaimportowano ${added} adresów.`);
+}
+
+$("#csvImportBtn").addEventListener("click", () => $("#csvImportFile").click());
+$("#csvImportFile").addEventListener("change", e => {
+  const f = e.target.files?.[0];
+  if(f) importGroupsCSV(f);
+  e.target.value = "";
+});
+$("#csvImportApply").addEventListener("click", applyCsvImport);
 
 /* =========================================================
    QUICK JOURNAL (C2)
