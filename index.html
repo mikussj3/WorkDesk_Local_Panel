@@ -503,6 +503,133 @@ input,textarea,select{font-family:inherit;color:var(--text)}
 
 /* badge "edytowane" w panelu Dane */
 #dataState.dirty{background:#2a2010;border-color:#5a4520;color:#ffd28a}
+
+/* =========================================================
+   COMMAND PALETTE (A1)
+   ========================================================= */
+.cmd-modal{width:min(680px,100%);max-height:70vh;display:flex;flex-direction:column}
+.cmd-input{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.cmd-input .ic{width:16px;height:16px;color:var(--text-mute)}
+.cmd-input input{flex:1;background:transparent;border:0;outline:0;font-size:15px;color:var(--text)}
+.cmd-list{flex:1;overflow:auto;padding:8px;min-height:280px}
+.cmd-item{
+  display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;
+  padding:10px 12px;border-radius:var(--r-md);cursor:pointer;
+  transition:background var(--t);
+}
+.cmd-item:hover,.cmd-item.active{background:var(--bg-3)}
+.cmd-item .ci-ic{
+  width:30px;height:30px;border-radius:8px;background:#222a3a;color:var(--accent);
+  display:grid;place-items:center;
+}
+.cmd-item .ci-ic svg{width:14px;height:14px}
+.cmd-item .ci-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.cmd-item .ci-title{font-size:13px;font-weight:500}
+.cmd-item .ci-sub{font-size:11px;color:var(--text-mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmd-item .ci-cat{
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute);
+  background:var(--bg-2);padding:2px 7px;border-radius:999px;border:1px solid var(--line);
+}
+.cmd-empty{padding:40px 16px;text-align:center;color:var(--text-mute);font-size:13px}
+.cmd-foot{
+  display:flex;gap:14px;padding:10px 16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--text-mute);background:var(--bg-1)
+}
+kbd{
+  display:inline-block;padding:1px 6px;font-size:11px;font-family:ui-monospace,Consolas,monospace;
+  background:var(--bg-3);border:1px solid var(--line);border-radius:5px;color:var(--text-dim);
+  box-shadow:0 1px 0 rgba(0,0,0,.4);margin:0 1px;
+}
+.kbd-sm{padding:0 4px;font-size:10px}
+.hint-kbd{font-size:11.5px;color:var(--text-mute);display:inline-flex;align-items:center;gap:4px}
+
+/* =========================================================
+   DRAFT BANNER (A3)
+   ========================================================= */
+.draft-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:var(--r-md);
+  background:#2a2010;border:1px solid #5a4520;color:#ffd28a;
+  font-size:13px;animation:slideUp .2s ease;
+}
+.draft-banner[hidden]{display:none}
+.draft-banner .ic{width:14px;height:14px}
+
+/* =========================================================
+   FIELD VALIDATION INFO (A4)
+   ========================================================= */
+.field-info{
+  font-size:11px;color:var(--text-mute);font-weight:400;letter-spacing:0;
+  text-transform:none;margin-left:8px;
+}
+.field-info.invalid{color:#ff8a8a}
+.field-info.ok{color:var(--ok)}
+.field input.invalid-input{border-color:#5a2b30;background:#1c1416}
+.field input.invalid-input:focus{border-color:#a44}
+
+/* =========================================================
+   TILES TOOLBAR + SEARCH + DnD (B1+B2)
+   ========================================================= */
+.tiles-toolbar{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:14px;
+}
+.tile.dragging{opacity:.4;border-style:dashed}
+.tile.drag-over{box-shadow:0 0 0 2px var(--accent)}
+.tile .pin-btn{
+  position:absolute;top:8px;right:8px;
+  width:24px;height:24px;display:grid;place-items:center;
+  background:transparent;border:0;color:var(--text-mute);cursor:pointer;border-radius:6px;
+  transition:background var(--t),color var(--t),transform var(--t);
+  z-index:2;opacity:0;
+}
+.tile:hover .pin-btn,.tile.pinned .pin-btn{opacity:1}
+.tile .pin-btn:hover{background:var(--bg-4);color:#ffd28a}
+.tile.pinned .pin-btn{color:#ffd28a}
+.tile.pinned{border-color:#5a4520}
+.tile .pin-btn svg{width:14px;height:14px}
+.tile-hidden{display:none !important}
+
+/* =========================================================
+   MULTI-COLOR STICKY NOTES (E2)
+   ========================================================= */
+.note-card{
+  position:relative;border-radius:var(--r-md);padding:10px 28px 10px 10px;
+  margin-bottom:8px;border:1px solid;
+  background:var(--note-bg,#26200f);
+  border-color:var(--note-bd,#5b4a1c);
+  color:var(--note-fg,#ffe8a8);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset;
+}
+.note-card textarea{
+  width:100%;min-height:54px;background:transparent;border:0;outline:0;color:inherit;
+  font-size:13px;line-height:1.5;resize:vertical;font-family:inherit;
+}
+.note-card .note-x{
+  position:absolute;top:6px;right:6px;width:20px;height:20px;
+  background:transparent;border:0;color:inherit;opacity:.5;cursor:pointer;border-radius:4px;
+}
+.note-card .note-x:hover{opacity:1;background:rgba(0,0,0,.25)}
+.note-card .note-x svg{width:11px;height:11px}
+.note-card .note-colors{
+  display:flex;gap:5px;margin-top:4px;
+}
+.note-color{
+  width:14px;height:14px;border-radius:50%;cursor:pointer;
+  border:1px solid rgba(255,255,255,.15);transition:transform var(--t);
+}
+.note-color:hover{transform:scale(1.15)}
+.note-color.active{box-shadow:0 0 0 2px var(--text)}
+
+/* =========================================================
+   TOAST with action (E1 — undo)
+   ========================================================= */
+.toast .toast-action{
+  margin-left:6px;background:transparent;border:1px solid var(--line);
+  color:inherit;padding:3px 9px;border-radius:6px;font-size:12px;cursor:pointer;
+  transition:background var(--t);
+}
+.toast .toast-action:hover{background:var(--bg-3)}
 </style>
 </head>
 <body>
@@ -534,6 +661,11 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   <div class="nav-spacer"></div>
 
   <div class="clock" id="clock" aria-live="polite"></div>
+
+  <button class="btn sm" id="openPaletteBtn" data-testid="open-palette-btn" title="Paleta poleceń (Ctrl+K)">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <span><kbd class="kbd-sm">Ctrl</kbd>+<kbd class="kbd-sm">K</kbd></span>
+  </button>
 
   <div class="timer" id="timer" data-testid="timer-pill" aria-live="polite">
     <span class="dot"></span>
@@ -615,8 +747,17 @@ input,textarea,select{font-family:inherit;color:var(--text)}
         <span class="badge" id="charBadge">znaki: 0</span>
       </div>
 
+      <!-- Draft restore banner (A3) -->
+      <div class="draft-banner" id="draftBanner" data-testid="draft-banner" hidden>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        <span>Znaleziono niewysłaną wersję roboczą — przywrócić?</span>
+        <span style="flex:1"></span>
+        <button class="btn sm primary" id="draftRestore" data-testid="draft-restore">Przywróć</button>
+        <button class="btn sm ghost" id="draftDiscard" data-testid="draft-discard">Odrzuć</button>
+      </div>
+
       <div class="field" style="position:relative">
-        <label for="fTo">Do</label>
+        <label for="fTo">Do <span class="field-info" id="infoTo"></span></label>
         <input id="fTo" type="text" autocomplete="off" placeholder="osoba@firma.pl, ..." data-testid="field-to"/>
         <button class="clear" data-clear="fTo" aria-label="Wyczyść">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -624,7 +765,7 @@ input,textarea,select{font-family:inherit;color:var(--text)}
         <div class="sugg" id="suggTo" data-suggest="fTo"></div>
       </div>
       <div class="field" style="position:relative">
-        <label for="fCc">DW (CC)</label>
+        <label for="fCc">DW (CC) <span class="field-info" id="infoCc"></span></label>
         <input id="fCc" type="text" autocomplete="off" data-testid="field-cc"/>
         <button class="clear" data-clear="fCc" aria-label="Wyczyść">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -632,7 +773,7 @@ input,textarea,select{font-family:inherit;color:var(--text)}
         <div class="sugg" id="suggCc" data-suggest="fCc"></div>
       </div>
       <div class="field" style="position:relative">
-        <label for="fBcc">UDW (BCC)</label>
+        <label for="fBcc">UDW (BCC) <span class="field-info" id="infoBcc"></span></label>
         <input id="fBcc" type="text" autocomplete="off" data-testid="field-bcc"/>
         <button class="clear" data-clear="fBcc" aria-label="Wyczyść">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -692,15 +833,17 @@ input,textarea,select{font-family:inherit;color:var(--text)}
       </div>
     </div>
 
-    <!-- Sticky note -->
+    <!-- Sticky notes (multi) -->
     <div class="panel open">
       <div class="panel-h" data-toggle>
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#ffd28a"><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M9 3h6v4H9z"/></svg>
-        <span class="t">Notatka</span>
+        <span class="t">Notatki</span>
+        <span class="count" id="notesCount">0</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </div>
-      <div class="panel-b sticky">
-        <textarea id="stickyNote" placeholder="Szybka notatka — zapisuje się sama…" data-testid="sticky-note"></textarea>
+      <div class="panel-b">
+        <div id="notesHost"></div>
+        <button class="btn sm full" id="noteAddBtn" data-testid="note-add-btn" style="margin-top:8px">+ Dodaj notatkę</button>
       </div>
     </div>
 
@@ -760,6 +903,17 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   <main class="main" role="main">
     <h2>Pulpit</h2>
     <div class="sub" id="welcome">Miłej pracy. Dziś jest <span id="todayLabel"></span>.</div>
+
+    <div class="tiles-toolbar">
+      <div class="search" style="flex:1;max-width:360px">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/>
+      </div>
+      <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
+      <span style="flex:1"></span>
+      <button class="btn sm ghost" id="tileReorderReset" title="Przywróć domyślną kolejność" data-testid="tile-reset-order">Reset kolejności</button>
+    </div>
+
     <div class="tiles" id="tilesHost"></div>
   </main>
 </div>
@@ -829,6 +983,26 @@ input,textarea,select{font-family:inherit;color:var(--text)}
     <div class="modal-f">
       <button class="btn" data-close="groupModal">Anuluj</button>
       <button class="btn primary" id="ngGenerate" data-testid="ng-generate">Generuj JSON</button>
+    </div>
+  </div>
+
+  <!-- Command palette modal (A1) -->
+  <div class="modal cmd-modal" id="cmdModal" role="dialog" aria-labelledby="cmdTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="cmdTitle" style="font-size:13px;color:var(--text-mute);font-weight:500">Paleta poleceń · <kbd>Ctrl</kbd>+<kbd>K</kbd></h3>
+      <button class="btn ghost sm x" data-close="cmdModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="cmd-input">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query"/>
+    </div>
+    <div class="cmd-list" id="cmdList" role="listbox"></div>
+    <div class="cmd-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> nawiguj</span>
+      <span><kbd>Enter</kbd> wykonaj</span>
+      <span><kbd>Esc</kbd> zamknij</span>
     </div>
   </div>
 </div>
@@ -1426,6 +1600,8 @@ $("#clearBtn").addEventListener("click", ()=>{
   Object.keys(groupState).forEach(k=> groupState[k].clear());
   renderGroups($("#grpSearch").value);
   updateCharBadge();
+  clearDraft();
+  validateAllRecipients();
   toast("Wyczyszczono kompozytor.");
 });
 /**
@@ -1455,8 +1631,9 @@ function mailto(to){
 }
 $("#sendBtn").addEventListener("click", ()=>{
   const to = $("#fTo").value.trim();
-  if(!to) return toast("Pole „Do” jest puste.","err");
+  if(!to) return toast('Pole „Do" jest puste.',"err");
   window.location.href = mailto(to);
+  clearDraft();
   toast("Otwieram klienta poczty…");
 });
 $("#bulkBtn").addEventListener("click", ()=>{
@@ -1665,9 +1842,7 @@ function bindTodoEvents(el, t){
   el.querySelector("input[type=checkbox]").addEventListener("change", e => {
     t.done = e.target.checked; saveTodos(todos); renderTodos();
   });
-  el.querySelector('[data-act="del"]').addEventListener("click", () => {
-    todos = todos.filter(x => x.id !== t.id); saveTodos(todos); renderTodos();
-  });
+  el.querySelector('[data-act="del"]').addEventListener("click", () => deleteTodoWithUndo(t));
   el.querySelector('[data-act="edit"]').addEventListener("click", () => startTodoEdit(el, t));
 }
 
@@ -1704,10 +1879,7 @@ function addTodo(){
   saveTodos(todos); $("#todoInput").value=""; renderTodos();
 }
 
-/* Sticky note */
-const NOTE_KEY = "wd.note.v1";
-$("#stickyNote").value = localStorage.getItem(NOTE_KEY) || "";
-$("#stickyNote").addEventListener("input", e=> localStorage.setItem(NOTE_KEY, e.target.value));
+/* Sticky note legacy — zastąpione przez multi-color notatki (E2), patrz renderNotes() */
 
 /* Tools */
 /** Set the small status line under the Tools panel. @param {string} s */
@@ -1791,40 +1963,87 @@ function ieUrl(url){
 function renderTiles(){
   const host = $("#tilesHost");
   host.innerHTML = "";
-  emailData.tiles.forEach(t=>{
-    const el = document.createElement(t.type==="copy" ? "div" : "a");
-    el.className = "tile" + (t.type==="copy" ? " copy-tile" : "");
-    if(t.type!=="copy"){
-      el.href = t.ie ? ieUrl(t.url) : t.url;
-      el.target = "_blank"; el.rel = "noopener";
-    }
-    el.setAttribute("data-testid", "tile-"+(t.title.toLowerCase().replace(/[^a-z0-9]+/g,"-")));
-    const tags = [];
-    if(t.ie) tags.push('<span class="tag ie">IE MODE</span>');
-    if(t.type==="copy") tags.push('<span class="tag copy">KOPIUJ</span>');
-    el.innerHTML = `
-      <div class="t-head">
-        <div class="t-icon">${getIcon(t.icon)}</div>
-        <div class="t-title">${escHTML(t.title)}</div>
-      </div>
-      <div class="t-desc">${escHTML(t.desc||"")}</div>
-      ${t.type==="copy" ? `<div class="t-value">${escHTML(t.value)}</div>` : ""}
-      <div class="t-tags">${tags.join("")}</div>
-    `;
-    if(t.type==="copy"){
-      el.addEventListener("click", async ()=>{
-        const ok = await copyToClipboard(t.value);
-        if(ok){
-          el.style.outline = "2px solid var(--ok)";
-          setTimeout(()=> el.style.outline="", 600);
-          toast(`Skopiowano: ${t.title}`);
-        } else {
-          toast("Nie udało się skopiować.","err");
-        }
-      });
-    }
-    host.appendChild(el);
+  tilesInRenderOrder().forEach(t => host.appendChild(buildTileElement(t)));
+  applyTileFilter();
+}
+
+/**
+ * Build a single tile element with optional IE/copy behavior, pin button and DnD handlers.
+ * @param {object} t
+ * @returns {HTMLElement}
+ */
+function buildTileElement(t){
+  const isCopy = t.type === "copy";
+  const el = document.createElement(isCopy ? "div" : "a");
+  el.className = "tile" + (isCopy ? " copy-tile" : "") + (pinnedTiles.has(t.title) ? " pinned" : "");
+  el.dataset.title = t.title;
+  el.draggable = true;
+  if(!isCopy){
+    el.href = t.ie ? ieUrl(t.url) : t.url;
+    el.target = "_blank"; el.rel = "noopener";
+  }
+  el.setAttribute("data-testid", "tile-" + (t.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")));
+
+  const tags = [];
+  if(t.ie) tags.push('<span class="tag ie">IE MODE</span>');
+  if(isCopy) tags.push('<span class="tag copy">KOPIUJ</span>');
+  (t.tags || []).forEach(tg => tags.push(`<span class="tag">${escHTML(tg)}</span>`));
+
+  el.innerHTML = `
+    <button class="pin-btn" aria-label="Przypnij" title="${pinnedTiles.has(t.title) ? "Odepnij" : "Przypnij na górę"}" data-testid="pin-${escHTML(t.title)}">
+      <svg viewBox="0 0 24 24" fill="${pinnedTiles.has(t.title) ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2"><path d="m12 17-6 5 2-7-5-4h6l3-8 3 8h6l-5 4 2 7z"/></svg>
+    </button>
+    <div class="t-head">
+      <div class="t-icon">${getIcon(t.icon)}</div>
+      <div class="t-title">${escHTML(t.title)}</div>
+    </div>
+    <div class="t-desc">${escHTML(t.desc || "")}</div>
+    ${isCopy ? `<div class="t-value">${escHTML(t.value)}</div>` : ""}
+    <div class="t-tags">${tags.join("")}</div>`;
+
+  // pin
+  el.querySelector(".pin-btn").addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    togglePin(t.title);
   });
+
+  // copy behavior
+  if(isCopy){
+    el.addEventListener("click", async e => {
+      if(e.target.closest(".pin-btn")) return;
+      const ok = await copyToClipboard(t.value);
+      if(ok){
+        el.style.outline = "2px solid var(--ok)";
+        setTimeout(() => el.style.outline = "", 600);
+        toast(`Skopiowano: ${t.title}`);
+      } else { toast("Nie udało się skopiować.", "err"); }
+    });
+  }
+
+  // drag&drop reorder
+  el.addEventListener("dragstart", e => {
+    el.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", t.title);
+  });
+  el.addEventListener("dragend", () => {
+    el.classList.remove("dragging");
+    $$(".tile.drag-over", $("#tilesHost")).forEach(x => x.classList.remove("drag-over"));
+    persistVisibleOrder();
+  });
+  el.addEventListener("dragover", e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const dragging = $(".tile.dragging", $("#tilesHost"));
+    if(!dragging || dragging === el) return;
+    const rect = el.getBoundingClientRect();
+    const before = (e.clientY - rect.top) < rect.height / 2;
+    el.parentNode.insertBefore(dragging, before ? el : el.nextSibling);
+  });
+  el.addEventListener("dragenter", () => { if(!el.classList.contains("dragging")) el.classList.add("drag-over"); });
+  el.addEventListener("dragleave", () => el.classList.remove("drag-over"));
+
+  return el;
 }
 
 /* =========================================================
@@ -2033,6 +2252,484 @@ $("#dataFile").addEventListener("change", e => {
 })();
 
 /* =========================================================
+   COMMAND PALETTE (A1)
+   --------------------------------------------------------
+   Ctrl+K otwiera modal z polem search; pozycje:
+   – akcje (otwórz e-mail, focus mode, eksport itd.)
+   – szablony (load by name)
+   – grupy (dodaj jako To)
+   – kafelki (otwórz / kopiuj)
+   – linki częste (otwórz)
+   Filtrowanie: case-insensitive includes po title+sub.
+   ========================================================= */
+
+/** @typedef {{cat:string, title:string, sub:string, icon:string, run:Function}} PaletteItem */
+
+/**
+ * Zbuduj pełną listę pozycji palety z aktualnych danych.
+ * @returns {PaletteItem[]}
+ */
+function buildPaletteItems(){
+  const items = [];
+
+  // Akcje globalne
+  items.push(
+    { cat:"Akcja", title:"Otwórz/zwiń pasek e-mail", sub:"Pokazuje workspace e-mail", icon:"mail", run:toggleEmail },
+    { cat:"Akcja", title:"Tryb skupienia",            sub:"Ukryj sidebar",            icon:"life", run:()=>$("#focusBtn").click() },
+    { cat:"Akcja", title:"Wyczyść kompozytor",        sub:"Czyści wszystkie pola",    icon:"box",  run:()=>$("#clearBtn").click() },
+    { cat:"Akcja", title:"Wyślij wiadomość",          sub:"Otwiera klienta poczty",   icon:"mail", run:()=>$("#sendBtn").click() },
+    { cat:"Akcja", title:"Bulk mail (po przecinku)",  sub:"Osobny mailto dla każdego",icon:"users",run:()=>$("#bulkBtn").click() },
+    { cat:"Akcja", title:"Eksport danych JSON",       sub:"Pobierz aktualny stan",    icon:"box",  run:exportData },
+    { cat:"Akcja", title:"Importuj dane JSON…",       sub:"Wczytaj plik z dysku",     icon:"box",  run:()=>$("#dataImport").click() },
+    { cat:"Akcja", title:"Przywróć dane domyślne",    sub:"Cofa zaimportowane zmiany",icon:"life", run:resetData },
+    { cat:"Akcja", title:"Dodaj nową grupę…",         sub:"Otwiera formularz",        icon:"users",run:()=>$("#addGroupBtn").click() },
+    { cat:"Akcja", title:"Generuj kod szablonu",      sub:"Z aktualnych pól",         icon:"book", run:()=>$("#genTmplBtn").click() },
+    { cat:"Akcja", title:"Wyczyść draft kompozytora", sub:"Usuń autosave",            icon:"box",  run:()=>{ clearDraft(); toast("Draft skasowany."); } }
+  );
+
+  // Szablony
+  sortedTemplates().forEach(t => items.push({
+    cat:"Szablon", title:t.name, sub:t.subject || "",
+    icon:"book", run:() => loadTemplateByName(t.name)
+  }));
+
+  // Grupy (Add as To)
+  emailData.sections.forEach(sec => sec.groups.forEach(g => items.push({
+    cat:"Grupa", title:`${g.name}  ·  ${sec.name}`, sub:`${g.emails.length} adresów → dodaj do "Do"`,
+    icon:"users",
+    run:() => addGroupAsRecipient(sec.name, g.name, "To")
+  })));
+
+  // Kafelki
+  emailData.tiles.forEach(t => items.push({
+    cat: t.type === "copy" ? "Kopiuj" : "Kafelek",
+    title: t.title,
+    sub: t.type === "copy" ? "Kopiuj do schowka" : (t.ie ? "Otwórz w trybie IE" : "Otwórz w nowej karcie"),
+    icon: t.icon || "globe",
+    run: () => runTileFromPalette(t)
+  }));
+
+  // Częste linki
+  emailData.frequentLinks.forEach(l => items.push({
+    cat:"Link", title:l.title, sub:l.url, icon:"globe",
+    run: () => window.open(l.url, "_blank", "noopener")
+  }));
+
+  return items;
+}
+
+/**
+ * Aktywuj grupę jako odbiorca (z palety) — dopisuje adresy do pola.
+ * @param {string} secName @param {string} grpName @param {"To"|"Cc"|"Bcc"} kind
+ */
+function addGroupAsRecipient(secName, grpName, kind){
+  const id = secName + "::" + grpName;
+  const grp = findGroupById(id); if(!grp) return;
+  const inp = fieldFor(kind);
+  const merged = uniq([...parseEmails(inp.value), ...grp.emails]);
+  inp.value = merged.join(", ");
+  inp.dispatchEvent(new Event("input"));
+  groupState[kind].add(id);
+  renderGroups($("#grpSearch").value || "");
+  if(!emailEl.classList.contains("expanded")) toggleEmail();
+  toast(`Dodano grupę „${grpName}" do „${kind === "To" ? "Do" : kind}".`);
+}
+
+/**
+ * Wykonaj akcję kafelka z palety (link/IE/copy).
+ * @param {object} t
+ */
+function runTileFromPalette(t){
+  if(t.type === "copy"){
+    copyToClipboard(t.value).then(ok => toast(ok ? `Skopiowano: ${t.title}` : "Nie udało się skopiować.", ok ? "ok" : "err"));
+  } else {
+    window.open(t.ie ? ieUrl(t.url) : t.url, "_blank", "noopener");
+  }
+}
+
+let paletteItems = [];
+let paletteActiveIx = 0;
+
+/** Otwórz Command Palette, zbuduj listę i ustaw focus na input. */
+function openPalette(){
+  paletteItems = buildPaletteItems();
+  paletteActiveIx = 0;
+  $("#cmdQuery").value = "";
+  renderPalette("");
+  showModal("cmdModal");
+  setTimeout(() => $("#cmdQuery").focus(), 30);
+}
+
+/**
+ * Wyrenderuj listę pozycji palety odfiltrowaną względem zapytania.
+ * @param {string} q
+ */
+function renderPalette(q){
+  const host = $("#cmdList");
+  const query = q.trim().toLowerCase();
+  const filtered = query
+    ? paletteItems.filter(it => (it.title + " " + it.sub + " " + it.cat).toLowerCase().includes(query))
+    : paletteItems;
+
+  if(!filtered.length){
+    host.innerHTML = `<div class="cmd-empty">Brak wyników dla „${escHTML(q)}"</div>`;
+    return;
+  }
+  paletteActiveIx = Math.min(paletteActiveIx, filtered.length - 1);
+  host.innerHTML = filtered.map((it, i) => `
+    <div class="cmd-item ${i === paletteActiveIx ? "active" : ""}" data-ix="${i}" role="option">
+      <div class="ci-ic">${getIcon(it.icon)}</div>
+      <div class="ci-txt">
+        <div class="ci-title">${escHTML(it.title)}</div>
+        <div class="ci-sub">${escHTML(it.sub)}</div>
+      </div>
+      <div class="ci-cat">${escHTML(it.cat)}</div>
+    </div>`).join("");
+
+  host.dataset.filtered = JSON.stringify(filtered.map((_,i) => i)); // niepotrzebne, ale bezpieczne
+  // klik handler
+  $$(".cmd-item", host).forEach((el, i) => {
+    el.addEventListener("click", () => executePaletteItem(filtered[i]));
+    el.addEventListener("mouseenter", () => { paletteActiveIx = i; refreshPaletteActive(); });
+  });
+}
+
+/** Podświetl aktualnie wybrany element listy. */
+function refreshPaletteActive(){
+  $$(".cmd-item", $("#cmdList")).forEach((el, i) => el.classList.toggle("active", i === paletteActiveIx));
+  const active = $(".cmd-item.active", $("#cmdList"));
+  if(active) active.scrollIntoView({ block:"nearest" });
+}
+
+/** Wykonaj wybraną pozycję (zamyka modal). */
+function executePaletteItem(it){
+  if(!it) return;
+  closeModal();
+  setTimeout(() => { try{ it.run(); }catch(e){ toast("Błąd akcji.","err"); } }, 50);
+}
+
+/** Klawiatura w polu palety. */
+function onPaletteKey(e){
+  const q = $("#cmdQuery").value.trim().toLowerCase();
+  const filtered = q
+    ? paletteItems.filter(it => (it.title + " " + it.sub + " " + it.cat).toLowerCase().includes(q))
+    : paletteItems;
+  if(e.key === "ArrowDown"){ e.preventDefault(); paletteActiveIx = (paletteActiveIx + 1) % filtered.length; refreshPaletteActive(); }
+  else if(e.key === "ArrowUp"){ e.preventDefault(); paletteActiveIx = (paletteActiveIx - 1 + filtered.length) % filtered.length; refreshPaletteActive(); }
+  else if(e.key === "Enter"){ e.preventDefault(); executePaletteItem(filtered[paletteActiveIx]); }
+}
+
+$("#openPaletteBtn").addEventListener("click", openPalette);
+$("#cmdQuery").addEventListener("input", e => { paletteActiveIx = 0; renderPalette(e.target.value); });
+$("#cmdQuery").addEventListener("keydown", onPaletteKey);
+
+// Globalny skrót Ctrl/Cmd + K
+window.addEventListener("keydown", e => {
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+    e.preventDefault();
+    openPalette();
+  }
+});
+
+/* =========================================================
+   AUTO-SAVE DRAFTU (A3)
+   ========================================================= */
+const DRAFT_KEY = "wd.draft.v1";
+const DRAFT_FIELDS = ["fTo","fCc","fBcc","fSubj","fBody","fSig"];
+let draftSaveTimer = null;
+
+/** Zapisuje aktualne pola kompozytora do localStorage (debounce 400 ms). */
+function scheduleDraftSave(){
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(() => {
+    const snap = {};
+    DRAFT_FIELDS.forEach(id => snap[id] = $("#"+id).value);
+    snap.savedAt = Date.now();
+    try{ localStorage.setItem(DRAFT_KEY, JSON.stringify(snap)); }catch{}
+  }, 400);
+}
+
+/** Czy draft zawiera jakąkolwiek wartość poza domyślną stopką. @returns {object|null} */
+function readMeaningfulDraft(){
+  try{
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    const meaningful = ["fTo","fCc","fBcc","fSubj","fBody"].some(k => (d[k] || "").trim().length > 0);
+    return meaningful ? d : null;
+  }catch{ return null; }
+}
+
+/** Skasuj draft z localStorage. */
+function clearDraft(){
+  clearTimeout(draftSaveTimer);
+  localStorage.removeItem(DRAFT_KEY);
+}
+
+/** Pokaż banner przywrócenia draftu. */
+function showDraftBanner(d){
+  const b = $("#draftBanner");
+  b.hidden = false;
+  $("#draftRestore").onclick = () => {
+    DRAFT_FIELDS.forEach(id => { if(d[id] !== undefined) $("#"+id).value = d[id]; });
+    updateCharBadge();
+    validateAllRecipients();
+    b.hidden = true;
+    if(!emailEl.classList.contains("expanded")) toggleEmail();
+    toast("Przywrócono wersję roboczą.");
+  };
+  $("#draftDiscard").onclick = () => { clearDraft(); b.hidden = true; toast("Wersja robocza odrzucona."); };
+}
+
+// auto-save przy każdej zmianie w polach kompozytora
+DRAFT_FIELDS.forEach(id => $("#"+id).addEventListener("input", scheduleDraftSave));
+
+/* =========================================================
+   WALIDACJA E-MAILI (A4)
+   ========================================================= */
+const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+
+/**
+ * Sprawdza adresy w polu, dodaje klasę invalid-input i wypełnia .field-info.
+ * @param {"fTo"|"fCc"|"fBcc"} id
+ */
+function validateRecipients(id){
+  const input = $("#"+id);
+  const info  = $("#info" + id.slice(1)); // fTo -> infoTo
+  const addrs = parseEmails(input.value);
+  if(!addrs.length){ info.textContent = ""; info.className = "field-info"; input.classList.remove("invalid-input"); return; }
+  const bad = addrs.filter(a => !EMAIL_RE.test(a));
+  if(bad.length){
+    info.textContent = `${addrs.length - bad.length} OK · ${bad.length} błędnych: ${bad.slice(0,2).join(", ")}${bad.length>2?"…":""}`;
+    info.className = "field-info invalid";
+    input.classList.add("invalid-input");
+  } else {
+    info.textContent = `${addrs.length} prawidłow${addrs.length === 1 ? "y" : "ych"}`;
+    info.className = "field-info ok";
+    input.classList.remove("invalid-input");
+  }
+}
+
+/** Uruchom walidację dla wszystkich trzech pól. */
+function validateAllRecipients(){
+  ["fTo","fCc","fBcc"].forEach(validateRecipients);
+}
+
+["fTo","fCc","fBcc"].forEach(id => {
+  $("#"+id).addEventListener("input", () => validateRecipients(id));
+});
+
+/* =========================================================
+   WYSZUKIWARKA KAFELKÓW + DRAG&DROP + ULUBIONE (B1+B2)
+   ========================================================= */
+const TILE_ORDER_KEY = "wd.tileOrder.v1";  // ["title1","title2",...]
+const TILE_PIN_KEY   = "wd.tilePins.v1";   // ["title1","title2",...]
+
+/** @returns {string[]} */
+function loadTileOrder(){ try{ return JSON.parse(localStorage.getItem(TILE_ORDER_KEY) || "[]"); }catch{ return []; } }
+function saveTileOrder(arr){ localStorage.setItem(TILE_ORDER_KEY, JSON.stringify(arr)); }
+
+/** @returns {Set<string>} */
+function loadPinned(){ try{ return new Set(JSON.parse(localStorage.getItem(TILE_PIN_KEY) || "[]")); }catch{ return new Set(); } }
+function savePinned(set){ localStorage.setItem(TILE_PIN_KEY, JSON.stringify([...set])); }
+
+let tileSearchQuery = "";
+let pinnedTiles = loadPinned();
+
+/**
+ * Posortuj kafelki: najpierw przypięte (po kolejności custom), potem reszta wg custom order, potem reszta wg danych.
+ * @returns {object[]}
+ */
+function tilesInRenderOrder(){
+  const customOrder = loadTileOrder();
+  const byTitle = new Map(emailData.tiles.map(t => [t.title, t]));
+  const seen = new Set();
+  const out = [];
+
+  // pinned first (w kolejności custom, lub w kolejności emailData)
+  emailData.tiles.forEach(t => { if(pinnedTiles.has(t.title)){ out.push(t); seen.add(t.title); } });
+
+  // następnie reszta wg custom order
+  customOrder.forEach(title => {
+    if(byTitle.has(title) && !seen.has(title)){ out.push(byTitle.get(title)); seen.add(title); }
+  });
+
+  // pozostałe (nowe lub bez custom order) wg emailData
+  emailData.tiles.forEach(t => { if(!seen.has(t.title)){ out.push(t); seen.add(t.title); } });
+
+  return out;
+}
+
+/** Filtr po tytule, opisie i tagach kafelków. */
+function tileMatchesSearch(t, q){
+  if(!q) return true;
+  const hay = (t.title + " " + (t.desc || "") + " " + (t.tags || []).join(" ")).toLowerCase();
+  return hay.includes(q);
+}
+
+/** Toggle pinned dla danego tytułu. */
+function togglePin(title){
+  if(pinnedTiles.has(title)) pinnedTiles.delete(title);
+  else pinnedTiles.add(title);
+  savePinned(pinnedTiles);
+  renderTiles();
+}
+
+/** Zapisz aktualną widoczną kolejność (bez przypiętych — bo te idą zawsze pierwsze). */
+function persistVisibleOrder(){
+  const titles = $$(".tile", $("#tilesHost")).map(el => el.dataset.title);
+  const nonPinned = titles.filter(t => !pinnedTiles.has(t));
+  saveTileOrder(nonPinned);
+}
+
+/* Wyszukiwarka */
+$("#tileSearch").addEventListener("input", e => {
+  tileSearchQuery = e.target.value.trim().toLowerCase();
+  applyTileFilter();
+});
+$("#tileReorderReset").addEventListener("click", () => {
+  if(!confirm("Przywrócić domyślną kolejność kafelków?")) return;
+  localStorage.removeItem(TILE_ORDER_KEY);
+  localStorage.removeItem(TILE_PIN_KEY);
+  pinnedTiles = new Set();
+  renderTiles();
+  toast("Przywrócono domyślną kolejność.");
+});
+
+/** Pokaż/ukryj kafelki bez ponownego renderu (filtr). */
+function applyTileFilter(){
+  $$(".tile", $("#tilesHost")).forEach(el => {
+    const title = el.dataset.title;
+    const t = emailData.tiles.find(x => x.title === title);
+    el.classList.toggle("tile-hidden", !(t && tileMatchesSearch(t, tileSearchQuery)));
+  });
+}
+
+/* =========================================================
+   TODO — UNDO przy DELETE (E1)
+   ========================================================= */
+let pendingUndo = null; // {todo, index, toastEl, timeout}
+
+/**
+ * Zastąp wcześniejszy delete w bindTodoEvents wersją z toast „cofnij".
+ * Wywoływane w bindTodoEvents (ten plik nadpisuje handler delete).
+ */
+function deleteTodoWithUndo(t){
+  const index = todos.findIndex(x => x.id === t.id);
+  if(index < 0) return;
+  const removed = todos.splice(index, 1)[0];
+  saveTodos(todos); renderTodos();
+
+  // anuluj poprzedni undo (jeśli był)
+  if(pendingUndo){ clearTimeout(pendingUndo.timeout); pendingUndo.toastEl?.remove(); }
+
+  const toastEl = document.createElement("div");
+  toastEl.className = "toast";
+  toastEl.innerHTML = `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+    <span>Usunięto: ${escHTML(removed.text)}</span>
+    <button class="toast-action" data-testid="todo-undo">Cofnij</button>`;
+  $("#toasts").appendChild(toastEl);
+
+  const timeout = setTimeout(() => {
+    toastEl.style.opacity = "0"; toastEl.style.transform = "translateY(6px)";
+    setTimeout(() => toastEl.remove(), 300);
+    pendingUndo = null;
+  }, 5000);
+
+  toastEl.querySelector(".toast-action").addEventListener("click", () => {
+    todos.splice(index, 0, removed);
+    saveTodos(todos); renderTodos();
+    clearTimeout(timeout);
+    toastEl.remove();
+    pendingUndo = null;
+    toast("Przywrócono zadanie.");
+  });
+
+  pendingUndo = { todo: removed, index, toastEl, timeout };
+}
+
+/* =========================================================
+   MULTI-COLOR STICKY NOTES (E2)
+   ========================================================= */
+const NOTES_KEY = "wd.notes.v2";
+
+/** Predefiniowane palety notatek (CSS variables: bg, border, text). */
+const NOTE_PALETTES = [
+  { id:"amber",  bg:"#26200f", bd:"#5b4a1c", fg:"#ffe8a8", swatch:"#e6c374" },
+  { id:"mint",   bg:"#0f2620", bd:"#1d4438", fg:"#bff5d6", swatch:"#6bd6a4" },
+  { id:"blue",   bg:"#101a2a", bd:"#234063", fg:"#cfdcff", swatch:"#7aa2ff" },
+  { id:"rose",   bg:"#2a1418", bd:"#5a2b30", fg:"#ffd0d0", swatch:"#ff8a8a" },
+  { id:"slate",  bg:"#161a22", bd:"#2c333f", fg:"#dfe3eb", swatch:"#8a93a8" }
+];
+
+/** @returns {Array<{id:string,color:string,text:string,createdAt:number}>} */
+function loadNotes(){
+  try{
+    const v2 = JSON.parse(localStorage.getItem(NOTES_KEY) || "null");
+    if(Array.isArray(v2)) return v2;
+  }catch{}
+  // migracja z v1 (stara jedna notatka)
+  const legacy = localStorage.getItem("wd.note.v1");
+  if(legacy){
+    return [{ id:"legacy", color:"amber", text:legacy, createdAt:Date.now() }];
+  }
+  return [];
+}
+function saveNotes(arr){ localStorage.setItem(NOTES_KEY, JSON.stringify(arr)); }
+let notes = loadNotes();
+
+/** Renderuj wszystkie notatki w panelu. */
+function renderNotes(){
+  const host = $("#notesHost");
+  host.innerHTML = "";
+  notes.forEach(n => host.appendChild(createNoteElement(n)));
+  $("#notesCount").textContent = notes.length;
+}
+
+/**
+ * Zbuduj DOM jednej notatki z color-pickerem.
+ * @param {{id:string,color:string,text:string}} n
+ */
+function createNoteElement(n){
+  const pal = NOTE_PALETTES.find(p => p.id === n.color) || NOTE_PALETTES[0];
+  const el = document.createElement("div");
+  el.className = "note-card";
+  el.style.setProperty("--note-bg", pal.bg);
+  el.style.setProperty("--note-bd", pal.bd);
+  el.style.setProperty("--note-fg", pal.fg);
+  el.innerHTML = `
+    <button class="note-x" aria-label="Usuń notatkę" data-testid="note-x">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <textarea placeholder="Treść notatki…">${escHTML(n.text)}</textarea>
+    <div class="note-colors">
+      ${NOTE_PALETTES.map(p => `<span class="note-color ${p.id === n.color ? "active" : ""}" data-c="${p.id}" style="background:${p.swatch}" title="${p.id}"></span>`).join("")}
+    </div>`;
+  el.querySelector("textarea").addEventListener("input", e => { n.text = e.target.value; saveNotes(notes); });
+  el.querySelector(".note-x").addEventListener("click", () => {
+    notes = notes.filter(x => x.id !== n.id); saveNotes(notes); renderNotes();
+  });
+  el.querySelectorAll(".note-color").forEach(sw => {
+    sw.addEventListener("click", () => { n.color = sw.dataset.c; saveNotes(notes); renderNotes(); });
+  });
+  return el;
+}
+
+/** Dodaj nową notatkę. */
+function addNote(){
+  notes.unshift({
+    id: Date.now() + "_" + Math.random().toString(36).slice(2,7),
+    color: NOTE_PALETTES[notes.length % NOTE_PALETTES.length].id,
+    text: "",
+    createdAt: Date.now()
+  });
+  saveNotes(notes); renderNotes();
+  // ustaw fokus na nowej notatce
+  setTimeout(() => $("#notesHost .note-card textarea")?.focus(), 30);
+}
+$("#noteAddBtn").addEventListener("click", addNote);
+
+/* =========================================================
    INIT — pierwsze renderowanie + ustawienie domyślnej stopki
    ========================================================= */
 /**
@@ -2059,13 +2756,33 @@ renderTemplateList();
 renderFlinks();
 renderTiles();
 renderTodos();
+renderNotes();
 setDefaultSignature();
 updateCharBadge();
+validateAllRecipients();
 
 // jeśli w localStorage są zaimportowane dane — wczytaj i przerenderuj
 const _stored = loadStoredData();
 if(_stored){ applyEmailData(_stored); rerenderAllFromData(); }
 else { refreshDataBadge(); }
+
+// Auto-restore draftu (A3) — wyświetl banner tylko gdy są niepuste pola
+const _draft = readMeaningfulDraft();
+if(_draft) showDraftBanner(_draft);
+
+// Globalne skróty klawiszowe (A2 light): Ctrl+Enter = wyślij, Ctrl+E = pasek email
+window.addEventListener("keydown", e => {
+  // pomijaj jeśli paleta jest otwarta (ma własną klawiaturę)
+  if(overlay.classList.contains("show") && $("#cmdModal").style.display === "flex") return;
+  if((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); $("#sendBtn").click(); }
+  else if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e" && !e.shiftKey){
+    // Ctrl+E koliduje z "wycentruj" w wielu polach — działa tylko gdy fokus nie jest w polu tekstowym
+    if(!["INPUT","TEXTAREA"].includes(document.activeElement?.tagName)){
+      e.preventDefault();
+      toggleEmail();
+    }
+  }
+});
 </script>
 </body>
 </html>
