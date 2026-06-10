@@ -630,6 +630,112 @@ kbd{
   transition:background var(--t);
 }
 .toast .toast-action:hover{background:var(--bg-3)}
+
+/* =========================================================
+   HELP MODAL (A2)
+   ========================================================= */
+.kbd-table{width:100%;border-collapse:collapse;font-size:13px}
+.kbd-table td{padding:8px 10px;border-bottom:1px solid var(--line-soft)}
+.kbd-table tr:last-child td{border-bottom:0}
+.kbd-table td:first-child{width:160px;color:var(--text-dim);white-space:nowrap}
+
+/* =========================================================
+   SNIPPET POPUP (A5)
+   ========================================================= */
+.snip-pop{
+  position:absolute;z-index:25;left:8px;bottom:8px;
+  background:#171c25;border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--shadow-md);max-height:220px;overflow:auto;min-width:280px;
+}
+.snip-pop[hidden]{display:none}
+.snip-pop .item{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.snip-pop .item:hover,.snip-pop .item.active{background:var(--bg-3)}
+.snip-pop .item code{font-size:11px;color:var(--accent);background:transparent;padding:0}
+.snip-pop .item .lbl{color:var(--text-mute);font-size:11px}
+
+/* =========================================================
+   MINI CALENDAR (B4)
+   ========================================================= */
+.cal-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.cal-title{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:11.5px}
+.cal-grid .dow{text-align:center;color:var(--text-mute);padding:4px 0;font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.cal-grid .day{
+  text-align:center;padding:6px 0;border-radius:6px;cursor:pointer;
+  background:transparent;border:1px solid transparent;color:var(--text);
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.cal-grid .day:hover{background:var(--bg-3);border-color:var(--line)}
+.cal-grid .day.muted{color:var(--text-mute);opacity:.45}
+.cal-grid .day.today{background:#1c2a45;border-color:#3a5bb8;color:#cfdcff;font-weight:600}
+.cal-grid .day.hol{color:#ff8a8a}
+.cal-grid .day.weekend{color:var(--text-dim)}
+.cal-foot{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--text-mute)}
+.cal-dot{width:8px;height:8px;border-radius:50%;background:var(--text-mute)}
+.cal-dot.today{background:#3a5bb8}
+.cal-dot.hol{background:#ff8a8a}
+
+/* =========================================================
+   PASSWORD GENERATOR (D1)
+   ========================================================= */
+.pwd-out{display:flex;gap:8px;margin-bottom:14px}
+.pwd-out input{
+  flex:1;background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 12px;font-family:ui-monospace,Consolas,monospace;font-size:14px;
+  color:var(--text);outline:0;letter-spacing:.5px;
+}
+.pwd-out input:focus{border-color:#3e5fbf}
+.pwd-row{margin-bottom:10px}
+.pwd-len{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-dim)}
+.pwd-len input[type=range]{flex:1;accent-color:var(--accent)}
+.pwd-len span{min-width:24px;text-align:center;color:var(--text);font-weight:600}
+.pwd-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.pwd-opts .checkbox{justify-content:flex-start}
+.pwd-strength{
+  height:6px;background:var(--bg-3);border-radius:999px;overflow:hidden;
+  position:relative;margin-top:6px;
+}
+.pwd-strength::after{
+  content:"";position:absolute;left:0;top:0;bottom:0;
+  width:var(--w,30%);background:var(--c,#ff6b6b);
+  transition:width var(--t),background var(--t);
+}
+
+/* =========================================================
+   CONVERTER (D4)
+   ========================================================= */
+.conv-row{display:grid;grid-template-columns:1fr 90px auto 90px 1fr;gap:8px;align-items:center}
+.conv-row input,.conv-row select{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:9px 11px;font-size:13px;color:var(--text);outline:0;
+}
+.conv-row input:focus,.conv-row select:focus{border-color:#3e5fbf}
+.conv-row input[readonly]{background:var(--bg-2);color:var(--text-dim);font-weight:600}
+.conv-arrow{text-align:center;color:var(--text-mute);font-size:14px}
+.conv-info{margin-top:6px;font-size:11.5px;color:var(--text-mute)}
+
+/* =========================================================
+   QR (D3)
+   ========================================================= */
+.qr-body{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px}
+.qr-host{
+  background:#fff;padding:14px;border-radius:var(--r-md);
+  box-shadow:var(--shadow-md);
+}
+.qr-host svg{display:block;width:240px;height:240px;image-rendering:pixelated}
+.qr-text{
+  max-width:380px;text-align:center;font-family:ui-monospace,Consolas,monospace;
+  font-size:12px;color:var(--text-dim);word-break:break-all;
+}
+.tile .qr-btn{
+  position:absolute;top:8px;right:36px;
+  width:24px;height:24px;display:grid;place-items:center;
+  background:transparent;border:0;color:var(--text-mute);cursor:pointer;border-radius:6px;
+  transition:background var(--t),color var(--t);z-index:2;opacity:0;
+}
+.tile:hover .qr-btn{opacity:1}
+.tile .qr-btn:hover{background:var(--bg-4);color:var(--accent-2)}
+.tile .qr-btn svg{width:14px;height:14px}
 </style>
 </head>
 <body>
@@ -665,6 +771,10 @@ kbd{
   <button class="btn sm" id="openPaletteBtn" data-testid="open-palette-btn" title="Paleta poleceń (Ctrl+K)">
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
     <span><kbd class="kbd-sm">Ctrl</kbd>+<kbd class="kbd-sm">K</kbd></span>
+  </button>
+
+  <button class="btn sm ghost" id="openHelpBtn" data-testid="open-help-btn" title="Skróty klawiszowe (Shift+?)" aria-label="Skróty klawiszowe">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.3 1.8c-.8.8-1.8 1.2-1.8 2.2"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
   </button>
 
   <div class="timer" id="timer" data-testid="timer-pill" aria-live="polite">
@@ -800,6 +910,8 @@ kbd{
           <button class="btn sm primary" id="smartLoad">Wczytaj</button>
           <button class="btn sm ghost" id="smartDismiss">Pomiń</button>
         </div>
+        <!-- A5 snippet dropdown (pokazuje się gdy w treści wpiszesz /xxx) -->
+        <div class="snip-pop" id="snipPop" data-testid="snip-pop" hidden></div>
       </div>
       <div class="field area">
         <label for="fSig">Podpis / stopka</label>
@@ -833,6 +945,34 @@ kbd{
       </div>
     </div>
 
+    <!-- Mini kalendarz (B4) -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        <span class="t">Kalendarz</span>
+        <span class="count" id="calLabel"></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="cal-head">
+          <button class="icon-btn" id="calPrev" aria-label="Poprzedni miesiąc" data-testid="cal-prev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="cal-title" id="calTitle">…</div>
+          <button class="icon-btn" id="calNext" aria-label="Następny miesiąc" data-testid="cal-next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div class="cal-grid" id="calGrid" role="grid"></div>
+        <div class="cal-foot">
+          <span class="cal-dot today"></span> dziś
+          <span class="cal-dot hol"></span> dzień wolny
+          <span style="flex:1"></span>
+          <button class="btn sm ghost" id="calToday" data-testid="cal-today">Dziś</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Sticky notes (multi) -->
     <div class="panel open">
       <div class="panel-h" data-toggle>
@@ -861,6 +1001,8 @@ kbd{
           <button class="btn sm" id="toolDatePL" data-testid="tool-date-pl">Data PL</button>
           <button class="btn sm" id="toolDateISO" data-testid="tool-date-iso">Data ISO</button>
           <button class="btn sm full" id="toolUpper" data-testid="tool-upper">UPPER / lower (zaznaczenie w treści)</button>
+          <button class="btn sm" id="toolPassword" data-testid="tool-password">Hasło…</button>
+          <button class="btn sm" id="toolConv" data-testid="tool-conv">Konwerter…</button>
         </div>
         <div class="tools-out" id="toolsOut">Gotowe.</div>
       </div>
@@ -983,6 +1125,129 @@ kbd{
     <div class="modal-f">
       <button class="btn" data-close="groupModal">Anuluj</button>
       <button class="btn primary" id="ngGenerate" data-testid="ng-generate">Generuj JSON</button>
+    </div>
+  </div>
+
+  <!-- Help modal — skróty (A2) -->
+  <div class="modal" id="helpModal" role="dialog" aria-labelledby="helpTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="helpTitle">Skróty klawiszowe</h3>
+      <button class="btn ghost sm x" data-close="helpModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <table class="kbd-table">
+        <tbody>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Paleta poleceń — wyszukaj akcję, szablon, kafelek</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Wyślij wiadomość (otwiera klienta poczty)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Zwiń/rozwiń pasek e-mail (poza polami tekstu)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Tryb skupienia (ukryj sidebar)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Wymuś zapis draftu kompozytora</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Wyczyść kompozytor</td></tr>
+          <tr><td><kbd>/</kbd></td><td>Fokus w wyszukiwarce kafelków (E3)</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>?</kbd></td><td>To okno</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Zamknij dowolny modal / palety</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text-mute);margin-top:14px;font-size:12px">
+        W treści wiadomości możesz wpisać <code>/podpis</code>, <code>/data</code>, <code>/nip</code> itp., aby wstawić snippet (A5).
+      </p>
+    </div>
+    <div class="modal-f">
+      <button class="btn primary" data-close="helpModal">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- Password generator modal (D1) -->
+  <div class="modal" id="pwdModal" role="dialog" aria-labelledby="pwdTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="pwdTitle">Generator hasła</h3>
+      <button class="btn ghost sm x" data-close="pwdModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="pwd-out">
+        <input id="pwdValue" type="text" readonly data-testid="pwd-value"/>
+        <button class="btn primary" id="pwdCopy" data-testid="pwd-copy">Kopiuj</button>
+      </div>
+      <div class="pwd-row">
+        <label class="pwd-len">Długość <span id="pwdLenVal">16</span>
+          <input id="pwdLen" type="range" min="6" max="48" value="16" data-testid="pwd-len"/>
+        </label>
+      </div>
+      <div class="pwd-opts">
+        <label class="checkbox"><input type="checkbox" id="pwdUpper" checked/> Wielkie A–Z</label>
+        <label class="checkbox"><input type="checkbox" id="pwdLower" checked/> Małe a–z</label>
+        <label class="checkbox"><input type="checkbox" id="pwdDigit" checked/> Cyfry 0–9</label>
+        <label class="checkbox"><input type="checkbox" id="pwdSym"   checked/> Symbole !@#$%</label>
+        <label class="checkbox"><input type="checkbox" id="pwdNoAmb" checked/> Pomiń mylące (0/O/l/1)</label>
+      </div>
+      <div class="pwd-strength" id="pwdStrength"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" data-close="pwdModal">Zamknij</button>
+      <button class="btn primary" id="pwdGen" data-testid="pwd-gen">Generuj nowe</button>
+    </div>
+  </div>
+
+  <!-- Converter modal (D4) -->
+  <div class="modal" id="convModal" role="dialog" aria-labelledby="convTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="convTitle">Konwerter walut · VAT</h3>
+      <button class="btn ghost sm x" data-close="convModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <h4 style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Waluty</h4>
+      <div class="conv-row">
+        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt"/>
+        <select id="convFrom" data-testid="conv-from">
+          <option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
+        </select>
+        <span class="conv-arrow">→</span>
+        <select id="convTo" data-testid="conv-to">
+          <option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
+        </select>
+        <input id="convOut" type="text" readonly data-testid="conv-out"/>
+      </div>
+      <div class="conv-info" id="convInfo"></div>
+
+      <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">VAT</h4>
+      <div class="conv-row">
+        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt"/>
+        <select id="vatRate" data-testid="vat-rate"><option>23</option><option>8</option><option>5</option><option>0</option></select>
+        <span class="conv-arrow">%</span>
+        <select id="vatDir" data-testid="vat-dir">
+          <option value="net2gross">netto → brutto</option>
+          <option value="gross2net">brutto → netto</option>
+        </select>
+        <input id="vatOut" type="text" readonly data-testid="vat-out"/>
+      </div>
+      <div class="conv-info" id="vatInfo"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn primary" data-close="convModal">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- QR code modal (D3) -->
+  <div class="modal" id="qrModal" role="dialog" aria-labelledby="qrTitle" style="display:none">
+    <div class="modal-h">
+      <h3 id="qrTitle">Kod QR</h3>
+      <button class="btn ghost sm x" data-close="qrModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b qr-body">
+      <div class="qr-host" id="qrHost"></div>
+      <div class="qr-text" id="qrText"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" data-close="qrModal">Zamknij</button>
+      <button class="btn primary" id="qrDownload" data-testid="qr-download">Pobierz SVG</button>
     </div>
   </div>
 
@@ -1146,7 +1411,32 @@ const emailData = {
     "piotr.zielinski@firma.pl",
     "biuro@firma.pl",
     "kontakt@firma.pl"
-  ]
+  ],
+
+  // Snippety: wpisz "/nazwa" w treści, aby wstawić tekst (A5).
+  // `name` musi być bez spacji; obsługa case-insensitive.
+  snippets: [
+    { name:"data",      label:"Dzisiejsza data (PL)", value:"{{date_pl}}" },
+    { name:"dataiso",   label:"Dzisiejsza data (ISO)", value:"{{date_iso}}" },
+    { name:"godzina",   label:"Aktualna godzina",     value:"{{time}}" },
+    { name:"podpis",    label:"Podpis stopki",        value:"—\nImię Nazwisko\nDział / Stanowisko\nFirma Sp. z o.o.\ntel. +48 000 000 000" },
+    { name:"spotkanie", label:"Blok potwierdzenia spotkania", value:"Potwierdzam nasze spotkanie zaplanowane na [data] o godzinie [godzina].\nMiejsce: [miejsce / link do spotkania online]." },
+    { name:"nip",       label:"NIP firmy",            value:"NIP: PL0000000000" },
+    { name:"iban",      label:"Numer konta",          value:"Numer konta: PL00 0000 0000 0000 0000 0000 0000" },
+    { name:"adres",     label:"Adres biura",          value:"Firma Sp. z o.o.\nul. Przykładowa 1, 00-000 Warszawa" },
+    { name:"prosba",    label:"Uprzejma prośba (otwarcie)", value:"Dzień dobry,\n\nzwracam się z uprzejmą prośbą o " },
+    { name:"dzieki",    label:"Podziękowanie (zamknięcie)", value:"\n\nZ góry dziękuję za pomoc.\n\nPozdrawiam," }
+  ],
+
+  // Kursy do konwertera (D4) — edytuj ręcznie według potrzeb (data referencyjna w komentarzu)
+  // ile PLN za 1 jednostkę waluty obcej
+  fx: {
+    EUR: 4.30,
+    USD: 4.00,
+    GBP: 5.05,
+    CHF: 4.45,
+    asOf: "2026-02-01"
+  }
 };
 
 /* =========================================================
@@ -2730,6 +3020,759 @@ function addNote(){
 $("#noteAddBtn").addEventListener("click", addNote);
 
 /* =========================================================
+   SNIPPETY w treści (A5)
+   --------------------------------------------------------
+   Po wpisaniu "/nazwa" w polu treści pokazuje się dropdown
+   z dopasowanymi snippetami z emailData.snippets.
+   ↑/↓ nawigacja, Enter / Tab wstawia, Esc zamyka.
+   Tokeny dynamiczne: {{date_pl}}, {{date_iso}}, {{time}}
+   ========================================================= */
+
+let snipActiveIx = 0;
+let snipMatches = [];
+
+/** Pobierz token "/abc" przed kursorem w polu treści. @returns {{token:string,start:number}|null} */
+function getSnippetToken(){
+  const t = $("#fBody");
+  const v = t.value;
+  const caret = t.selectionStart ?? v.length;
+  const left = v.slice(0, caret);
+  const m = left.match(/(?:^|\s)\/([a-z0-9]{0,20})$/i);
+  if(!m) return null;
+  return { token: m[1].toLowerCase(), start: caret - m[1].length - 1 }; // start = pozycja "/"
+}
+
+/** Zastąp tokeny dynamiczne w wartości snippetu. */
+function expandSnippet(value){
+  const d = new Date();
+  return value
+    .replace(/\{\{date_pl\}\}/g,  pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear())
+    .replace(/\{\{date_iso\}\}/g, d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()))
+    .replace(/\{\{time\}\}/g,     pad(d.getHours())+":"+pad(d.getMinutes()));
+}
+
+/** Wyrenderuj listę snippetów odfiltrowaną względem tokena. */
+function renderSnippetPop(){
+  const pop = $("#snipPop");
+  const tk = getSnippetToken();
+  if(!tk){ pop.hidden = true; return; }
+  snipMatches = (emailData.snippets || [])
+    .filter(s => s.name.toLowerCase().startsWith(tk.token))
+    .slice(0, 8);
+  if(!snipMatches.length){ pop.hidden = true; return; }
+  snipActiveIx = Math.min(snipActiveIx, snipMatches.length-1);
+  pop.innerHTML = snipMatches.map((s,i)=>`
+    <div class="item ${i===snipActiveIx?"active":""}" data-ix="${i}">
+      <span><code>/${escHTML(s.name)}</code> <span class="lbl">${escHTML(s.label)}</span></span>
+    </div>`).join("");
+  pop.hidden = false;
+  $$(".item", pop).forEach(el=>{
+    el.addEventListener("mousedown", e=>{ e.preventDefault(); insertSnippet(snipMatches[+el.dataset.ix]); });
+    el.addEventListener("mouseenter", ()=>{ snipActiveIx = +el.dataset.ix; refreshSnipActive(); });
+  });
+}
+
+function refreshSnipActive(){
+  $$(".item", $("#snipPop")).forEach((el,i)=> el.classList.toggle("active", i===snipActiveIx));
+}
+
+/** Wstaw snippet w miejsce tokena. */
+function insertSnippet(s){
+  if(!s) return;
+  const t = $("#fBody");
+  const tk = getSnippetToken();
+  if(!tk) return;
+  const before = t.value.slice(0, tk.start);
+  const after  = t.value.slice(t.selectionStart ?? t.value.length);
+  const value  = expandSnippet(s.value);
+  t.value = before + value + after;
+  const caret = (before + value).length;
+  t.setSelectionRange(caret, caret);
+  t.focus();
+  $("#snipPop").hidden = true;
+  updateCharBadge();
+  scheduleDraftSave();
+}
+
+// Wpinamy listenery na pole treści — z dodatkiem do istniejących
+$("#fBody").addEventListener("input", renderSnippetPop);
+$("#fBody").addEventListener("keydown", e => {
+  if($("#snipPop").hidden || !snipMatches.length) return;
+  if(e.key === "ArrowDown"){ e.preventDefault(); snipActiveIx = (snipActiveIx+1) % snipMatches.length; refreshSnipActive(); }
+  else if(e.key === "ArrowUp"){ e.preventDefault(); snipActiveIx = (snipActiveIx-1+snipMatches.length) % snipMatches.length; refreshSnipActive(); }
+  else if(e.key === "Enter" || e.key === "Tab"){ e.preventDefault(); insertSnippet(snipMatches[snipActiveIx]); }
+  else if(e.key === "Escape"){ $("#snipPop").hidden = true; }
+});
+$("#fBody").addEventListener("blur", () => setTimeout(()=> $("#snipPop").hidden = true, 120));
+
+/* =========================================================
+   MINI KALENDARZ z dniami wolnymi PL (B4)
+   ========================================================= */
+let calCursor = (function(){ const d = new Date(); return { y:d.getFullYear(), m:d.getMonth() }; })();
+
+/** Oblicz datę Wielkanocy w danym roku (algorytm Gaussa/Meeusa). @returns {Date} */
+function easterDate(year){
+  const a = year % 19, b = Math.floor(year/100), c = year % 100;
+  const d = Math.floor(b/4), e = b % 4, f = Math.floor((b+8)/25);
+  const g = Math.floor((b-f+1)/3);
+  const h = (19*a + b - d - g + 15) % 30;
+  const i = Math.floor(c/4), k = c % 4;
+  const L = (32 + 2*e + 2*i - h - k) % 7;
+  const mm = Math.floor((a + 11*h + 22*L) / 451);
+  const month = Math.floor((h + L - 7*mm + 114) / 31);   // 3 = marzec, 4 = kwiecień
+  const day = ((h + L - 7*mm + 114) % 31) + 1;
+  return new Date(year, month-1, day);
+}
+
+/** Zwraca Set kluczy "MM-DD" dni wolnych PL w roku. */
+function polishHolidays(year){
+  const holidays = new Set([
+    "01-01", "01-06", "05-01", "05-03",
+    "08-15", "11-01", "11-11", "12-25", "12-26"
+  ]);
+  const easter = easterDate(year);
+  const add = (date) => holidays.add(pad(date.getMonth()+1)+"-"+pad(date.getDate()));
+  add(easter);                                       // Niedziela Wielkanocna
+  add(new Date(easter.getTime() + 1*86400000));      // Poniedziałek Wielkanocny
+  add(new Date(easter.getTime() + 49*86400000));     // Zielone Świątki
+  add(new Date(easter.getTime() + 60*86400000));     // Boże Ciało
+  return holidays;
+}
+
+/** Wyrenderuj kalendarz miesiąca z calCursor. */
+function renderCalendar(){
+  const grid  = $("#calGrid");
+  const today = new Date();
+  const todayKey = today.getFullYear()+"-"+pad(today.getMonth()+1)+"-"+pad(today.getDate());
+  const holidays = polishHolidays(calCursor.y);
+
+  const first  = new Date(calCursor.y, calCursor.m, 1);
+  const monLbl = first.toLocaleDateString("pl-PL", { month:"long", year:"numeric" });
+  $("#calTitle").textContent = monLbl.charAt(0).toUpperCase() + monLbl.slice(1);
+  $("#calLabel").textContent = first.toLocaleDateString("pl-PL", { month:"short" });
+
+  // dzień tygodnia 1=Pn,..,0=Nd — przesuwamy do offsetu z poniedziałkiem na lewo
+  const startOffset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(calCursor.y, calCursor.m+1, 0).getDate();
+  const prevDays    = new Date(calCursor.y, calCursor.m, 0).getDate();
+
+  const cells = [];
+  ["Pn","Wt","Śr","Cz","Pt","So","Nd"].forEach(d => cells.push(`<div class="dow">${d}</div>`));
+
+  // poprzedni miesiąc
+  for(let i = startOffset-1; i >= 0; i--){
+    cells.push(`<div class="day muted">${prevDays - i}</div>`);
+  }
+  // bieżący miesiąc
+  for(let d = 1; d <= daysInMonth; d++){
+    const date = new Date(calCursor.y, calCursor.m, d);
+    const key  = pad(calCursor.m+1)+"-"+pad(d);
+    const isToday = todayKey === (calCursor.y+"-"+pad(calCursor.m+1)+"-"+pad(d));
+    const dow = date.getDay(); // 0 = Nd, 6 = So
+    const isWeekend = dow === 0 || dow === 6;
+    const isHol = holidays.has(key);
+    const cls = ["day"];
+    if(isToday) cls.push("today");
+    if(isHol) cls.push("hol");
+    else if(isWeekend) cls.push("weekend");
+    cells.push(`<div class="${cls.join(" ")}" data-day="${d}" title="${escHTML(date.toLocaleDateString("pl-PL", { weekday:"long", day:"numeric", month:"long" }))}">${d}</div>`);
+  }
+  // wypełniacz na koniec (do pełnych 6 wierszy)
+  const total = startOffset + daysInMonth;
+  const tail = (7 - (total % 7)) % 7;
+  for(let i = 1; i <= tail; i++) cells.push(`<div class="day muted">${i}</div>`);
+
+  grid.innerHTML = cells.join("");
+
+  // klik dnia — wstaw datę do treści (kursor) lub skopiuj do schowka
+  $$(".day:not(.muted)", grid).forEach(el => {
+    el.addEventListener("click", () => {
+      const d = +el.dataset.day;
+      const ds = pad(d)+"."+pad(calCursor.m+1)+"."+calCursor.y;
+      insertIntoBodyAtCursor(ds);
+      toast("Wstawiono datę: "+ds);
+    });
+  });
+}
+
+/** Wstaw tekst do pola treści w pozycji kursora (lub na końcu). */
+function insertIntoBodyAtCursor(text){
+  const t = $("#fBody");
+  if(!emailEl.classList.contains("expanded")) toggleEmail();
+  t.focus();
+  const s = t.selectionStart ?? t.value.length;
+  const e = t.selectionEnd ?? t.value.length;
+  t.value = t.value.slice(0,s) + text + t.value.slice(e);
+  const caret = s + text.length;
+  t.setSelectionRange(caret, caret);
+  updateCharBadge();
+  scheduleDraftSave();
+}
+
+$("#calPrev").addEventListener("click", ()=>{ calCursor.m--; if(calCursor.m<0){ calCursor.m=11; calCursor.y--; } renderCalendar(); });
+$("#calNext").addEventListener("click", ()=>{ calCursor.m++; if(calCursor.m>11){ calCursor.m=0; calCursor.y++; } renderCalendar(); });
+$("#calToday").addEventListener("click", ()=>{ const d=new Date(); calCursor.y=d.getFullYear(); calCursor.m=d.getMonth(); renderCalendar(); });
+
+/* =========================================================
+   GENERATOR HASŁA (D1)
+   ========================================================= */
+const PWD_SETS = {
+  upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  lower: "abcdefghijklmnopqrstuvwxyz",
+  digit: "0123456789",
+  sym:   "!@#$%^&*()-_=+[]{};:,.<>?/"
+};
+const PWD_AMBIG = /[O0lI1|`'"]/g;
+
+/** Zwróć kryptograficznie losową liczbę z zakresu [0, max). */
+function rngInt(max){
+  const buf = new Uint32Array(1);
+  (window.crypto || window.msCrypto).getRandomValues(buf);
+  return buf[0] % max;
+}
+
+/** Wygeneruj nowe hasło na podstawie obecnych ustawień modala. */
+function generatePassword(){
+  const len = +$("#pwdLen").value;
+  $("#pwdLenVal").textContent = len;
+  const pools = [];
+  if($("#pwdUpper").checked) pools.push(PWD_SETS.upper);
+  if($("#pwdLower").checked) pools.push(PWD_SETS.lower);
+  if($("#pwdDigit").checked) pools.push(PWD_SETS.digit);
+  if($("#pwdSym").checked)   pools.push(PWD_SETS.sym);
+  const noAmb = $("#pwdNoAmb").checked;
+  let all = pools.map(p => noAmb ? p.replace(PWD_AMBIG, "") : p);
+  if(!all.length || all.some(p => !p.length)){
+    $("#pwdValue").value = "";
+    setPwdStrength(0);
+    return;
+  }
+  // Co najmniej 1 znak z każdego puli
+  const out = [];
+  all.forEach(p => out.push(p[rngInt(p.length)]));
+  const combined = all.join("");
+  while(out.length < len) out.push(combined[rngInt(combined.length)]);
+  // Mieszaj
+  for(let i = out.length - 1; i > 0; i--){
+    const j = rngInt(i+1);
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  $("#pwdValue").value = out.join("");
+  setPwdStrength(estimateStrength(out.join(""), combined.length));
+}
+
+/** Heurystyczna siła hasła 0..1. */
+function estimateStrength(pwd, alphaSize){
+  const bits = pwd.length * Math.log2(Math.max(alphaSize, 2));
+  return Math.max(0, Math.min(1, bits / 100));
+}
+
+/** Pokaż siłę hasła kolorem i szerokością. */
+function setPwdStrength(v){
+  const colors = ["#ff6b6b","#ffb86b","#ffd28a","#9cffd1","#6bd6a4"];
+  const ix = Math.min(colors.length-1, Math.floor(v * colors.length));
+  const el = $("#pwdStrength");
+  el.style.setProperty("--w", Math.max(8, v*100) + "%");
+  el.style.setProperty("--c", colors[ix]);
+}
+
+$("#pwdLen").addEventListener("input", () => { $("#pwdLenVal").textContent = $("#pwdLen").value; generatePassword(); });
+["pwdUpper","pwdLower","pwdDigit","pwdSym","pwdNoAmb"].forEach(id => $("#"+id).addEventListener("change", generatePassword));
+$("#pwdGen").addEventListener("click", generatePassword);
+$("#pwdCopy").addEventListener("click", async () => {
+  if(!$("#pwdValue").value) return toast("Najpierw wygeneruj hasło.","err");
+  const ok = await copyToClipboard($("#pwdValue").value);
+  toast(ok ? "Hasło skopiowane." : "Nie udało się skopiować.", ok?"ok":"err");
+});
+$("#toolPassword").addEventListener("click", () => { generatePassword(); showModal("pwdModal"); });
+
+/* =========================================================
+   KONWERTER WALUT + VAT (D4)
+   ========================================================= */
+/** Przelicz kwotę między walutami przez bazę PLN. */
+function fxConvert(amount, from, to){
+  if(from === to) return amount;
+  const fx = emailData.fx || {};
+  const toPLN = (amt, cur) => cur === "PLN" ? amt : amt * (fx[cur] || 0);
+  const fromPLN = (amt, cur) => cur === "PLN" ? amt : amt / (fx[cur] || 1);
+  return fromPLN(toPLN(amount, from), to);
+}
+
+function recalcConv(){
+  const amt = parseFloat($("#convAmt").value) || 0;
+  const from = $("#convFrom").value, to = $("#convTo").value;
+  const out = fxConvert(amt, from, to);
+  $("#convOut").value = out.toFixed(2) + " " + to;
+  const fx = emailData.fx || {};
+  $("#convInfo").textContent = `Kursy: 1 EUR = ${fx.EUR} PLN · 1 USD = ${fx.USD} PLN · 1 GBP = ${fx.GBP} PLN · 1 CHF = ${fx.CHF} PLN  (z dnia ${escHTML(fx.asOf || "?")}). Kursy edytujesz w emailData.fx.`;
+}
+
+function recalcVat(){
+  const amt = parseFloat($("#vatAmt").value) || 0;
+  const rate = parseFloat($("#vatRate").value) || 0;
+  const dir = $("#vatDir").value;
+  let net, gross, vat;
+  if(dir === "net2gross"){ net = amt; vat = net * rate/100; gross = net + vat; }
+  else                   { gross = amt; net = gross / (1 + rate/100); vat = gross - net; }
+  $("#vatOut").value = (dir === "net2gross" ? gross : net).toFixed(2) + " PLN";
+  $("#vatInfo").textContent = `Netto: ${net.toFixed(2)} · VAT (${rate}%): ${vat.toFixed(2)} · Brutto: ${gross.toFixed(2)}`;
+}
+
+["convAmt","convFrom","convTo"].forEach(id => $("#"+id).addEventListener("input", recalcConv));
+["vatAmt","vatRate","vatDir"].forEach(id => $("#"+id).addEventListener("input", recalcVat));
+$("#toolConv").addEventListener("click", () => { recalcConv(); recalcVat(); showModal("convModal"); });
+
+/* =========================================================
+   QR CODE — własny enkoder (D3)
+   --------------------------------------------------------
+   Wsparcie: tryb bajtowy, ECC level M, wersje 1–10.
+   Implementacja: bez bibliotek zewnętrznych.
+   Źródło algorytmu: standard ISO/IEC 18004.
+   ========================================================= */
+const QR = (function(){
+  // GF(256) tables: poly 0x11D
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  (function init(){
+    let x = 1;
+    for(let i = 0; i < 255; i++){ EXP[i] = x; LOG[x] = i; x <<= 1; if(x & 0x100) x ^= 0x11D; }
+    for(let i = 255; i < 512; i++) EXP[i] = EXP[i-255];
+  })();
+  const gfMul = (a,b) => (a && b) ? EXP[LOG[a] + LOG[b]] : 0;
+
+  /** Wygeneruj wielomian generujący dla Reed-Solomon stopnia `degree`. */
+  function rsGenPoly(degree){
+    let poly = [1];
+    for(let i = 0; i < degree; i++){
+      const next = new Array(poly.length + 1).fill(0);
+      for(let j = 0; j < poly.length; j++){
+        next[j] ^= poly[j];
+        next[j+1] ^= gfMul(poly[j], EXP[i]);
+      }
+      poly = next;
+    }
+    return poly;
+  }
+
+  /** Oblicz ECC dla bloku danych. */
+  function rsEncode(data, ecLen){
+    const gen = rsGenPoly(ecLen);
+    const result = new Array(ecLen).fill(0);
+    for(const b of data){
+      const factor = b ^ result[0];
+      result.shift(); result.push(0);
+      if(factor){
+        for(let i = 0; i < ecLen; i++) result[i] ^= gfMul(gen[i+1], factor);
+      }
+    }
+    return result;
+  }
+
+  // Tabele charakterystyk dla ECC level M, wersje 1–10:
+  // [version-1] = { totalCodewords, dataCodewords, ecPerBlock, numBlocks }
+  // (Wartości z ISO/IEC 18004:2006, tabela 9, poziom M)
+  const CAPS_M = [
+    { v:1,  total:26,  data:16,  ec:10, blocks:[[16,10]] },
+    { v:2,  total:44,  data:28,  ec:16, blocks:[[28,16]] },
+    { v:3,  total:70,  data:44,  ec:26, blocks:[[44,26]] },
+    { v:4,  total:100, data:64,  ec:18, blocks:[[32,18],[32,18]] },
+    { v:5,  total:134, data:86,  ec:24, blocks:[[43,24],[43,24]] },
+    { v:6,  total:172, data:108, ec:16, blocks:[[27,16],[27,16],[27,16],[27,16]] },
+    { v:7,  total:196, data:124, ec:18, blocks:[[31,18],[31,18],[31,18],[31,18]] },
+    { v:8,  total:242, data:154, ec:22, blocks:[[38,22],[38,22],[39,22],[39,22]] },
+    { v:9,  total:292, data:182, ec:22, blocks:[[36,22],[36,22],[36,22],[36,22],[37,22]] },
+    { v:10, total:346, data:216, ec:26, blocks:[[43,26],[43,26],[43,26],[43,26],[44,26],[44,26]] }
+  ];
+
+  // Pozycje centrów wzorców wyrównawczych (alignment) wg wersji
+  const ALIGN_POS = [
+    [], [6,18], [6,22], [6,26], [6,30], [6,34],
+    [6,22,38], [6,24,42], [6,26,46], [6,28,50]
+  ];
+
+  /** Znajdź najmniejszą wersję mieszczącą `dataBytes` w trybie bajtowym. */
+  function pickVersion(dataBytes){
+    const needBits = 4 + (dataBytes < 256 ? 8 : 16) + dataBytes * 8;
+    for(const cap of CAPS_M){
+      const ccBits = cap.v < 10 ? 8 : 16;
+      const cap_bits = 4 + ccBits + (cap.data * 8 - 4 - ccBits);
+      if(cap.data * 8 >= needBits) return cap;
+    }
+    return null;
+  }
+
+  /** Zakoduj string UTF-8 jako tablicę bajtów. */
+  function toBytes(str){
+    return Array.from(new TextEncoder().encode(str));
+  }
+
+  /** Zbuduj strumień bitów (BitBuffer). */
+  function bb(){
+    const bits = [];
+    return {
+      push(value, len){
+        for(let i = len-1; i >= 0; i--) bits.push((value >>> i) & 1);
+      },
+      length(){ return bits.length; },
+      toBytes(){
+        // dopełnij do bajta
+        while(bits.length % 8 !== 0) bits.push(0);
+        const out = [];
+        for(let i = 0; i < bits.length; i += 8){
+          let b = 0;
+          for(let j = 0; j < 8; j++) b = (b<<1) | bits[i+j];
+          out.push(b);
+        }
+        return out;
+      }
+    };
+  }
+
+  /** Główne kodowanie danych → final codeword stream. */
+  function encodeData(text){
+    const data = toBytes(text);
+    const cap = pickVersion(data.length);
+    if(!cap) throw new Error("Tekst za długi dla QR v1–10 ECC M");
+
+    const ccBits = cap.v < 10 ? 8 : 16;
+    const buf = bb();
+    buf.push(0b0100, 4);           // tryb bajtowy
+    buf.push(data.length, ccBits); // licznik znaków
+    for(const b of data) buf.push(b, 8);
+
+    // Terminator (max 4 zera, nie przekroczyć max bits)
+    const maxBits = cap.data * 8;
+    const term = Math.min(4, maxBits - buf.length());
+    if(term > 0) buf.push(0, term);
+
+    let cw = buf.toBytes();
+    // dopełnij bajtami 0xEC, 0x11
+    const padBytes = [0xEC, 0x11];
+    while(cw.length < cap.data) cw.push(padBytes[(cw.length - cap.data) & 1 ? 0 : 1] ?? padBytes[(cw.length) % 2]);
+    cw = cw.slice(0, cap.data);
+
+    // Podział na bloki + ECC per blok
+    const dataBlocks = [], ecBlocks = [];
+    let offset = 0;
+    for(const [bDataLen, bEcLen] of cap.blocks){
+      const block = cw.slice(offset, offset + bDataLen);
+      dataBlocks.push(block);
+      ecBlocks.push(rsEncode(block, bEcLen));
+      offset += bDataLen;
+    }
+
+    // Interleave: kolumnami przez bloki danych, potem przez bloki ECC
+    const maxData = Math.max(...dataBlocks.map(b => b.length));
+    const result = [];
+    for(let i = 0; i < maxData; i++){
+      for(const b of dataBlocks) if(i < b.length) result.push(b[i]);
+    }
+    const maxEc = Math.max(...ecBlocks.map(b => b.length));
+    for(let i = 0; i < maxEc; i++){
+      for(const b of ecBlocks) if(i < b.length) result.push(b[i]);
+    }
+
+    return { cap, bytes: result };
+  }
+
+  /** Zbuduj pustą macierz size×size z funkcjami pomocniczymi. */
+  function newMatrix(size){
+    const m = Array.from({length:size}, () => new Int8Array(size).fill(-1)); // -1 = puste
+    return m;
+  }
+
+  /** Wstaw 7×7 wzorzec znajdujący w (x,y). */
+  function placeFinder(m, x, y){
+    const size = m.length;
+    for(let dy = -1; dy <= 7; dy++){
+      for(let dx = -1; dx <= 7; dx++){
+        const px = x + dx, py = y + dy;
+        if(px < 0 || py < 0 || px >= size || py >= size) continue;
+        const onBorder = (dx >= 0 && dx <= 6 && (dy === 0 || dy === 6)) ||
+                         (dy >= 0 && dy <= 6 && (dx === 0 || dx === 6));
+        const inner = dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4;
+        m[py][px] = (onBorder || inner) ? 1 : 0;
+      }
+    }
+  }
+
+  /** Wstaw 5×5 wzorzec wyrównujący w (x,y). */
+  function placeAlignment(m, x, y){
+    for(let dy = -2; dy <= 2; dy++){
+      for(let dx = -2; dx <= 2; dx++){
+        const onBorder = Math.abs(dx) === 2 || Math.abs(dy) === 2;
+        const center = dx === 0 && dy === 0;
+        m[y+dy][x+dx] = (onBorder || center) ? 1 : 0;
+      }
+    }
+  }
+
+  /** Wzorzec maski wg numeru maski (0..7). */
+  function maskFn(n){
+    return [
+      (y,x) => (y+x) % 2 === 0,
+      (y,x) =>  y % 2 === 0,
+      (y,x) =>  x % 3 === 0,
+      (y,x) => (y+x) % 3 === 0,
+      (y,x) => (Math.floor(y/2) + Math.floor(x/3)) % 2 === 0,
+      (y,x) => ((y*x) % 2) + ((y*x) % 3) === 0,
+      (y,x) => (((y*x) % 2) + ((y*x) % 3)) % 2 === 0,
+      (y,x) => (((y+x) % 2) + ((y*x) % 3)) % 2 === 0
+    ][n];
+  }
+
+  /** Format info: ECC bits (2) + mask (3) + BCH(15,5) + XOR 0x5412. */
+  function formatBits(maskNum){
+    const ecBits = 0b00; // M
+    let data = (ecBits << 3) | maskNum;
+    let rem = data;
+    for(let i = 0; i < 10; i++){
+      rem <<= 1;
+      if(rem & 0x400) rem ^= 0x537;
+    }
+    return ((data << 10) | rem) ^ 0x5412;
+  }
+
+  /** Umieść format info wokół 3 finder patterns. */
+  function placeFormat(m, maskNum){
+    const size = m.length;
+    const fmt = formatBits(maskNum);
+    for(let i = 0; i < 15; i++){
+      const bit = (fmt >> i) & 1;
+      // wokół lewego górnego
+      if(i < 6) m[i][8] = bit;
+      else if(i < 8) m[i+1][8] = bit;
+      else if(i < 9) m[8][7] = bit;
+      else m[8][14-i] = bit;
+      // wokół prawego górnego i lewego dolnego
+      if(i < 8) m[8][size-1-i] = bit;
+      else m[size-1-(14-i)][8] = bit;
+    }
+    m[size-8][8] = 1; // ciemny moduł
+  }
+
+  /** Wypełnij macierz danymi w zygzaku. */
+  function placeData(m, codewords, maskNum){
+    const size = m.length;
+    const mask = maskFn(maskNum);
+    let bitIx = 0;
+    const totalBits = codewords.length * 8;
+    let up = true;
+    for(let col = size-1; col > 0; col -= 2){
+      if(col === 6) col--; // skip timing column
+      for(let i = 0; i < size; i++){
+        const y = up ? size-1-i : i;
+        for(let c = 0; c < 2; c++){
+          const x = col - c;
+          if(m[y][x] !== -1) continue;
+          let bit = 0;
+          if(bitIx < totalBits){
+            const byte = codewords[bitIx >> 3];
+            bit = (byte >> (7 - (bitIx & 7))) & 1;
+            bitIx++;
+          }
+          if(mask(y, x)) bit ^= 1;
+          m[y][x] = bit;
+        }
+      }
+      up = !up;
+    }
+  }
+
+  /** Penalty score dla maski (do wyboru najlepszej). */
+  function penalty(m){
+    const size = m.length;
+    let p = 0;
+    // 1) ciągi 5+
+    for(let y = 0; y < size; y++){
+      let rc = 1, cc = 1;
+      for(let x = 1; x < size; x++){
+        if(m[y][x] === m[y][x-1]){ rc++; if(rc === 5) p += 3; else if(rc > 5) p++; } else rc = 1;
+        if(m[x][y] === m[x-1][y]){ cc++; if(cc === 5) p += 3; else if(cc > 5) p++; } else cc = 1;
+      }
+    }
+    // 2) bloki 2×2
+    for(let y = 0; y < size-1; y++){
+      for(let x = 0; x < size-1; x++){
+        const v = m[y][x];
+        if(v === m[y][x+1] && v === m[y+1][x] && v === m[y+1][x+1]) p += 3;
+      }
+    }
+    return p;
+  }
+
+  /** Główna funkcja: tekst → macierz QR. */
+  function make(text){
+    const { cap, bytes } = encodeData(text);
+    const size = 17 + cap.v * 4;
+
+    // 8 wariantów maski — wybór najlepszego
+    let best = null;
+    for(let mask = 0; mask < 8; mask++){
+      const m = newMatrix(size);
+      // finder + separators
+      placeFinder(m, 0, 0);
+      placeFinder(m, size-7, 0);
+      placeFinder(m, 0, size-7);
+      // separatory (0 wokół finderów)
+      for(let i = 0; i < 8; i++){
+        if(m[7][i] === -1) m[7][i] = 0;
+        if(m[i][7] === -1) m[i][7] = 0;
+        if(m[size-8][i] === -1) m[size-8][i] = 0;
+        if(m[i][size-8] === -1) m[i][size-8] = 0;
+        if(m[7][size-1-i] === -1) m[7][size-1-i] = 0;
+        if(m[size-1-i][7] === -1) m[size-1-i][7] = 0;
+      }
+      // timing
+      for(let i = 8; i < size-8; i++){
+        m[6][i] = (i % 2 === 0) ? 1 : 0;
+        m[i][6] = (i % 2 === 0) ? 1 : 0;
+      }
+      // alignment (wszystkie pary z ALIGN_POS, pomijając kolizje z finderami)
+      const positions = ALIGN_POS[cap.v - 1];
+      for(const cy of positions) for(const cx of positions){
+        if((cx <= 7 && cy <= 7) || (cx <= 7 && cy >= size-8) || (cx >= size-8 && cy <= 7)) continue;
+        placeAlignment(m, cx, cy);
+      }
+      // rezerwacja format info (placeFormat nadpisze)
+      placeFormat(m, mask);
+      // dane
+      placeData(m, bytes, mask);
+      // ostateczny format
+      placeFormat(m, mask);
+
+      const sc = penalty(m);
+      if(!best || sc < best.score) best = { matrix: m, score: sc, mask };
+    }
+    return best.matrix;
+  }
+
+  /** Zamień macierz na SVG. */
+  function toSVG(matrix, scale = 8){
+    const size = matrix.length;
+    const total = (size + 8) * scale; // 4-modułowy quiet zone
+    const off = 4 * scale;
+    let path = "";
+    for(let y = 0; y < size; y++){
+      for(let x = 0; x < size; x++){
+        if(matrix[y][x] === 1){
+          path += `M${off + x*scale},${off + y*scale}h${scale}v${scale}h-${scale}z`;
+        }
+      }
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">
+      <rect width="100%" height="100%" fill="#fff"/>
+      <path d="${path}" fill="#000"/>
+    </svg>`;
+  }
+
+  return { make, toSVG };
+})();
+
+/** Pokaż modal QR z wartością. */
+let lastQrSVG = "", lastQrText = "";
+function showQrModal(text, label){
+  try{
+    const m = QR.make(text);
+    lastQrSVG = QR.toSVG(m);
+    lastQrText = text;
+    $("#qrHost").innerHTML = lastQrSVG;
+    $("#qrText").textContent = label ? `${label}\n${text}` : text;
+    $("#qrTitle").textContent = "Kod QR" + (label ? ` · ${label}` : "");
+    showModal("qrModal");
+  }catch(err){
+    toast("Tekst za długi dla QR (max ~200 znaków).", "err");
+  }
+}
+
+$("#qrDownload").addEventListener("click", () => {
+  if(!lastQrSVG) return;
+  const blob = new Blob([lastQrSVG], { type:"image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `qr-${(lastQrText || "code").slice(0,20).replace(/\W+/g,"_")}.svg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Pobrano SVG.");
+});
+
+/* =========================================================
+   GLOBALNE SKRÓTY KLAWIATUROWE (A2) + "/" focus (E3)
+   --------------------------------------------------------
+   Reguła: gdy fokus jest w polu tekstowym, większość skrótów
+   z modyfikatorami nadal działa, ale "/" i podobne pojedyncze
+   znaki są blokowane (żeby nie blokować pisania).
+   ========================================================= */
+
+/** Czy aktywny element jest polem edycji tekstu. */
+function isTypingTarget(){
+  const el = document.activeElement;
+  if(!el) return false;
+  if(["INPUT","TEXTAREA"].includes(el.tagName)) return true;
+  if(el.isContentEditable) return true;
+  return false;
+}
+
+$("#openHelpBtn").addEventListener("click", () => showModal("helpModal"));
+
+window.addEventListener("keydown", e => {
+  // Pomiń jeśli paleta jest otwarta — paleta ma własną klawiaturę
+  if(overlay.classList.contains("show") && $("#cmdModal").style.display === "flex") return;
+
+  const mod = e.ctrlKey || e.metaKey;
+  const key = e.key.toLowerCase();
+
+  // Ctrl+S → wymuś zapis draftu
+  if(mod && key === "s"){ e.preventDefault(); scheduleDraftSave(); toast("Draft zapisany."); return; }
+  // Ctrl+L → wyczyść kompozytor
+  if(mod && key === "l"){ e.preventDefault(); $("#clearBtn").click(); return; }
+  // Ctrl+B → tryb skupienia
+  if(mod && key === "b" && !e.shiftKey){ e.preventDefault(); $("#focusBtn").click(); return; }
+  // Shift+? → help
+  if(!mod && e.shiftKey && (key === "?" || key === "/")){
+    if(!isTypingTarget()){ e.preventDefault(); showModal("helpModal"); return; }
+  }
+  // "/" → fokus na wyszukiwarce kafelków (E3) — tylko gdy NIE piszesz
+  if(!mod && key === "/" && !e.shiftKey){
+    if(!isTypingTarget()){ e.preventDefault(); $("#tileSearch").focus(); $("#tileSearch").select(); return; }
+  }
+});
+
+/* =========================================================
+   DODAJ PRZYCISK "QR" do kafelków typu copy (D3)
+   --------------------------------------------------------
+   Hook do istniejącego buildTileElement — dorzucamy przycisk
+   QR przy renderze, ponieważ łatwiej dopisać go po render.
+   ========================================================= */
+/** Po każdym renderze kafelków, doczep przycisk QR do tile.copy-tile. */
+function addQrButtonsToTiles(){
+  $$(".tile.copy-tile", $("#tilesHost")).forEach(el => {
+    if(el.querySelector(".qr-btn")) return;
+    const title = el.dataset.title;
+    const t = emailData.tiles.find(x => x.title === title);
+    if(!t) return;
+    const btn = document.createElement("button");
+    btn.className = "qr-btn";
+    btn.setAttribute("aria-label","Pokaż QR");
+    btn.title = "Pokaż jako kod QR";
+    btn.setAttribute("data-testid","qr-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-"));
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14h1v1h-1zM14 20h1v1h-1zM18 18h3v3h-3z"/></svg>`;
+    btn.addEventListener("click", e => {
+      e.preventDefault(); e.stopPropagation();
+      showQrModal(t.value, t.title);
+    });
+    el.appendChild(btn);
+  });
+}
+
+// Patch renderTiles — dorzuć QR po każdym renderze
+const _origRenderTiles = renderTiles;
+renderTiles = function(){
+  _origRenderTiles();
+  addQrButtonsToTiles();
+};
+
+/* =========================================================
    INIT — pierwsze renderowanie + ustawienie domyślnej stopki
    ========================================================= */
 /**
@@ -2757,6 +3800,7 @@ renderFlinks();
 renderTiles();
 renderTodos();
 renderNotes();
+renderCalendar();
 setDefaultSignature();
 updateCharBadge();
 validateAllRecipients();
