@@ -122,7 +122,6 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   padding:2px 8px;border-radius:999px;background:var(--bg-3);color:var(--text-dim);
   border:1px solid var(--line);
 }
-.badge.focus{background:#2a2010;border-color:#5a4520;color:#ffd28a}
 
 /* =========================================================
    COLLAPSIBLE EMAIL BAR
@@ -280,6 +279,14 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   transition:border-color var(--t),background var(--t);
 }
 .field textarea{padding:11px 32px 11px 11px;min-height:120px;resize:vertical;line-height:1.5}
+#fBody{
+  min-height:240px;
+  height:240px;
+}
+#fSig{
+  min-height:60px;
+  height:60px;
+}
 .field input:focus,.field textarea:focus,.field select:focus{
   border-color:#3e5fbf;background:#171c25;
 }
@@ -318,6 +325,10 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   display:none;align-items:center;gap:10px;font-size:13px;
   animation:slideUp .2s ease;
 }
+.smart-bar .ic{
+  width:20px;
+  height:20px;
+}
 .smart-bar.show{display:flex}
 @keyframes slideUp{from{transform:translateY(4px);opacity:0}to{transform:none;opacity:1}}
 
@@ -331,9 +342,6 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   min-height: calc(100vh - var(--nav-h) - var(--bar-h));
   align-items: start;
 }
-.layout.focus{grid-template-columns:0 1fr 0}
-.layout.focus .sidebar,
-.layout.focus .sidebar-right{display:none}
 
 .sidebar,
 .sidebar-right {
@@ -731,10 +739,6 @@ kbd{
   border-color:#3a5bb8;
   color:#cfdcff;
 }
-.signature-presets{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  margin:8px 0 0;
-}
 .signature-presets .sig-preset{
   padding:4px 9px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
 }
@@ -839,6 +843,124 @@ kbd{
 .cal-dot.today{background:#3a5bb8}
 .cal-dot.hol{background:#ff8a8a}
 
+.cal-grid .day.has-reminder{
+  position:relative;
+  padding-right:12px;
+}
+.cal-rem-bell{
+  position:absolute;
+  right:2px;
+  top:1px;
+  font-size:10px;
+  line-height:1;
+}
+.cal-reminders{
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid var(--line-soft);
+}
+.cal-reminders-title{
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-mute);
+  margin-bottom:6px;
+}
+.cal-reminder-list{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.cal-reminder-item{
+  display:grid;
+  grid-template-columns:42px 1fr auto;
+  gap:6px;
+  align-items:center;
+  padding:6px 8px;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  background:var(--bg-1);
+  font-size:11.5px;
+}
+.cal-reminder-item.done{opacity:.55}
+.cal-reminder-item .date{font-family:ui-monospace,Consolas,monospace;color:var(--accent-2)}
+.cal-reminder-item .text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-dim)}
+.cal-reminder-item button{width:20px;height:20px}
+.cal-reminder-empty{font-size:11.5px;color:var(--text-mute);padding:4px 2px}
+.cal-day-menu{
+  position:fixed;
+  z-index:120;
+  min-width:250px;
+  max-width:310px;
+  background:#171c25;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-lg);
+  padding:8px;
+  display:none;
+}
+.cal-day-menu.show{display:block;animation:popIn .14s cubic-bezier(.2,.7,.2,1)}
+.cal-day-menu .menu-head{
+  padding:6px 8px 8px;
+  border-bottom:1px solid var(--line-soft);
+  margin-bottom:5px;
+}
+.cal-day-menu .menu-date{font-weight:600;font-size:13px;color:var(--text)}
+.cal-day-menu .menu-sub{font-size:11px;color:var(--text-mute);margin-top:1px}
+.cal-day-menu .menu-reminders{display:flex;flex-direction:column;gap:4px;margin:6px 0}
+.cal-day-menu .menu-reminder{
+  padding:5px 7px;
+  border-radius:7px;
+  background:var(--bg-2);
+  border:1px solid var(--line-soft);
+  font-size:11.5px;
+  color:var(--text-dim);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cal-day-menu .menu-item{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  border-radius:7px;
+  cursor:pointer;
+  font-size:12.5px;
+  text-align:left;
+}
+.cal-day-menu .menu-item:hover{background:var(--bg-3)}
+.cal-day-menu .menu-sep{height:1px;background:var(--line-soft);margin:5px 0}
+.cal-rem-form{display:flex;flex-direction:column;gap:7px;padding:6px 2px 2px}
+.cal-rem-form label{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute)}
+.cal-rem-form input{
+  width:100%;
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  padding:8px 9px;
+  color:var(--text);
+  outline:0;
+  font-size:12.5px;
+}
+.cal-rem-form input:focus{border-color:#3e5fbf;background:#171c25}
+.cal-rem-form .form-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:2px}
+.toast.reminder{min-width:300px;align-items:flex-start}
+.toast.reminder .toast-content{display:flex;flex-direction:column;gap:2px;min-width:0}
+.toast.reminder .toast-title{font-weight:600;color:var(--text)}
+.toast.reminder .toast-text{color:var(--text-dim);font-size:12.5px;line-height:1.35}
+.toast.reminder .toast-actions{display:flex;gap:6px;margin-top:7px}
+[data-theme="light"] .cal-day-menu{background:#ffffff}
+[data-theme="light"] .cal-reminder-item{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .cal-day-menu .menu-item:hover{background:#eef1f7}
+[data-theme="light"] .cal-day-menu .menu-reminder{background:#f4f6fa}
+[data-theme="light"] .cal-rem-form input{background:#ffffff}
+[data-theme="light"] .cal-rem-form input:focus{background:#f8faff;border-color:var(--accent)}
+
 /* =========================================================
    PASSWORD GENERATOR (D1)
    ========================================================= */
@@ -877,6 +999,34 @@ kbd{
 .conv-row input[readonly]{background:var(--bg-2);color:var(--text-dim);font-weight:600}
 .conv-arrow{text-align:center;color:var(--text-mute);font-size:14px}
 .conv-info{margin-top:6px;font-size:11.5px;color:var(--text-mute)}
+.fx-rates{
+  margin-top:12px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  background:var(--bg-1);
+}
+.fx-rates-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:8px;
+}
+.fx-rates-title{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute);
+}
+.fx-rates-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.fx-rate-field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fx-rate-field label{font-size:10.5px;color:var(--text-mute);letter-spacing:.06em;text-transform:uppercase}
+.fx-rate-field input{
+  width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:8px 9px;font-size:12.5px;color:var(--text);outline:0;
+}
+.fx-rate-field input:focus{border-color:#3e5fbf;background:#171c25}
+.fx-rate-note{margin-top:7px;font-size:11px;color:var(--text-mute);line-height:1.35}
+@media (max-width:560px){.fx-rates-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* =========================================================
    QR (D3)
@@ -1098,6 +1248,9 @@ kbd{
 [data-theme="light"] .todo-add input:focus,
 [data-theme="light"] .journal-add input:focus{border-color:var(--accent);background:#f8faff}
 [data-theme="light"] .field input.invalid-input{background:#fdf0f2;border-color:#d88a8a}
+[data-theme="light"] .fx-rates{background:#ffffff}
+[data-theme="light"] .fx-rate-field input{background:#ffffff}
+[data-theme="light"] .fx-rate-field input:focus{background:#f8faff;border-color:var(--accent)}
 
 /* popovers */
 [data-theme="light"] .sugg,
@@ -1183,7 +1336,6 @@ kbd{
 [data-theme="light"] .tile-filter-badges .filter-badge{background:#ffffff}
 [data-theme="light"] .tile-filter-badges .filter-badge:hover{background:#f4f6fa}
 [data-theme="light"] .tile-filter-badges .filter-badge.active{background:#e8efff;border-color:var(--accent);color:#1a4abc}
-[data-theme="light"] .badge.focus{background:#fff7e0;border-color:#e8c98a;color:#7a5b1a}
 [data-theme="light"] #dataState.dirty{background:#fff7e0;border-color:#e8c98a;color:#7a5b1a}
 
 /* buttons */
@@ -1283,15 +1435,6 @@ kbd{
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
   </button>
 
-  <span class="badge focus" id="focusBadge" style="display:none" data-testid="focus-badge">
-    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/></svg>
-    Tryb skupienia
-  </span>
-
-  <button class="btn" id="focusBtn" data-testid="focus-toggle">
-    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/></svg>
-    Tryb skupienia
-  </button>
 </header>
 
 <!-- ============= EMAIL BAR ============= -->
@@ -1436,7 +1579,7 @@ kbd{
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
         <div class="smart-bar" id="smartBar" data-testid="smart-bar">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          <svg class="ic ic-email" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
           <span id="smartText">Wczytać szablon?</span>
           <span style="flex:1"></span>
           <button class="btn sm primary" id="smartLoad">Wczytaj</button>
@@ -1560,6 +1703,10 @@ kbd{
           <span class="cal-dot hol"></span> dzień wolny
           <span style="flex:1"></span>
           <button class="btn sm ghost" id="calToday" data-testid="cal-today">Dziś</button>
+        </div>
+        <div class="cal-reminders" id="calRemindersBox">
+          <div class="cal-reminders-title">Najbliższe przypomnienia</div>
+          <div class="cal-reminder-list" id="calReminderList"></div>
         </div>
       </div>
     </div>
@@ -1787,6 +1934,32 @@ kbd{
         <input id="convOut" type="text" readonly data-testid="conv-out"/>
       </div>
       <div class="conv-info" id="convInfo"></div>
+
+      <div class="fx-rates" aria-label="Aktualne notowania walut">
+        <div class="fx-rates-head">
+          <div class="fx-rates-title">Aktualne notowania</div>
+          <button class="btn sm ghost" id="fxResetBtn" type="button" data-testid="fx-reset-btn">Reset</button>
+        </div>
+        <div class="fx-rates-grid">
+          <div class="fx-rate-field">
+            <label for="fxEUR">EUR / PLN</label>
+            <input id="fxEUR" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-eur"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxUSD">USD / PLN</label>
+            <input id="fxUSD" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-usd"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxGBP">GBP / PLN</label>
+            <input id="fxGBP" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-gbp"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxCHF">CHF / PLN</label>
+            <input id="fxCHF" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-chf"/>
+          </div>
+        </div>
+        <div class="fx-rate-note">Wpisz kurs jako wartość PLN za 1 jednostkę waluty. Zmiana kursu od razu aktualizuje wynik konwersji.</div>
+      </div>
 
       <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">VAT</h4>
       <div class="conv-row">
@@ -2103,16 +2276,18 @@ const emailData = {
     { name:"dzieki",    label:"Podziękowanie (zamknięcie)", value:"\n\nZ góry dziękuję za pomoc.\n\nPozdrawiam," }
   ],
 
-  // Kursy do konwertera (D4) — edytuj ręcznie według potrzeb (data referencyjna w komentarzu)
+  // Kursy do konwertera (D4) — wartości domyślne, użytkownik może je korygować w popupie.
   // ile PLN za 1 jednostkę waluty obcej
   fx: {
     EUR: 4.30,
     USD: 4.00,
     GBP: 5.05,
     CHF: 4.45,
-    asOf: "2026-02-01"
+    asOf: "domyślne"
   }
 };
+
+const DEFAULT_FX = Object.freeze({ EUR:4.30, USD:4.00, GBP:5.05, CHF:4.45, asOf:"domyślne" });
 
 /* =========================================================
    POMOCNICZE / UTIL
@@ -2238,14 +2413,6 @@ function tickTimer(){
 }
 setInterval(tickTimer,1000); tickTimer();
 
-// Focus mode
-$("#focusBtn").addEventListener("click", ()=>{
-  const l = $("#layout");
-  l.classList.toggle("focus");
-  const on = l.classList.contains("focus");
-  $("#focusBadge").style.display = on ? "inline-flex" : "none";
-  toast(on ? "Tryb skupienia włączony" : "Tryb skupienia wyłączony");
-});
 
 /* =========================================================
    COLLAPSIBLE EMAIL BAR
@@ -3857,6 +4024,254 @@ $("#fBody").addEventListener("blur", () => setTimeout(()=> $("#snipPop").hidden 
 /* =========================================================
    MINI KALENDARZ z dniami wolnymi PL (B4)
    ========================================================= */
+const CAL_REM_KEY = "wd.calendar.reminders.v1";
+let calDayMenu = null;
+let calReminders = loadCalendarReminders();
+
+function loadCalendarReminders(){
+  try{ return JSON.parse(localStorage.getItem(CAL_REM_KEY) || "[]"); }catch{ return []; }
+}
+function saveCalendarReminders(){
+  localStorage.setItem(CAL_REM_KEY, JSON.stringify(calReminders));
+}
+function dateKeyLocal(date){ return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate()); }
+function datePL(date){ return pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear(); }
+function dateLongPL(date){ return date.toLocaleDateString("pl-PL", { weekday:"long", day:"2-digit", month:"long", year:"numeric" }); }
+function dateShortWithTime(r){ return r.date.slice(8,10)+"."+r.date.slice(5,7)+" "+r.time; }
+function addDaysLocal(date, n){ return new Date(date.getFullYear(), date.getMonth(), date.getDate()+n); }
+function endOfMonthLocal(date){ return new Date(date.getFullYear(), date.getMonth()+1, 0); }
+function reminderDateTime(r){
+  const [y,m,d] = r.date.split("-").map(Number);
+  const [hh,mm] = r.time.split(":").map(Number);
+  return new Date(y, m-1, d, hh, mm || 0, 0, 0);
+}
+function activeRemindersForDate(key){
+  return calReminders
+    .filter(r => r.date === key && !r.done)
+    .sort((a,b) => (a.time || "").localeCompare(b.time || ""));
+}
+function createCalendarDayMenu(){
+  const el = document.createElement("div");
+  el.id = "calDayMenu";
+  el.className = "cal-day-menu";
+  document.body.appendChild(el);
+  document.addEventListener("mousedown", e => {
+    if(el.classList.contains("show") && !el.contains(e.target) && !e.target.closest("#calGrid")) hideCalendarDayMenu();
+  });
+  document.addEventListener("keydown", e => { if(e.key === "Escape") hideCalendarDayMenu(); });
+  return el;
+}
+function hideCalendarDayMenu(){ if(calDayMenu) calDayMenu.classList.remove("show"); }
+function positionCalendarDayMenu(x, y){
+  const menu = calDayMenu || (calDayMenu = createCalendarDayMenu());
+  menu.style.left = "0px";
+  menu.style.top = "0px";
+  menu.classList.add("show");
+  const rect = menu.getBoundingClientRect();
+  const left = Math.min(x + 8, window.innerWidth - rect.width - 12);
+  const top  = Math.min(y + 8, window.innerHeight - rect.height - 12);
+  menu.style.left = Math.max(8, left) + "px";
+  menu.style.top = Math.max(8, top) + "px";
+}
+function addTodoFromCalendar(text){
+  const input = $("#todoInput");
+  if(!input) return;
+  input.value = text;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+function addNoteFromCalendar(text){
+  notes.unshift({
+    id: Date.now()+"_"+Math.random().toString(36).slice(2,7),
+    color: NOTE_PALETTES[notes.length % NOTE_PALETTES.length].id,
+    text,
+    createdAt: Date.now()
+  });
+  saveNotes(notes); renderNotes();
+}
+function addJournalFromCalendar(text){
+  const input = $("#journalInput");
+  if(!input) return;
+  input.value = text;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+async function copyCalendarDate(date){
+  const value = datePL(date);
+  const ok = await copyToClipboard(value);
+  toast(ok ? "Skopiowano datę: "+value : "Nie udało się skopiować daty.", ok ? "ok" : "err");
+}
+async function copyCalculatedDate(label, date){
+  const value = datePL(date);
+  const ok = await copyToClipboard(value);
+  toast(ok ? `${label}: ${value} skopiowano.` : "Nie udało się skopiować daty.", ok ? "ok" : "err");
+}
+function openCalendarReminderForm(date){
+  const menu = calDayMenu || (calDayMenu = createCalendarDayMenu());
+  const dateLabel = datePL(date);
+  const now = new Date();
+  const defaultTime = pad(Math.max(8, now.getHours()))+":"+pad(now.getMinutes());
+  menu.innerHTML = `
+    <div class="menu-head">
+      <div class="menu-date">🔔 Przypomnienie: ${escHTML(dateLabel)}</div>
+      <div class="menu-sub">Wpisz godzinę i krótką notatkę.</div>
+    </div>
+    <div class="cal-rem-form">
+      <div>
+        <label for="calRemTime">Godzina</label>
+        <input id="calRemTime" type="time" value="${defaultTime}">
+      </div>
+      <div>
+        <label for="calRemText">Treść</label>
+        <input id="calRemText" type="text" placeholder="Np. Zadzwonić do przewoźnika">
+      </div>
+      <div class="form-actions">
+        <button class="btn sm ghost" id="calRemCancel" type="button">Anuluj</button>
+        <button class="btn sm primary" id="calRemSave" type="button">Zapisz</button>
+      </div>
+    </div>`;
+  $("#calRemCancel").addEventListener("click", hideCalendarDayMenu);
+  $("#calRemSave").addEventListener("click", () => {
+    const time = $("#calRemTime").value || "09:00";
+    const text = $("#calRemText").value.trim();
+    if(!text) return toast("Wpisz treść przypomnienia.", "err");
+    calReminders.unshift({
+      id: "rem_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+      date: dateKeyLocal(date),
+      time,
+      text,
+      done:false,
+      createdAt: Date.now(),
+      lastNotifiedAt: 0,
+      snoozedUntil: 0
+    });
+    saveCalendarReminders();
+    hideCalendarDayMenu();
+    renderCalendar();
+    checkCalendarReminders();
+    toast("Dodano przypomnienie: "+dateLabel+" "+time);
+  });
+  setTimeout(() => $("#calRemText")?.focus(), 30);
+}
+function showCalendarDayMenu(ev, date){
+  const menu = calDayMenu || (calDayMenu = createCalendarDayMenu());
+  const key = dateKeyLocal(date);
+  const reminders = activeRemindersForDate(key);
+  menu.innerHTML = `
+    <div class="menu-head">
+      <div class="menu-date">${escHTML(datePL(date))}</div>
+      <div class="menu-sub">${escHTML(dateLongPL(date))}</div>
+    </div>
+    ${reminders.length ? `<div class="menu-reminders">${reminders.map(r => `<div class="menu-reminder">🔔 ${escHTML(r.time)} — ${escHTML(r.text)}</div>`).join("")}</div>` : ""}
+    <button class="menu-item" data-act="copy" type="button">📋 Kopiuj datę</button>
+    <button class="menu-item" data-act="email" type="button">✉️ Dodaj do treści email</button>
+    <button class="menu-item" data-act="todo" type="button">✅ Dodaj do TO DO</button>
+    <button class="menu-item" data-act="note" type="button">📝 Utwórz notatkę</button>
+    <button class="menu-item" data-act="journal" type="button">📓 Dodaj do Journal</button>
+    <button class="menu-item" data-act="reminder" type="button">🔔 Ustaw przypomnienie</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item" data-act="plus7" type="button">📅 +7 dni</button>
+    <button class="menu-item" data-act="plus14" type="button">📅 +14 dni</button>
+    <button class="menu-item" data-act="eom" type="button">📅 Koniec miesiąca</button>`;
+  menu.querySelectorAll("[data-act]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const act = btn.dataset.act;
+      const ds = datePL(date);
+      if(act === "copy"){ await copyCalendarDate(date); hideCalendarDayMenu(); }
+      else if(act === "email"){ insertIntoBodyAtCursor(ds); toast("Dodano datę do treści email: "+ds); hideCalendarDayMenu(); }
+      else if(act === "todo"){ addTodoFromCalendar("Termin: "+ds+" — "); toast("Wstawiono datę do pola TO DO — dopisz szczegóły i zatwierdź."); hideCalendarDayMenu(); }
+      else if(act === "note"){ addNoteFromCalendar(ds+"\n\n"); toast("Utworzono notatkę z datą."); hideCalendarDayMenu(); }
+      else if(act === "journal"){ addJournalFromCalendar(ds+" — "); toast("Wstawiono datę do pola Journal — dopisz szczegóły i zatwierdź."); hideCalendarDayMenu(); }
+      else if(act === "reminder"){ openCalendarReminderForm(date); }
+      else if(act === "plus7"){ await copyCalculatedDate("+7 dni", addDaysLocal(date, 7)); hideCalendarDayMenu(); }
+      else if(act === "plus14"){ await copyCalculatedDate("+14 dni", addDaysLocal(date, 14)); hideCalendarDayMenu(); }
+      else if(act === "eom"){ await copyCalculatedDate("Koniec miesiąca", endOfMonthLocal(date)); hideCalendarDayMenu(); }
+    });
+  });
+  positionCalendarDayMenu(ev.clientX, ev.clientY);
+}
+function renderCalendarReminderList(){
+  const host = $("#calReminderList");
+  if(!host) return;
+  const now = Date.now();
+  const upcoming = calReminders
+    .filter(r => !r.done && reminderDateTime(r).getTime() >= now - 86400000)
+    .sort((a,b) => reminderDateTime(a) - reminderDateTime(b))
+    .slice(0, 5);
+  if(!upcoming.length){
+    host.innerHTML = `<div class="cal-reminder-empty">Brak aktywnych przypomnień.</div>`;
+    return;
+  }
+  host.innerHTML = upcoming.map(r => `
+    <div class="cal-reminder-item" title="${escHTML(r.text)}">
+      <span class="date">${escHTML(dateShortWithTime(r))}</span>
+      <span class="text">🔔 ${escHTML(r.text)}</span>
+      <button class="icon-btn" data-rem-done="${escHTML(r.id)}" title="Oznacz jako zrobione" aria-label="Oznacz jako zrobione">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
+      </button>
+    </div>`).join("");
+  host.querySelectorAll("[data-rem-done]").forEach(btn => {
+    btn.addEventListener("click", () => markCalendarReminderDone(btn.dataset.remDone));
+  });
+}
+function removeCalendarReminder(id){
+  const before = calReminders.length;
+  calReminders = calReminders.filter(x => x.id !== id);
+  if(calReminders.length === before) return false;
+  saveCalendarReminders();
+  renderCalendar();
+  renderCalendarReminderList();
+  return true;
+}
+function markCalendarReminderDone(id){
+  if(removeCalendarReminder(id)){
+    toast("Przypomnienie zakończone i usunięte z localStorage.");
+  }
+}
+function showReminderToast(r){
+  const wrap = $("#toasts");
+  const el = document.createElement("div");
+  el.className = "toast reminder ok";
+  el.innerHTML = `
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+    <div class="toast-content">
+      <span class="toast-title">Przypomnienie · ${escHTML(r.time)}</span>
+      <span class="toast-text">${escHTML(r.text)}</span>
+      <span class="toast-actions">
+        <button class="toast-action" data-act="snooze" type="button">Odłóż 10 min</button>
+        <button class="toast-action" data-act="done" type="button">Zrobione</button>
+      </span>
+    </div>`;
+  wrap.appendChild(el);
+  el.querySelector('[data-act="snooze"]').addEventListener("click", () => {
+    r.snoozedUntil = Date.now() + 10*60000;
+    r.lastNotifiedAt = 0;
+    saveCalendarReminders();
+    el.remove();
+    renderCalendarReminderList();
+    toast("Odłożono przypomnienie o 10 minut.");
+  });
+  el.querySelector('[data-act="done"]').addEventListener("click", () => {
+    removeCalendarReminder(r.id);
+    el.remove();
+    toast("Przypomnienie zakończone i usunięte z localStorage.");
+  });
+}
+function checkCalendarReminders(){
+  const now = Date.now();
+  calReminders.forEach(r => {
+    if(r.done) return;
+    if(r.snoozedUntil && r.snoozedUntil > now) return;
+    if(r.lastNotifiedAt) return;
+    const due = r.snoozedUntil || reminderDateTime(r).getTime();
+    if(due <= now){
+      r.lastNotifiedAt = now;
+      showReminderToast(r);
+    }
+  });
+  saveCalendarReminders();
+  renderCalendarReminderList();
+}
 let calCursor = (function(){ const d = new Date(); return { y:d.getFullYear(), m:d.getMonth() }; })();
 
 /** Oblicz datę Wielkanocy w danym roku (algorytm Gaussa/Meeusa). @returns {Date} */
@@ -3921,10 +4336,14 @@ function renderCalendar(){
     const isWeekend = dow === 0 || dow === 6;
     const isHol = holidays.has(key);
     const cls = ["day"];
+    const fullKey = calCursor.y+"-"+pad(calCursor.m+1)+"-"+pad(d);
+    const hasReminder = activeRemindersForDate(fullKey).length > 0;
     if(isToday) cls.push("today");
     if(isHol) cls.push("hol");
     else if(isWeekend) cls.push("weekend");
-    cells.push(`<div class="${cls.join(" ")}" data-day="${d}" title="${escHTML(date.toLocaleDateString("pl-PL", { weekday:"long", day:"numeric", month:"long" }))}">${d}</div>`);
+    if(hasReminder) cls.push("has-reminder");
+    const title = date.toLocaleDateString("pl-PL", { weekday:"long", day:"numeric", month:"long" }) + (hasReminder ? " — przypomnienie" : "");
+    cells.push(`<div class="${cls.join(" ")}" data-day="${d}" title="${escHTML(title)}"><span>${d}</span>${hasReminder ? '<span class="cal-rem-bell">🔔</span>' : ''}</div>`);
   }
   // wypełniacz na koniec (do pełnych 6 wierszy)
   const total = startOffset + daysInMonth;
@@ -3933,15 +4352,14 @@ function renderCalendar(){
 
   grid.innerHTML = cells.join("");
 
-  // klik dnia — wstaw datę do treści (kursor) lub skopiuj do schowka
+  // klik dnia — pokaż świadome menu akcji zamiast automatycznie wstawiać datę do emaila
   $$(".day:not(.muted)", grid).forEach(el => {
-    el.addEventListener("click", () => {
+    el.addEventListener("click", ev => {
       const d = +el.dataset.day;
-      const ds = pad(d)+"."+pad(calCursor.m+1)+"."+calCursor.y;
-      insertIntoBodyAtCursor(ds);
-      toast("Wstawiono datę: "+ds);
+      showCalendarDayMenu(ev, new Date(calCursor.y, calCursor.m, d));
     });
   });
+  renderCalendarReminderList();
 }
 
 /** Wstaw tekst do pola treści w pozycji kursora (lub na końcu). */
@@ -3961,6 +4379,7 @@ function insertIntoBodyAtCursor(text){
 $("#calPrev").addEventListener("click", ()=>{ calCursor.m--; if(calCursor.m<0){ calCursor.m=11; calCursor.y--; } renderCalendar(); });
 $("#calNext").addEventListener("click", ()=>{ calCursor.m++; if(calCursor.m>11){ calCursor.m=0; calCursor.y++; } renderCalendar(); });
 $("#calToday").addEventListener("click", ()=>{ const d=new Date(); calCursor.y=d.getFullYear(); calCursor.m=d.getMonth(); renderCalendar(); });
+setInterval(checkCalendarReminders, 30000);
 
 /* =========================================================
    GENERATOR HASŁA (D1)
@@ -4038,22 +4457,51 @@ $("#toolPassword").addEventListener("click", () => { generatePassword(); showMod
 /* =========================================================
    KONWERTER WALUT + VAT (D4)
    ========================================================= */
+const FX_CODES = ["EUR","USD","GBP","CHF"];
+
+function getFxInput(code){
+  return $(`#fx${code}`);
+}
+
+function normalizeFx(value, fallback){
+  const n = parseFloat(String(value).replace(",", "."));
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function syncFxInputsFromData(){
+  emailData.fx = { ...DEFAULT_FX, ...(emailData.fx || {}) };
+  FX_CODES.forEach(code => {
+    const input = getFxInput(code);
+    if(input) input.value = Number(emailData.fx[code] || DEFAULT_FX[code]).toFixed(4);
+  });
+}
+
+function syncFxDataFromInputs(){
+  emailData.fx = { ...DEFAULT_FX, ...(emailData.fx || {}) };
+  FX_CODES.forEach(code => {
+    const input = getFxInput(code);
+    if(input) emailData.fx[code] = normalizeFx(input.value, DEFAULT_FX[code]);
+  });
+  emailData.fx.asOf = "ręcznie ustawione";
+}
+
 /** Przelicz kwotę między walutami przez bazę PLN. */
 function fxConvert(amount, from, to){
   if(from === to) return amount;
-  const fx = emailData.fx || {};
-  const toPLN = (amt, cur) => cur === "PLN" ? amt : amt * (fx[cur] || 0);
-  const fromPLN = (amt, cur) => cur === "PLN" ? amt : amt / (fx[cur] || 1);
+  const fx = { ...DEFAULT_FX, ...(emailData.fx || {}) };
+  const toPLN = (amt, cur) => cur === "PLN" ? amt : amt * normalizeFx(fx[cur], DEFAULT_FX[cur]);
+  const fromPLN = (amt, cur) => cur === "PLN" ? amt : amt / normalizeFx(fx[cur], DEFAULT_FX[cur]);
   return fromPLN(toPLN(amount, from), to);
 }
 
 function recalcConv(){
+  syncFxDataFromInputs();
   const amt = parseFloat($("#convAmt").value) || 0;
   const from = $("#convFrom").value, to = $("#convTo").value;
   const out = fxConvert(amt, from, to);
   $("#convOut").value = out.toFixed(2) + " " + to;
-  const fx = emailData.fx || {};
-  $("#convInfo").textContent = `Kursy: 1 EUR = ${fx.EUR} PLN · 1 USD = ${fx.USD} PLN · 1 GBP = ${fx.GBP} PLN · 1 CHF = ${fx.CHF} PLN  (z dnia ${escHTML(fx.asOf || "?")}). Kursy edytujesz w emailData.fx.`;
+  const fx = { ...DEFAULT_FX, ...(emailData.fx || {}) };
+  $("#convInfo").textContent = `Kursy ręczne: 1 EUR = ${Number(fx.EUR).toFixed(4)} PLN · 1 USD = ${Number(fx.USD).toFixed(4)} PLN · 1 GBP = ${Number(fx.GBP).toFixed(4)} PLN · 1 CHF = ${Number(fx.CHF).toFixed(4)} PLN.`;
 }
 
 function recalcVat(){
@@ -4068,8 +4516,15 @@ function recalcVat(){
 }
 
 ["convAmt","convFrom","convTo"].forEach(id => $("#"+id).addEventListener("input", recalcConv));
+FX_CODES.forEach(code => getFxInput(code)?.addEventListener("input", recalcConv));
+$("#fxResetBtn")?.addEventListener("click", () => {
+  emailData.fx = { ...DEFAULT_FX };
+  syncFxInputsFromData();
+  recalcConv();
+  toast("Przywrócono domyślne kursy walut.", "ok");
+});
 ["vatAmt","vatRate","vatDir"].forEach(id => $("#"+id).addEventListener("input", recalcVat));
-$("#toolConv").addEventListener("click", () => { recalcConv(); recalcVat(); showModal("convModal"); });
+$("#toolConv").addEventListener("click", () => { syncFxInputsFromData(); recalcConv(); recalcVat(); showModal("convModal"); });
 
 /* =========================================================
    QR CODE — własny enkoder (D3)
@@ -5356,6 +5811,7 @@ renderTodos();
 renderNotes();
 renderCalendar();
 renderJournal();
+checkCalendarReminders();
 setDefaultSignature();
 updateCharBadge();
 validateAllRecipients();
