@@ -1,3 +1,138 @@
+WorkDesk One-Page – Informacje o projekcie
+
+Status projektu
+
+⚠️ Projekt jest obecnie w fazie Draft / Work In Progress.
+
+Aplikacja jest funkcjonalna i może być używana na co dzień, jednak nie jest produktem komercyjnym ani gotowym systemem wdrożeniowym. Jest to rozwijany projekt typu „one-page productivity tool”, który można dostosować do własnych potrzeb.
+
+Dla kogo jest ten projekt?
+
+Projekt został stworzony głównie z myślą o osobach pracujących w:
+
+- korporacjach,
+- dużych organizacjach,
+- firmach logistycznych,
+- działach operacyjnych,
+- administracji,
+- biurach obsługi klienta,
+
+czyli wszędzie tam, gdzie:
+
+- nie można instalować dodatkowego oprogramowania,
+- obowiązują ograniczenia IT,
+- brakuje odpowiednich narzędzi wspierających codzienną pracę,
+- wiele czynności wykonuje się ręcznie i wielokrotnie każdego dnia.
+
+Aplikacja działa jako pojedynczy plik HTML uruchamiany lokalnie w przeglądarce.
+
+Wymagane podstawowe umiejętności techniczne
+
+Aby dostosować aplikację do własnych potrzeb, potrzebne są przynajmniej minimalne zdolności edycji kodu lub korzystania z narzędzi AI.
+
+Najczęściej wymagane będzie:
+
+- usunięcie przykładowych danych,
+- dodanie własnych linków,
+- dodanie własnych grup adresowych,
+- dodanie własnych szablonów wiadomości,
+- konfiguracja kafelków i skrótów,
+- dostosowanie danych startowych.
+
+Większość zmian można wykonać bez znajomości programowania, korzystając z pomocy modeli AI.
+
+Wsparcie AI
+
+Kod projektu można rozwijać przy pomocy własnego ulubionego agenta AI, np.:
+
+- ChatGPT,
+- Claude,
+- Gemini,
+- Codex,
+- Goose,
+- Cursor,
+- Windsurf,
+- innych narzędzi AI.
+
+Należy jednak pamiętać, że modele AI mogą generować błędny kod lub nieprawidłowe modyfikacje.
+
+Zawsze zaleca się:
+
+- wykonywanie kopii zapasowej przed zmianami,
+- testowanie działania aplikacji po każdej modyfikacji,
+- zachowanie wcześniejszych wersji pliku.
+
+Brak zależności zewnętrznych
+
+Jednym z głównych założeń projektu jest maksymalna prostota.
+
+Aplikacja:
+
+✅ nie wymaga serwera,
+
+✅ nie wymaga instalacji,
+
+✅ nie wymaga Node.js,
+
+✅ nie wymaga bazy danych,
+
+✅ nie wymaga Docker,
+
+✅ nie wymaga połączenia z Internetem,
+
+✅ nie korzysta z zewnętrznych bibliotek JavaScript.
+
+Wystarczy otworzyć plik HTML w przeglądarce.
+
+Przechowywanie danych
+
+Wszystkie dane przechowywane są lokalnie w przeglądarce użytkownika przy użyciu mechanizmu:
+
+localStorage
+
+Oznacza to, że dane pozostają dostępne po ponownym uruchomieniu przeglądarki.
+
+Ważne ograniczenie
+
+⚠️ Dane zapisane w localStorage mogą zostać utracone.
+
+Może się to zdarzyć między innymi gdy:
+
+- użytkownik wyczyści dane przeglądarki,
+- administrator firmowy wyczyści profil użytkownika,
+- przeglądarka zostanie zresetowana,
+- profil systemowy zostanie usunięty,
+- polityki bezpieczeństwa firmy usuną dane lokalne.
+
+Dlatego regularne tworzenie kopii zapasowych jest bardzo ważne.
+
+Zalecenia dotyczące bezpieczeństwa danych
+
+Rekomendowane jest:
+
+1. Regularne eksportowanie danych do plików JSON.
+2. Przechowywanie kopii pliku HTML w bezpiecznej lokalizacji.
+3. Przechowywanie eksportów JSON na dysku sieciowym lub OneDrive.
+4. Wykonywanie backupu przed większymi zmianami w kodzie.
+5. Zachowywanie kilku wcześniejszych wersji aplikacji.
+
+Filozofia projektu
+
+Celem projektu nie jest zastąpienie rozbudowanych systemów klasy ERP, CRM czy platform korporacyjnych.
+
+Jego zadaniem jest zapewnienie lekkiego, szybkiego i łatwego do przenoszenia narzędzia, które pomaga wykonywać codzienne zadania biurowe szybciej i wygodniej — szczególnie w środowiskach, gdzie instalacja dodatkowego oprogramowania jest utrudniona lub niemożliwa.
+
+Najważniejsze założenia projektu:
+
+- jeden plik,
+- szybkie uruchomienie,
+- pełna praca lokalna,
+- brak zależności zewnętrznych,
+- łatwa personalizacja,
+- maksymalna kontrola użytkownika nad własnymi danymi.
+
+OPIS FUNKCJONALNOŚCI
+
 1. Główna idea aplikacji
 To lokalna, jednoplikowa aplikacja typu WorkDesk / biurowy kombajn. Ma pomagać w codziennej pracy: szybkie linki, kopiowanie danych, pisanie maili, grupy odbiorców, notatki, TODO, journal, kalendarz, przypomnienia, konwerter, backupy i eksport/import danych.
 Dane są trzymane lokalnie w przeglądarce przez localStorage, a główne dane konfiguracyjne aplikacji można eksportować/importować jako JSON. Mechanizm danych używa klucza wd.data.v1, a wymagane sekcje danych to sections, templates, tiles, frequentLinks, knownMails. �
