@@ -39,6 +39,7 @@
   --nav-h:54px;
   --bar-h:40px;
   --side-w:320px;
+  --side-right-w:320px;
   --email-side-w:320px;
   --t:160ms cubic-bezier(.2,.7,.2,1);
 }
@@ -325,15 +326,17 @@ input,textarea,select{font-family:inherit;color:var(--text)}
    ========================================================= */
 .layout {
   display: grid;
-  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  grid-template-columns: var(--side-w) minmax(0, 1fr) var(--side-right-w);
   gap: 0;
   min-height: calc(100vh - var(--nav-h) - var(--bar-h));
   align-items: start;
 }
-.layout.focus{grid-template-columns:0 1fr}
-.layout.focus .sidebar{display:none}
+.layout.focus{grid-template-columns:0 1fr 0}
+.layout.focus .sidebar,
+.layout.focus .sidebar-right{display:none}
 
-.sidebar {
+.sidebar,
+.sidebar-right {
   border-right: 1px solid var(--line);
   background: var(--bg-1);
   padding: 14px;
@@ -344,6 +347,10 @@ input,textarea,select{font-family:inherit;color:var(--text)}
   max-height: none;
   height: auto;
   align-self: start;
+}
+.sidebar-right{
+  border-right:0;
+  border-left:1px solid var(--line);
 }
 
 .panel{
@@ -525,7 +532,7 @@ input,textarea,select{font-family:inherit;color:var(--text)}
 .form-grid .field input, .form-grid .field textarea{padding-right:32px}
 
 /* toast */
-.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:100;display:flex;flex-direction:column;gap:8px}
+.toast-wrap{position:fixed;right:50%;top:18px;z-index:100;display:flex;flex-direction:column;gap:8px}
 .toast{
   background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);
   padding:10px 14px;font-size:13px;box-shadow:var(--shadow-md);
@@ -542,7 +549,7 @@ input,textarea,select{font-family:inherit;color:var(--text)}
 /* responsive */
 @media (max-width:980px){
   .layout{grid-template-columns:1fr}
-  .sidebar{border-right:0;border-bottom:1px solid var(--line);max-height:none}
+  .sidebar,.sidebar-right{border-right:0;border-left:0;border-bottom:1px solid var(--line);max-height:none}
   .email-panel{grid-template-columns:1fr}
   .email-side{border-right:0;border-bottom:1px solid var(--line);max-height:none}
 }
@@ -644,6 +651,92 @@ kbd{
 .tiles-toolbar{
   display:flex;align-items:center;gap:14px;
   margin-bottom:14px;
+}
+.tile-filter-badges{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin:-4px 0 14px;
+}
+.tile-filter-badges .filter-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:999px;
+  background:var(--bg-2);border:1px solid var(--line);
+  color:var(--text-dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;transition:background var(--t),border-color var(--t),color var(--t),transform var(--t);
+}
+.tile-filter-badges .filter-badge:hover{background:var(--bg-3);color:var(--text)}
+.tile-filter-badges .filter-badge.active{background:#1c2a45;border-color:#3a5bb8;color:#cfdcff}
+.tile-filter-badges .filter-badge:active{transform:translateY(1px)}
+.email-select-visible{
+  display:grid;
+  grid-template-columns:1fr auto;
+  grid-template-rows:auto auto;
+  gap:6px 10px;
+  padding:9px 10px;
+  border-radius:var(--r-md);
+  background:var(--bg-2);
+  border:1px solid var(--line);
+  margin:10px 0;
+  transition:background var(--t),border-color var(--t);
+}
+
+.email-select-visible:hover{
+  background:var(--bg-3);
+  border-color:#34394a;
+}
+
+/* LEWY DOLNY RÓG */
+.email-select-visible .title{
+  grid-column:1;
+  grid-row:2;
+  align-self:end;
+  justify-self:start;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  margin-top: -24px;
+}
+
+.email-select-visible .title .main{
+  padding: 0px;
+  font-size:13px;
+  font-weight:500;
+  color:var(--text);
+  margin:0;
+}
+
+.email-select-visible .title .sub{
+  font-size:11px;
+  color:var(--text-mute);
+  margin:0;
+}
+
+/* PRAWY GÓRNY RÓG */
+.email-select-visible .checks{
+  grid-column:2;
+  grid-row:1;
+  justify-self:end;
+  align-self:start;
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.email-select-visible .checks .checkbox{
+  font-size:8px;
+  padding:2px 6px;
+}
+.email-select-visible .checkbox:has(input:checked){
+  background:#1c2a45;
+  border-color:#3a5bb8;
+  color:#cfdcff;
+}
+.signature-presets{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin:8px 0 0;
+}
+.signature-presets .sig-preset{
+  padding:4px 9px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
 }
 .tile.dragging{opacity:.4;border-style:dashed}
 .tile.drag-over{box-shadow:0 0 0 2px var(--accent)}
@@ -1037,7 +1130,8 @@ kbd{
 [data-theme="light"] .panel-h{background:linear-gradient(180deg,#f8fafd,#f1f4fa)}
 [data-theme="light"] .group{background:#ffffff;box-shadow:var(--shadow-sm)}
 [data-theme="light"] .group:hover{background:#f8fafd;border-color:#b8c2d2}
-[data-theme="light"] .sidebar{background:#f4f6fa;border-right-color:var(--line)}
+[data-theme="light"] .sidebar,
+[data-theme="light"] .sidebar-right{background:#f4f6fa;border-color:var(--line)}
 
 /* email panel */
 [data-theme="light"] .email-bar{background:#f4f6fa}
@@ -1086,6 +1180,9 @@ kbd{
 [data-theme="light"] .csv-preview .row-tag.dup{background:var(--bg-2);color:var(--text-mute);border-color:var(--line)}
 [data-theme="light"] .csv-preview .row-tag.bad{background:#fae0e3;color:#a04444;border-color:#d88a8a}
 [data-theme="light"] .badge{background:#ffffff}
+[data-theme="light"] .tile-filter-badges .filter-badge{background:#ffffff}
+[data-theme="light"] .tile-filter-badges .filter-badge:hover{background:#f4f6fa}
+[data-theme="light"] .tile-filter-badges .filter-badge.active{background:#e8efff;border-color:var(--accent);color:#1a4abc}
 [data-theme="light"] .badge.focus{background:#fff7e0;border-color:#e8c98a;color:#7a5b1a}
 [data-theme="light"] #dataState.dirty{background:#fff7e0;border-color:#e8c98a;color:#7a5b1a}
 
@@ -1216,6 +1313,26 @@ kbd{
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="grpSearch" type="text" placeholder="Szukaj sekcji lub grupy…" data-testid="group-search"/>
       </div>
+      <div class="email-select-visible">
+        <div class="title">
+          <div class="main">Zaznacz widoczne</div>
+          <div class="sub">Uwzględnia aktualne filtrowanie i wyszukiwanie</div>
+        </div>
+        <div class="checks">
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleTo">
+            TO
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleCc">
+            CC
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleBcc">
+            BCC
+          </label>
+        </div>
+      </div>
       <div id="groupsHost" style="margin-top:10px"></div>
       <button class="btn add-group-btn" id="addGroupBtn" data-testid="add-group-btn">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -1238,6 +1355,9 @@ kbd{
         <div class="field" style="margin:0">
           <label for="tmplPick">Szablon wiadomości</label>
           <input id="tmplSearch" type="text" placeholder="Szukaj szablonu…" list="tmplList" data-testid="template-search"/>
+          <button class="clear" data-clear="tmplSearch" aria-label="Wyczyść szablon wiadomości" data-testid="template-clear-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
           <datalist id="tmplList"></datalist>
         </div>
         <div style="display:flex;align-items:end;gap:8px;grid-column:2/4">
@@ -1325,6 +1445,12 @@ kbd{
         <!-- A5 snippet dropdown (pokazuje się gdy w treści wpiszesz /xxx) -->
         <div class="snip-pop" id="snipPop" data-testid="snip-pop" hidden></div>
       </div>
+      <div class="signature-presets" aria-label="Wybierz stopkę">
+        <button class="btn sm ghost sig-preset" data-signature="SHORT" data-testid="sig-short">SHORT</button>
+        <button class="btn sm ghost sig-preset" data-signature="LONG" data-testid="sig-long">LONG</button>
+        <button class="btn sm ghost sig-preset" data-signature="OFFICIAL" data-testid="sig-official">OFFICIAL</button>
+        <button class="btn sm ghost sig-preset" data-signature="CASUAL" data-testid="sig-casual">CASUAL</button>
+      </div>
       <div class="field area">
         <label for="fSig">Podpis / stopka</label>
         <textarea id="fSig" data-testid="field-signature"></textarea>
@@ -1357,6 +1483,59 @@ kbd{
       </div>
     </div>
 
+    <!-- Sticky notes (multi) -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#ffd28a"><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M9 3h6v4H9z"/></svg>
+        <span class="t">Notatki</span>
+        <span class="count" id="notesCount">0</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div id="notesHost"></div>
+        <button class="btn sm full" id="noteAddBtn" data-testid="note-add-btn" style="margin-top:8px">+ Dodaj notatkę</button>
+      </div>
+    </div>
+
+    <!-- Frequent links -->
+    <div class="panel open">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+        <span class="t">Częste linki</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b" id="flinksHost"></div>
+    </div>
+
+  </aside>
+
+  <!-- ============= MAIN ============= -->
+  <main class="main" role="main">
+    <h2>Pulpit</h2>
+    <div class="sub" id="welcome">Miłej pracy. Dziś jest <span id="todayLabel"></span>.</div>
+
+    <div class="tiles-toolbar">
+      <div class="search" style="flex:1;max-width:360px">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/>
+      </div>
+      <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
+      <span style="flex:1"></span>
+      <button class="btn sm ghost" id="tileReorderReset" title="Przywróć domyślną kolejność" data-testid="tile-reset-order">Reset kolejności</button>
+    </div>
+
+    <div class="tile-filter-badges" id="tileFilterBadges" data-testid="tile-filter-badges" aria-label="Szybkie filtrowanie kafelków">
+      <button class="filter-badge active" data-tile-filter="ALL" type="button">ALL</button>
+      <button class="filter-badge" data-tile-filter="LINKS" type="button">LINKS</button>
+      <button class="filter-badge" data-tile-filter="KOPIUJ" type="button">KOPIUJ</button>
+      <button class="filter-badge" data-tile-filter="IE MODE" type="button">IE MODE</button>
+    </div>
+
+    <div class="tiles" id="tilesHost"></div>
+  </main>
+
+  <!-- ============= RIGHT SIDEBAR ============= -->
+  <aside class="sidebar-right" aria-label="Panel boczny prawy">
     <!-- Mini kalendarz (B4) -->
     <div class="panel open">
       <div class="panel-h" data-toggle>
@@ -1385,41 +1564,6 @@ kbd{
       </div>
     </div>
 
-    <!-- Sticky notes (multi) -->
-    <div class="panel open">
-      <div class="panel-h" data-toggle>
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#ffd28a"><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M9 3h6v4H9z"/></svg>
-        <span class="t">Notatki</span>
-        <span class="count" id="notesCount">0</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-      </div>
-      <div class="panel-b">
-        <div id="notesHost"></div>
-        <button class="btn sm full" id="noteAddBtn" data-testid="note-add-btn" style="margin-top:8px">+ Dodaj notatkę</button>
-      </div>
-    </div>
-
-    <!-- Quick Journal — worklog (C2) -->
-    <div class="panel open">
-      <div class="panel-h" data-toggle>
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent-2)"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17h15M9 8h7M9 12h5"/></svg>
-        <span class="t">Journal · co robię?</span>
-        <span class="count" id="journalCount">0</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-      </div>
-      <div class="panel-b">
-        <div class="journal-add">
-          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input"/>
-          <button class="btn sm primary" id="journalAdd" data-testid="journal-add" title="Zapisz wpis z aktualnym timestampem">+</button>
-        </div>
-        <div class="journal-list" id="journalList"></div>
-        <div class="journal-foot">
-          <button class="btn sm ghost" id="journalExport" data-testid="journal-export" title="Eksport wpisów z dziś jako CSV">Eksport CSV</button>
-          <button class="btn sm ghost" id="journalClear" data-testid="journal-clear" title="Skasuj wszystkie wpisy">Wyczyść</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Tools -->
     <div class="panel open">
       <div class="panel-h" data-toggle>
@@ -1443,14 +1587,25 @@ kbd{
       </div>
     </div>
 
-    <!-- Frequent links -->
+    <!-- Quick Journal — worklog (C2) -->
     <div class="panel open">
       <div class="panel-h" data-toggle>
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
-        <span class="t">Częste linki</span>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent-2)"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17h15M9 8h7M9 12h5"/></svg>
+        <span class="t">Journal · co robię?</span>
+        <span class="count" id="journalCount">0</span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </div>
-      <div class="panel-b" id="flinksHost"></div>
+      <div class="panel-b">
+        <div class="journal-add">
+          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input"/>
+          <button class="btn sm primary" id="journalAdd" data-testid="journal-add" title="Zapisz wpis z aktualnym timestampem">+</button>
+        </div>
+        <div class="journal-list" id="journalList"></div>
+        <div class="journal-foot">
+          <button class="btn sm ghost" id="journalExport" data-testid="journal-export" title="Eksport wpisów z dziś jako CSV">Eksport CSV</button>
+          <button class="btn sm ghost" id="journalClear" data-testid="journal-clear" title="Skasuj wszystkie wpisy">Wyczyść</button>
+        </div>
+      </div>
     </div>
 
     <!-- Dane: export / import / reset -->
@@ -1476,24 +1631,6 @@ kbd{
       </div>
     </div>
   </aside>
-
-  <!-- ============= MAIN ============= -->
-  <main class="main" role="main">
-    <h2>Pulpit</h2>
-    <div class="sub" id="welcome">Miłej pracy. Dziś jest <span id="todayLabel"></span>.</div>
-
-    <div class="tiles-toolbar">
-      <div class="search" style="flex:1;max-width:360px">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/>
-      </div>
-      <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
-      <span style="flex:1"></span>
-      <button class="btn sm ghost" id="tileReorderReset" title="Przywróć domyślną kolejność" data-testid="tile-reset-order">Reset kolejności</button>
-    </div>
-
-    <div class="tiles" id="tilesHost"></div>
-  </main>
 </div>
 
 <!-- ============= MODALS ============= -->
@@ -2188,6 +2325,33 @@ function renderGroups(filter=""){
 
   if(!visible) host.innerHTML = emptyGroupsHTML(filter);
   bindGroupCheckboxes();
+  updateVisibleGroupsControl();
+}
+
+/** Return composite IDs for all groups visible after the current search filter. */
+function visibleGroupIds(){
+  const filter = $("#grpSearch").value.trim().toLowerCase();
+  const ids = [];
+  sortedSectionsForRender().forEach(sec => {
+    sec.groups.filter(g => matchesGroupFilter(g, sec, filter)).forEach(g => ids.push(sec.name + "::" + g.name));
+  });
+  return ids;
+}
+
+/** Refresh state of the global TO/CC/BCC checkboxes for visible groups. */
+function updateVisibleGroupsControl(){
+  const ids = visibleGroupIds();
+  ["To","Cc","Bcc"].forEach(kind => {
+    const cb = $(`#checkVisible${kind}`);
+    if(!cb) return;
+    const checked = ids.filter(id => groupState[kind].has(id)).length;
+    cb.checked = ids.length > 0 && checked === ids.length;
+    cb.indeterminate = checked > 0 && checked < ids.length;
+    cb.disabled = ids.length === 0;
+    cb.closest(".checkbox")?.classList.toggle("on", checked > 0);
+  });
+  const badge = $("#visibleGroupsBadge");
+  if(badge) badge.textContent = `${ids.length} wid.`;
 }
 
 /**
@@ -2268,6 +2432,33 @@ function bindGroupCheckboxes(){
   $$("#groupsHost input[type=checkbox]").forEach(cb => cb.addEventListener("change", onGroupToggle));
 }
 
+function toggleVisibleGroups(kind, shouldCheck){
+  const ids = visibleGroupIds();
+  const input = fieldFor(kind);
+  let current = parseEmails(input.value);
+  const visibleEmails = ids.flatMap(id => findGroupById(id)?.emails || []);
+
+  if(shouldCheck){
+    ids.forEach(id => groupState[kind].add(id));
+    current = uniq([...current, ...visibleEmails]);
+  } else {
+    ids.forEach(id => groupState[kind].delete(id));
+    const stillSelectedEmails = new Set([...groupState[kind]].flatMap(id => findGroupById(id)?.emails || []));
+    const remove = new Set(visibleEmails.filter(mail => !stillSelectedEmails.has(mail)));
+    current = current.filter(x => !remove.has(x));
+  }
+
+  input.value = current.join(", ");
+  input.dispatchEvent(new Event("input"));
+  renderGroups($("#grpSearch").value);
+}
+
+["To","Cc","Bcc"].forEach(kind => {
+  $(`#checkVisible${kind}`)?.addEventListener("change", e => {
+    toggleVisibleGroups(kind, e.target.checked);
+  });
+});
+
 /**
  * Find a group by its composite "section::group" id.
  * @param {string} id
@@ -2312,6 +2503,7 @@ function onGroupToggle(e){
   }
   inp.dispatchEvent(new Event("input"));
   cb.closest(".checkbox").classList.toggle("on", cb.checked);
+  updateVisibleGroupsControl();
 }
 
 /**
@@ -2420,7 +2612,7 @@ $$("[data-clear]").forEach(b=>{
   });
 });
 $("#clearBtn").addEventListener("click", ()=>{
-  ["fTo","fCc","fBcc","fSubj","fBody","fSig"].forEach(id=> $("#"+id).value="");
+  ["tmplSearch","fTo","fCc","fBcc","fSubj","fBody","fSig"].forEach(id=> $("#"+id).value="");
   Object.keys(groupState).forEach(k=> groupState[k].clear());
   renderGroups($("#grpSearch").value);
   updateCharBadge();
@@ -2811,6 +3003,7 @@ function buildTileElement(t){
   const tags = [];
   if(t.ie) tags.push('<span class="tag ie">IE MODE</span>');
   if(isCopy) tags.push('<span class="tag copy">KOPIUJ</span>');
+  if(!isCopy && !t.ie) tags.push('<span class="tag">LINKS</span>');
   (t.tags || []).forEach(tg => tags.push(`<span class="tag">${escHTML(tg)}</span>`));
 
   el.innerHTML = `
@@ -3358,6 +3551,7 @@ function loadPinned(){ try{ return new Set(JSON.parse(localStorage.getItem(TILE_
 function savePinned(set){ localStorage.setItem(TILE_PIN_KEY, JSON.stringify([...set])); }
 
 let tileSearchQuery = "";
+let tileTypeFilter = "ALL";
 let pinnedTiles = loadPinned();
 
 /**
@@ -3391,6 +3585,20 @@ function tileMatchesSearch(t, q){
   return hay.includes(q);
 }
 
+/** Szybki filtr typu kafelka: ALL / LINKS / KOPIUJ / IE MODE. */
+function tileMatchesType(t, filter){
+  if(filter === "KOPIUJ") return t.type === "copy";
+  if(filter === "IE MODE") return !!t.ie;
+  if(filter === "LINKS") return t.type !== "copy" && !t.ie;
+  return true;
+}
+
+function updateTileFilterBadges(){
+  $$("#tileFilterBadges .filter-badge").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tileFilter === tileTypeFilter);
+  });
+}
+
 /** Toggle pinned dla danego tytułu. */
 function togglePin(title){
   if(pinnedTiles.has(title)) pinnedTiles.delete(title);
@@ -3411,6 +3619,13 @@ $("#tileSearch").addEventListener("input", e => {
   tileSearchQuery = e.target.value.trim().toLowerCase();
   applyTileFilter();
 });
+$$("#tileFilterBadges .filter-badge").forEach(btn => {
+  btn.addEventListener("click", () => {
+    tileTypeFilter = btn.dataset.tileFilter || "ALL";
+    updateTileFilterBadges();
+    applyTileFilter();
+  });
+});
 $("#tileReorderReset").addEventListener("click", () => {
   if(!confirm("Przywrócić domyślną kolejność kafelków?")) return;
   localStorage.removeItem(TILE_ORDER_KEY);
@@ -3425,7 +3640,7 @@ function applyTileFilter(){
   $$(".tile", $("#tilesHost")).forEach(el => {
     const title = el.dataset.title;
     const t = emailData.tiles.find(x => x.title === title);
-    el.classList.toggle("tile-hidden", !(t && tileMatchesSearch(t, tileSearchQuery)));
+    el.classList.toggle("tile-hidden", !(t && tileMatchesSearch(t, tileSearchQuery) && tileMatchesType(t, tileTypeFilter)));
   });
 }
 
@@ -5078,6 +5293,41 @@ applyTheme(effectiveTheme());
 /* =========================================================
    INIT — pierwsze renderowanie + ustawienie domyślnej stopki
    ========================================================= */
+const SIGNATURE_PRESETS = {
+  SHORT: `—
+Imię Nazwisko`,
+  LONG: `—
+Imię Nazwisko
+Dział / Stanowisko
+Firma Sp. z o.o.
+ul. Przykładowa 1, 00-000 Warszawa
+tel. +48 000 000 000 · www.firma.pl`,
+  OFFICIAL: `Z poważaniem,
+
+Imię Nazwisko
+Dział / Stanowisko
+Firma Sp. z o.o.
+ul. Przykładowa 1, 00-000 Warszawa
+tel. +48 000 000 000 · www.firma.pl
+
+Niniejsza wiadomość może zawierać informacje poufne.
+Jeśli otrzymali ją Państwo omyłkowo, proszę o jej skasowanie.`,
+  CASUAL: `Pozdrawiam,
+Imię Nazwisko
+tel. +48 000 000 000`
+};
+
+$$('[data-signature]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.signature;
+    if(!SIGNATURE_PRESETS[key]) return;
+    $('#fSig').value = SIGNATURE_PRESETS[key];
+    $('#fSig').dispatchEvent(new Event('input'));
+    $('#fSig').focus();
+    toast('Wstawiono stopkę: ' + key);
+  });
+});
+
 /**
  * Initialize the signature field with a sensible default footer
  * if the user hasn't typed anything yet.
@@ -5101,6 +5351,7 @@ renderGroups();
 renderTemplateList();
 renderFlinks();
 renderTiles();
+updateTileFilterBadges();
 renderTodos();
 renderNotes();
 renderCalendar();
@@ -5135,4 +5386,3 @@ window.addEventListener("keydown", e => {
 </script>
 </body>
 </html>
-
