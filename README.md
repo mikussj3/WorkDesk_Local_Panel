@@ -769,9 +769,7 @@ Private/incognito mode is not recommended for persistent use because storage may
 - The application is not a replacement for an encrypted password manager.
 - The `mailto:` workflow depends on the operating system and configured email client.
 - External links require network or intranet access.
-- Mobile layouts exist, but the primary use case remains desktop office work.
 - No formal third-party accessibility, security or compliance certification is claimed.
-- A project license has not yet been selected in the supplied source package.
 
 ## Release policy
 
@@ -813,11 +811,9 @@ Do not publish real operational records, email addresses, internal URLs or expor
 
 ## License
 
-The supplied KF64 source package does **not** include a selected open-source license.
+WorkDesk is released as full open-source software under the permissive [MIT License](LICENSE).
 
-Until a license is added, copyright law generally reserves reuse, modification and redistribution rights to the copyright holder. Publishing source code on GitHub alone does not automatically grant open-source permissions.
-
-Before making the repository public, choose and add an appropriate `LICENSE` file, for example MIT, Apache-2.0, GPL-3.0 or another license reviewed for the project's goals.
+You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software without restrictions. See the [LICENSE](LICENSE) file for the full license text.
 
 ## FAQ
 

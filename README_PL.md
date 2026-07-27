@@ -767,7 +767,6 @@ Tryb prywatny/incognito nie jest zalecany, ponieważ dane mogą być automatyczn
 - Linki zewnętrzne wymagają sieci lub intranetu.
 - Istnieje responsywność mobilna, ale głównym przypadkiem użycia jest desktopowa praca biurowa.
 - Projekt nie deklaruje formalnej certyfikacji bezpieczeństwa, dostępności ani compliance.
-- W dostarczonej paczce źródłowej nie wybrano jeszcze licencji projektu.
 
 ## Zasady wydawania wersji
 
@@ -809,11 +808,9 @@ Nie publikuj w publicznych issue rzeczywistych rekordów operacyjnych, adresów 
 
 ## Licencja
 
-Dostarczona paczka źródłowa KF64 **nie zawiera wybranej licencji open source**.
+Projekt WorkDesk udostępniany jest jako w pełni otwarte oprogramowanie (open-source) na permissive licencji [MIT](LICENSE).
 
-Do czasu dodania licencji prawo autorskie co do zasady zastrzega prawa kopiowania, modyfikowania i redystrybucji dla właściciela praw. Samo opublikowanie kodu na GitHubie nie nadaje automatycznie uprawnień open source.
-
-Przed upublicznieniem repozytorium wybierz i dodaj plik `LICENSE`, np. MIT, Apache-2.0, GPL-3.0 lub inną licencję dopasowaną do celu projektu.
+Zezwala się na pełne i nieograniczone modyfikowanie, kopiowanie, używanie, rozpowszechnianie, sublicencjonowanie oraz komercyjne i prywatne wykorzystanie kodu i aplikacji. Pełna treść znajduje się w pliku [LICENSE](LICENSE).
 
 ## FAQ
 
