@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WorkDesk 1.66.3-KF64-D — Panel pracy lokalny</title>
+<style>
+{{STYLES}}
+</style>
+
+</head>
+<body>
+
+<!-- ============= NAVBAR ============= -->
+<header class="navbar" role="banner">
+  <div class="brand" data-testid="brand">
+    <!-- Inline SVG logo -->
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#7aa2ff"/>
+          <stop offset="1" stop-color="#9cffd1"/>
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#lg)" opacity=".18"/>
+      <path d="M8 22 L14 10 L18 18 L24 10" fill="none" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="24" cy="22" r="2" fill="url(#lg)"/>
+    </svg>
+    <div class="name"><b data-app-name>WorkDesk</b><span>Lokalny panel · v<span data-app-version>1.66.3</span></span></div>
+  </div>
+
+  <nav class="nav-links" aria-label="Główne menu" tabindex="0" data-a11y-scroll="true" aria-orientation="horizontal">
+    <a href="#" data-testid="nav-pulpit">Pulpit</a>
+    <a href="#" data-testid="nav-narzedzia">Narzędzia</a>
+    <a href="#" data-testid="nav-pomoc">Pomoc</a>
+  </nav>
+
+  <div class="nav-spacer"></div>
+
+  <div class="clock" id="clock" aria-live="polite"></div>
+
+  <button type="button" class="btn sm" id="openPaletteBtn" data-testid="open-palette-btn" title="Paleta poleceń (Ctrl+K)">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <span><kbd class="kbd-sm">Ctrl</kbd>+<kbd class="kbd-sm">K</kbd></span>
+  </button>
+
+  <button type="button" class="btn sm ghost" id="openHelpBtn" data-testid="open-help-btn" title="Skróty klawiszowe (Shift+?)" aria-label="Skróty klawiszowe">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.3 1.8c-.8.8-1.8 1.2-1.8 2.2"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+  </button>
+
+  <!-- Theme toggle (E4) — klik: light/dark; Alt+klik lub długie przytrzymanie: reset do systemu -->
+  <button type="button" class="btn sm ghost" id="themeToggle" data-testid="theme-toggle" title="Motyw: klik = jasny/ciemny, Alt+klik = wg systemu" aria-label="Motyw">
+    <svg class="ic theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M5 5l2 2M17 17l2 2M2 12h3M19 12h3M5 19l2-2M17 7l2-2"/></svg>
+    <svg class="ic theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <span class="theme-lbl" id="themeLbl">system</span>
+  </button>
+
+  <div class="timer" id="timer" data-testid="timer-pill" aria-live="polite">
+    <span class="dot"></span>
+    <span class="label">Przerwa za</span>
+    <span class="val" id="timerVal">–</span>
+  </div>
+
+  <!-- Pomodoro (B5) -->
+  <div class="pomo" id="pomo" data-testid="pomo-pill" hidden>
+    <button type="button" class="pomo-btn" id="pomoToggle" title="Pomodoro start/pauza" aria-label="Uruchom Pomodoro" aria-pressed="false" data-testid="pomo-toggle">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
+      <span id="pomoLabel">Pomidor</span>
+      <span class="val" id="pomoVal">25:00</span>
+    </button>
+    <button type="button" class="pomo-x" id="pomoStop" title="Zatrzymaj" aria-label="Zatrzymaj">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <button type="button" class="btn sm ghost" id="pomoStart" data-testid="pomo-start" title="Pomodoro 25/5" aria-label="Uruchom Pomodoro 25/5">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
+  </button>
+
+</header>
+<div class="data-confidence" id="dataConfidence" role="status" aria-live="polite" aria-atomic="true">
+  <span class="data-confidence__dot" aria-hidden="true"></span>
+  <span id="dataConfidenceText">Sprawdzanie stanu danych…</span>
+  <button type="button" class="data-confidence__action" id="dataConfidenceBackup" hidden>Utwórz backup</button>
+</div>
+<div class="attention-center" id="attentionCenter" role="region" aria-label="Ważne komunikaty" aria-live="polite"></div>
+
+<!-- ============= EMAIL BAR ============= -->
+<section class="email" id="email">
+  <div class="email-bar" id="emailBar" data-testid="email-bar" role="button" tabindex="0" aria-expanded="false" aria-label="Panel e-mail">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>
+    </svg>
+    <span class="lbl">Napisz e-mail</span>
+    <span class="hint">— grupy, szablony, generatory JSON</span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+
+  <div class="email-panel">
+    <!-- left -->
+    <aside class="email-side" aria-label="Grupy e-mail">
+      <h4>Wyszukaj grupę</h4>
+      <div class="search">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="grpSearch" type="text" placeholder="Szukaj sekcji lub grupy…" data-testid="group-search" aria-label="Szukaj grup e-mail">
+      </div>
+      <div class="email-select-visible">
+        <div class="title">
+          <div class="email-select-visible__label">Zaznacz widoczne</div>
+          <div class="email-select-visible__hint">Uwzględnia aktualne filtrowanie i wyszukiwanie</div>
+        </div>
+        <div class="checks">
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleTo">
+            TO
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleCc">
+            CC
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="checkVisibleBcc">
+            BCC
+          </label>
+        </div>
+      </div>
+      <div id="groupsHost" style="margin-top:10px"></div>
+      <button type="button" class="btn add-group-btn" id="addGroupBtn" data-testid="add-group-btn">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Dodaj nową grupę
+      </button>
+      <button type="button" class="btn add-group-btn ghost" id="groupDefaultsRestore">Przywróć grupy…</button>
+      <button type="button" class="btn sm full" id="csvExportBtn" data-testid="csv-export-btn" style="margin-top:6px" title="Pobierz wszystkie grupy jako CSV">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+        Eksport CSV grup
+      </button>
+      <button type="button" class="btn sm full" id="csvImportBtn" data-testid="csv-import-btn" style="margin-top:6px" title="Wczytaj plik CSV z kolumnami Sekcja,Grupa,Email">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+        Importuj CSV…
+      </button>
+      <input id="csvImportFile" type="file" accept="text/csv,.csv" style="display:none" aria-label="Importuj kontakty CSV">
+    </aside>
+
+    <!-- right -->
+    <div class="email-main">
+      <div class="tmpl-row">
+        <div class="field" style="margin:0">
+          <label for="tmplPick">Szablon wiadomości</label>
+          <input id="tmplSearch" type="text" placeholder="Szukaj szablonu…" list="tmplList" data-testid="template-search" aria-label="Szukaj szablonu">
+          <button type="button" class="clear" data-clear="tmplSearch" aria-label="Wyczyść szablon wiadomości" data-testid="template-clear-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+          <datalist id="tmplList"></datalist>
+        </div>
+        <div style="display:flex;align-items:end;gap:8px;grid-column:2/4">
+          <button type="button" class="btn primary" id="loadTmplBtn" data-testid="load-template-btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+            Wczytaj
+          </button>
+          <button type="button" class="btn" id="genTmplBtn" data-testid="generate-template-btn">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18 22 12 16 6M8 6 2 12l6 6"/></svg>
+            Generuj kod szablonu
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" class="btn primary" id="sendBtn" data-testid="send-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-11 11M22 2 15 22l-4-9-9-4z"/></svg>
+          Wyślij
+        </button>
+        <button type="button" class="btn" id="clearBtn" data-testid="clear-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Wyczyść
+        </button>
+        <button type="button" class="btn" id="bulkBtn" data-testid="bulk-btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="13" height="13" rx="2"/><rect x="8" y="3" width="13" height="13" rx="2"/></svg>
+          Bulk mail
+        </button>
+        <span style="flex:1"></span>
+        <span class="badge" id="charBadge">znaki: 0</span>
+      </div>
+
+      <div class="field" style="position:relative">
+        <label for="fTo">Do <span class="field-info" id="infoTo"></span></label>
+        <input id="fTo" type="text" autocomplete="off" placeholder="osoba@firma.pl, ..." data-testid="field-to"/>
+        <button type="button" class="clear" data-clear="fTo" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggTo" data-suggest="fTo"></div>
+      </div>
+      <div class="field" style="position:relative">
+        <label for="fCc">DW (CC) <span class="field-info" id="infoCc"></span></label>
+        <input id="fCc" type="text" autocomplete="off" data-testid="field-cc"/>
+        <button type="button" class="clear" data-clear="fCc" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggCc" data-suggest="fCc"></div>
+      </div>
+      <div class="field" style="position:relative">
+        <label for="fBcc">UDW (BCC) <span class="field-info" id="infoBcc"></span></label>
+        <input id="fBcc" type="text" autocomplete="off" data-testid="field-bcc"/>
+        <button type="button" class="clear" data-clear="fBcc" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="sugg" id="suggBcc" data-suggest="fBcc"></div>
+      </div>
+      <div class="field">
+        <label for="fSubject">Temat</label>
+        <input id="fSubject" type="text" data-testid="field-subject"/>
+        <button type="button" class="clear" data-clear="fSubject" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="field area">
+        <label for="fBody">Treść wiadomości</label>
+        <textarea id="fBody" data-testid="field-body" placeholder="Wpisz treść… (możesz zacząć od nazwy szablonu, aby wczytać ją automatycznie)"></textarea>
+        <button type="button" class="clear" data-clear="fBody" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="smart-bar" id="smartBar" data-testid="smart-bar">
+          <svg class="ic ic-email" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          <span id="smartText">Wczytać szablon?</span>
+          <span style="flex:1"></span>
+          <button type="button" class="btn sm primary" id="smartLoad">Wczytaj</button>
+          <button type="button" class="btn sm ghost" id="smartDismiss">Pomiń</button>
+        </div>
+        <!-- A5 snippet dropdown (pokazuje się gdy w treści wpiszesz /xxx) -->
+        <div class="snip-pop" id="snipPop" data-testid="snip-pop" hidden></div>
+      </div>
+      <div class="signature-presets" aria-label="Wybierz stopkę">
+        <button type="button" class="btn sm ghost sig-preset" data-signature="SHORT" data-testid="sig-short">SHORT</button>
+        <button type="button" class="btn sm ghost sig-preset" data-signature="LONG" data-testid="sig-long">LONG</button>
+        <button type="button" class="btn sm ghost sig-preset" data-signature="OFFICIAL" data-testid="sig-official">OFFICIAL</button>
+        <button type="button" class="btn sm ghost sig-preset" data-signature="CASUAL" data-testid="sig-casual">CASUAL</button>
+      </div>
+      <div class="field area">
+        <label for="fSig">Podpis / stopka</label>
+        <textarea id="fSig" data-testid="field-signature"></textarea>
+        <button type="button" class="clear" data-clear="fSig" aria-label="Wyczyść">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= MAIN LAYOUT ============= -->
+<div class="layout" id="layout">
+  <!-- ============= LEFT SIDEBAR ============= -->
+  <aside class="sidebar" aria-label="Panel boczny">
+    <!-- TODO -->
+    <div class="panel open" id="todoPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="m9 11 3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span class="t">To Do</span>
+        <span class="count" id="todoCount">0</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="todo-add">
+          <input id="todoInput" type="text" placeholder="Nowe zadanie…" data-testid="todo-input" aria-label="Nowe zadanie">
+          <button type="button" class="btn primary sm" id="todoAddBtn" data-testid="todo-add-btn">Dodaj</button>
+        </div>
+        <div class="business-tools" id="todoControls">
+          <select id="todoPriority" class="business-input" aria-label="Priorytet zadania"><option value="normal">Normalny</option><option value="high">Pilny</option><option value="low">Niski</option></select>
+          <input id="todoDue" type="date" class="business-input" aria-label="Termin zadania">
+          <select id="todoFilter" class="business-input" aria-label="Filtr zadań"><option value="all">Wszystkie</option><option value="today">Na dziś</option><option value="high">Pilne</option><option value="overdue">Po terminie</option><option value="done">Wykonane</option></select>
+        </div>
+        <div class="todo-list" id="todoList"></div>
+        <div class="todo-archive-actions"><button type="button" class="btn sm ghost" id="todoArchiveBtn">Archiwum 30 dni</button><button type="button" class="btn sm ghost" id="todoArchiveCsv">Eksport archiwum CSV</button></div>
+      </div>
+    </div>
+
+    <!-- Sticky notes (multi) -->
+    <div class="panel open" id="notesPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#ffd28a"><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M9 3h6v4H9z"/></svg>
+        <span class="t">Notatki</span>
+        <span class="count" id="notesCount">0</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div id="notesHost"></div>
+        <button type="button" class="btn sm full" id="noteAddBtn" data-testid="note-add-btn" style="margin-top:8px">+ Dodaj notatkę</button>
+      </div>
+    </div>
+
+    <!-- Frequent links -->
+    <div class="panel open" id="linksPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+        <span class="t">Częste linki</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b" id="flinksHost"></div>
+    </div>
+
+  </aside>
+
+  <!-- ============= MAIN ============= -->
+  <main class="main" id="mainContent" role="main">
+    <h2>Pulpit</h2>
+    <div class="sub" id="welcome">Miłej pracy. Dziś jest <span id="todayLabel"></span>.</div>
+    <section class="daily-start" id="dailyStart" aria-label="Dzisiaj — najważniejsze informacje" aria-live="polite"></section>
+    <div class="business-toolbar">
+      <div class="search" style="position:relative">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="globalSearch" type="search" placeholder="Szukaj we wszystkich modułach…" autocomplete="off" aria-label="Wyszukaj w aplikacji" aria-controls="globalResults" aria-autocomplete="list">
+        <div class="global-results" id="globalResults" role="listbox"></div>
+      </div>
+      <button type="button" class="btn sm" id="quickActionsBtn">Polecenia</button>
+      <button type="button" class="btn sm" id="dayReportBtn">Raport dnia</button>
+      <button type="button" class="btn sm ghost" id="recentActionsBtn">Ostatnie akcje</button>
+      <div id="businessActions" class="business-actions" aria-label="Narzędzia biznesowe"></div>
+    </div>
+
+    <div class="tiles-toolbar">
+      <div class="search" style="flex:1;max-width:360px">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/ aria-label="Szukaj kafelka">
+      </div>
+      <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
+      <span style="flex:1"></span>
+      <button type="button" class="btn sm ghost" id="tileReorderReset" title="Przywróć domyślną kolejność" data-testid="tile-reset-order">Reset kolejności</button>
+      <button type="button" class="btn sm ghost" id="tileDefaultsRestore">Przywróć kafelki…</button>
+    </div>
+
+    <div class="tile-filter-badges" id="tileFilterBadges" data-testid="tile-filter-badges" aria-label="Szybkie filtrowanie kafelków">
+      <button class="filter-badge active" data-tile-filter="ALL" type="button">ALL</button>
+      <button class="filter-badge" data-tile-filter="LINKS" type="button">LINKS</button>
+      <button class="filter-badge" data-tile-filter="KOPIUJ" type="button">KOPIUJ</button>
+      <button class="filter-badge" data-tile-filter="IE MODE" type="button">IE MODE</button>
+    </div>
+
+    <div class="tiles" id="tilesHost"></div>
+  </main>
+
+  <!-- ============= RIGHT SIDEBAR ============= -->
+  <aside class="sidebar-right" aria-label="Panel boczny prawy">
+    <!-- Mini kalendarz (B4) -->
+    <div class="panel open" id="calendarPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent)"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        <span class="t">Kalendarz</span>
+        <span class="count" id="calLabel"></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="cal-head">
+          <button type="button" class="icon-btn" id="calPrev" aria-label="Poprzedni miesiąc" data-testid="cal-prev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="cal-title" id="calTitle">…</div>
+          <button type="button" class="icon-btn" id="calNext" aria-label="Następny miesiąc" data-testid="cal-next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div class="cal-grid" id="calGrid" role="grid"></div>
+        <div class="cal-foot">
+          <span class="cal-dot today"></span> dziś
+          <span class="cal-dot hol"></span> dzień wolny
+          <span style="flex:1"></span>
+          <button type="button" class="btn sm ghost" id="calToday" data-testid="cal-today">Dziś</button>
+        </div>
+        <div class="cal-reminders" id="calRemindersBox">
+          <div class="business-tools" id="calendarReminderTools">
+            <button type="button" class="btn sm" data-days="0">Dziś</button><button type="button" class="btn sm" data-days="1">Jutro</button><button type="button" class="btn sm" data-days="3">Za 3 dni</button><button type="button" class="btn sm" data-days="7">Za tydzień</button><button type="button" class="btn sm ghost" id="upcomingBtn">Nadchodzące</button>
+          </div>
+          <div class="cal-reminders-title">Najbliższe przypomnienia</div>
+          <div class="module-help" id="reminderLimitInfo">Przypomnienia działają tylko, gdy aplikacja jest otwarta w przeglądarce. Uśpienie urządzenia lub nieaktywna karta może opóźnić alert.</div>
+          <div class="cal-reminder-list" id="calReminderList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="panel open" id="toolsPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#9cffd1"><path d="M14.7 6.3a4 4 0 1 1-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 1 1 5.4-5.4l-3 3-2-2 3-3z"/></svg>
+        <span class="t">Narzędzia</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="tools">
+          <button type="button" class="btn sm" id="toolClean" data-testid="tool-clean">Wyczyść tekst</button>
+          <button type="button" class="btn sm" id="toolCount" data-testid="tool-count">Policz znaki</button>
+          <button type="button" class="btn sm" id="toolDatePL" data-testid="tool-date-pl">Data PL</button>
+          <button type="button" class="btn sm" id="toolDateISO" data-testid="tool-date-iso">Data ISO</button>
+          <button type="button" class="btn sm full" id="toolUpper" data-testid="tool-upper">UPPER / lower (zaznaczenie w treści)</button>
+          <button type="button" class="btn sm" id="toolPassword" data-testid="tool-password">Hasło…</button>
+          <button type="button" class="btn sm" id="toolConv" data-testid="tool-conv">Konwerter…</button>
+          <button type="button" class="btn sm" id="toolTime" data-testid="tool-time">Czas / Data robocza…</button>
+          <button type="button" class="btn sm" id="toolId" data-testid="tool-id">Generator ID / UUID…</button>
+        </div>
+        <div class="tools-out" id="toolsOut">Gotowe.</div>
+      </div>
+    </div>
+
+    <!-- Quick Journal — worklog (C2) -->
+    <div class="panel open" id="journalPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent-2)"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17h15M9 8h7M9 12h5"/></svg>
+        <span class="t">Journal · co robię?</span>
+        <span class="count" id="journalCount">0</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="journal-add">
+          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input"/ aria-label="Nowy wpis dziennika">
+          <button type="button" class="btn sm primary" id="journalAdd" data-testid="journal-add" title="Zapisz wpis z aktualnym timestampem">+</button>
+        </div>
+        <div class="business-tools" id="journalControls">
+          <select id="journalType" class="business-input" aria-label="Typ nowego wpisu"><option value="info">Informacja</option><option value="problem">Problem</option><option value="decision">Decyzja</option><option value="contact">Kontakt</option><option value="done">Wykonane</option></select>
+          <input id="journalSearch" class="business-input" type="search" placeholder="Szukaj wpisów…" aria-label="Szukaj w Journalu">
+          <select id="journalFilterType" class="business-input" aria-label="Filtr typu wpisu"><option value="all">Wszystkie typy</option><option value="info">Informacja</option><option value="problem">Problem</option><option value="decision">Decyzja</option><option value="contact">Kontakt</option><option value="done">Wykonane</option></select>
+          <select id="journalRange" class="business-input" aria-label="Zakres Journalu"><option value="all">Wszystkie</option><option value="today">Dziś</option><option value="7">7 dni</option><option value="30">30 dni</option></select>
+          <span id="journalResult" class="ds-meta" aria-live="polite"></span>
+          <button type="button" class="btn sm ghost" id="journalSummary">Podsumowanie</button>
+        </div>
+        <div class="journal-list" id="journalList"></div>
+        <div class="journal-foot">
+          <button type="button" class="btn sm ghost" id="journalExport" data-testid="journal-export" title="Eksport wpisów z dziś jako CSV">Eksport CSV</button>
+          <button type="button" class="btn sm ghost" id="journalClear" data-testid="journal-clear" title="Skasuj wszystkie wpisy">Wyczyść</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dane: export / import / reset -->
+    <div class="panel open" id="dataPanel">
+      <div class="panel-h" data-toggle>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--accent-2)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+        <span class="t">Dane (JSON)</span>
+        <span class="count" id="dataState">domyślne</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="panel-b">
+        <div class="data-primary-actions">
+          <button type="button" class="btn sm primary" id="dataExport" data-testid="data-export" title="Pobierz pełną kopię danych jako plik JSON">Eksportuj backup</button>
+          <button type="button" class="btn sm" id="dataImport" data-testid="data-import" title="Wczytaj wcześniej zapisany backup JSON">Importuj backup…</button>
+          <button type="button" class="btn sm" id="dataBackups" data-testid="data-backups" title="Lokalne punkty przywracania">Punkty przywracania…</button>
+        </div>
+        <details class="data-advanced" id="dataAdvanced">
+          <summary>Zaawansowane i diagnostyka</summary>
+          <div class="tools">
+            <button type="button" class="btn sm" id="dataExportPartial" data-testid="data-export-partial" title="Eksportuj tylko wybrane moduły">Eksport modułu…</button>
+            <button type="button" class="btn sm" id="dataResetModule" data-testid="data-reset-module" title="Zresetuj tylko jeden moduł; wcześniej zostanie utworzony punkt przywracania">Reset modułu…</button>
+            <button type="button" class="btn sm danger" id="dataReset" data-testid="data-reset" title="Przywróć dane wbudowane; wcześniej zostanie utworzony punkt przywracania">Przywróć dane wbudowane</button>
+            <button type="button" class="btn sm" id="dataRoundTripTest" data-testid="data-roundtrip-test" title="Test diagnostyczny: eksport → reset → import bez trwałej zmiany danych">Test eksport → reset → import</button>
+            <button type="button" class="btn sm" id="storageIntegrityTest" title="Test kwarantanny uszkodzonego JSON i rollbacku zapisu">Test integralności pamięci</button>
+          </div>
+        </details>
+        <div class="storage-dashboard" id="storageDashboard">
+          <div class="storage-summary" id="storageSummary">
+            <div class="storage-summary-head">
+              <span class="storage-status-dot" aria-hidden="true"></span>
+              <span class="storage-total" id="storageTotal">—</span>
+              <span class="storage-caption" id="storageCaption">budżet —</span>
+            </div>
+            <div class="storage-bar" aria-hidden="true"><span id="storageBarFill"></span></div>
+          </div>
+          <div class="storage-modules" id="storageModules"></div>
+          <div class="storage-actions">
+            <button type="button" class="btn sm" id="storageLimitsBtn" title="Zmień limity rekordów, tekstów i budżet pamięci">Ustaw limity…</button>
+            <button type="button" class="btn sm" id="storageCleanupBtn" title="Pokaż dane, które można bezpiecznie usunąć">Zwolnij miejsce…</button>
+          </div>
+        </div>
+        <div class="tools-out" style="margin-top:8px;line-height:1.45">
+          Możesz też <b>przeciągnąć</b> plik <code>.json</code> w dowolne miejsce okna.
+        </div>
+        <!-- hidden input używany przez "Importuj…" -->
+        <input id="dataFile" type="file" accept="application/json,.json" style="display:none" aria-label="Importuj dane JSON">
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Mobile section navigation -->
+<nav class="mobile-quick-nav" id="mobileQuickNav" aria-label="Szybka nawigacja po modułach" hidden>
+  <button type="button" data-mobile-target="email" aria-label="Przejdź do e-mail">E-mail</button>
+  <button type="button" data-mobile-target="mainContent" aria-label="Przejdź do pulpitu">Pulpit</button>
+  <button type="button" data-mobile-target="todoPanel" aria-label="Przejdź do zadań">TODO</button>
+  <button type="button" data-mobile-target="notesPanel" aria-label="Przejdź do notatek">Notatki</button>
+  <button type="button" data-mobile-target="calendarPanel" aria-label="Przejdź do kalendarza">Kalendarz</button>
+  <button type="button" data-mobile-target="journalPanel" aria-label="Przejdź do journalu">Journal</button>
+  <button type="button" data-mobile-target="dataPanel" aria-label="Przejdź do danych">Dane</button>
+</nav>
+<button type="button" class="back-to-top" id="backToTopBtn" aria-label="Wróć na górę" title="Wróć na górę" hidden>↑</button>
+
+<!-- ============= MODALS ============= -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <!-- Bulk mail queue -->
+  <div class="modal" id="bulkMailModal" role="dialog" aria-labelledby="bulkMailTitle" hidden>
+    <div class="modal-h"><h3 id="bulkMailTitle">Wiadomości seryjne</h3><button type="button" class="btn ghost sm x" data-close="bulkMailModal" aria-label="Zamknij">×</button></div>
+    <div class="modal-b">
+      <p class="bulk-mail-summary" id="bulkMailSummary"></p>
+      <div class="bulk-mail-progress" id="bulkMailProgress" role="status" aria-live="polite"></div>
+      <div class="bulk-mail-list" id="bulkMailList"></div>
+      <p class="module-help">Każda osobna wiadomość jest otwierana wyłącznie po kliknięciu, dzięki czemu przeglądarka nie blokuje kolejnych okien.</p>
+    </div>
+    <div class="modal-f"><button type="button" class="btn ghost" data-close="bulkMailModal">Zamknij</button><button type="button" class="btn" id="bulkMailBcc">Jeden e-mail BCC</button><button type="button" class="btn primary" id="bulkMailNext">Otwórz następny</button></div>
+  </div>
+
+<!-- Storage limits -->
+  <div class="modal lg" id="storageLimitsModal" role="dialog" aria-labelledby="storageLimitsTitle" hidden>
+    <div class="modal-h"><h3 id="storageLimitsTitle">Limity pamięci i rekordów</h3><button type="button" class="btn ghost sm x" data-close="storageLimitsModal" aria-label="Zamknij">×</button></div>
+    <div class="modal-b"><div class="storage-limit-grid" id="storageLimitGrid"></div><div class="tools-out" style="margin-top:12px">Limity są zapisywane w preferencjach aplikacji i można je przywrócić do wartości domyślnych.</div></div>
+    <div class="modal-f"><button type="button" class="btn ghost" id="storageLimitsReset">Domyślne</button><button type="button" class="btn" data-close="storageLimitsModal">Anuluj</button><button type="button" class="btn primary" id="storageLimitsSave">Zapisz limity</button></div>
+  </div>
+
+  <!-- Storage cleanup preview -->
+  <div class="modal lg" id="storageCleanupModal" role="dialog" aria-labelledby="storageCleanupTitle" hidden>
+    <div class="modal-h"><h3 id="storageCleanupTitle">Podgląd zwalniania miejsca</h3><button type="button" class="btn ghost sm x" data-close="storageCleanupModal" aria-label="Zamknij">×</button></div>
+    <div class="modal-b"><div class="cleanup-list" id="storageCleanupList"></div></div>
+    <div class="modal-f"><button type="button" class="btn" data-close="storageCleanupModal">Anuluj</button><button type="button" class="btn danger" id="storageCleanupApply">Usuń zaznaczone</button></div>
+  </div>
+
+  <!-- Generic code modal -->
+  <div class="modal lg" id="codeModal" role="dialog" aria-labelledby="codeTitle" hidden>
+    <div class="modal-h">
+      <h3 id="codeTitle">Wygenerowany kod</h3>
+      <button type="button" class="btn ghost sm x" data-close="codeModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <p style="margin-top:0;color:var(--text-dim)">
+        Skopiuj poniższy fragment i wklej w odpowiednim miejscu wewnątrz <code>index.html</code>.
+      </p>
+      <pre class="code-block" id="codeBlock"></pre>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="codeModal">Zamknij</button>
+      <button type="button" class="btn primary" id="copyCodeBtn">Kopiuj kod</button>
+    </div>
+  </div>
+
+  <!-- Add group modal -->
+  <div class="modal" id="groupModal" role="dialog" aria-labelledby="groupTitle" hidden>
+    <div class="modal-h">
+      <h3 id="groupTitle">Dodaj nową grupę</h3>
+      <button type="button" class="btn ghost sm x" data-close="groupModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="form-grid">
+        <div class="field">
+          <label for="ngSection">Sekcja</label>
+          <input id="ngSection" type="text" placeholder="np. Dział handlowy" data-testid="ng-section"/>
+        </div>
+        <div class="field">
+          <label for="ngGroup">Nazwa grupy</label>
+          <input id="ngGroup" type="text" placeholder="np. Klienci kluczowi" data-testid="ng-group"/>
+        </div>
+        <div class="field area">
+          <label for="ngEmails">Adresy e-mail (po przecinku lub w nowej linii)</label>
+          <textarea id="ngEmails" placeholder="anna@firma.pl, jan@firma.pl" data-testid="ng-emails"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="groupModal">Anuluj</button>
+      <button type="button" class="btn primary" id="ngGenerate" data-testid="ng-generate">Dodaj</button>
+    </div>
+  </div>
+
+  <!-- Help modal — skróty (A2) -->
+  <div class="modal" id="helpModal" role="dialog" aria-labelledby="helpTitle" hidden>
+    <div class="modal-h">
+      <h3 id="helpTitle">Skróty klawiszowe</h3>
+      <button type="button" class="btn ghost sm x" data-close="helpModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <table class="kbd-table">
+        <tbody>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Paleta poleceń — wyszukaj akcję, szablon, kafelek</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Wyślij wiadomość (otwiera klienta poczty)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Zwiń/rozwiń pasek e-mail (poza polami tekstu)</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Wymuś zapis draftu kompozytora</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Wyczyść kompozytor</td></tr>
+          <tr><td><kbd>/</kbd></td><td>Fokus w wyszukiwarce kafelków (E3)</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>?</kbd></td><td>To okno</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Zamknij dowolny modal / palety</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text-mute);margin-top:14px;font-size:12px">
+        W treści wiadomości możesz wpisać <code>/podpis</code>, <code>/data</code>, <code>/nip</code> itp., aby wstawić snippet (A5).
+      </p>
+      <div class="business-card" style="margin-top:14px">
+        <h4 style="margin:0 0 8px">Build i diagnostyka</h4>
+        <div id="buildInfo" class="business-meta"></div>
+        <details style="margin-top:10px">
+          <summary>Diagnostyka developerska</summary>
+</details>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn primary" data-close="helpModal">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- Password generator modal (D1) -->
+  <div class="modal" id="pwdModal" role="dialog" aria-labelledby="pwdTitle" hidden>
+    <div class="modal-h">
+      <h3 id="pwdTitle">Generator hasła</h3>
+      <button type="button" class="btn ghost sm x" data-close="pwdModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="pwd-out">
+        <input id="pwdValue" type="text" readonly data-testid="pwd-value"/ aria-label="Wygenerowane hasło">
+        <button type="button" class="btn primary" id="pwdCopy" data-testid="pwd-copy">Kopiuj</button>
+      </div>
+      <div class="pwd-row">
+        <label class="pwd-len">Długość <span id="pwdLenVal">16</span>
+          <input id="pwdLen" type="range" min="6" max="48" value="16" data-testid="pwd-len"/>
+        </label>
+      </div>
+      <div class="pwd-opts">
+        <label class="checkbox"><input type="checkbox" id="pwdUpper" checked/> Wielkie A–Z</label>
+        <label class="checkbox"><input type="checkbox" id="pwdLower" checked/> Małe a–z</label>
+        <label class="checkbox"><input type="checkbox" id="pwdDigit" checked/> Cyfry 0–9</label>
+        <label class="checkbox"><input type="checkbox" id="pwdSym"   checked/> Symbole !@#$%</label>
+        <label class="checkbox"><input type="checkbox" id="pwdNoAmb" checked/> Pomiń mylące (0/O/l/1)</label>
+      </div>
+      <div class="pwd-strength" id="pwdStrength"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="pwdModal">Zamknij</button>
+      <button type="button" class="btn primary" id="pwdGen" data-testid="pwd-gen">Generuj nowe</button>
+    </div>
+  </div>
+
+  <!-- Converter modal (D4) -->
+  <div class="modal" id="convModal" role="dialog" aria-labelledby="convTitle" hidden>
+    <div class="modal-h">
+      <h3 id="convTitle">Konwerter walut · VAT</h3>
+      <button type="button" class="btn ghost sm x" data-close="convModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <h4 style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Waluty · <span class="manual-rate-label">kurs ręczny</span></h4>
+      <div class="conv-row">
+        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt"/ aria-label="Kwota do przeliczenia">
+        <select id="convFrom" data-testid="conv-from" aria-label="Waluta źródłowa">
+          <option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
+        </select>
+        <span class="conv-arrow">→</span>
+        <select id="convTo" data-testid="conv-to" aria-label="Waluta docelowa">
+          <option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
+        </select>
+        <input id="convOut" type="text" readonly data-testid="conv-out"/ aria-label="Wynik przeliczenia">
+      </div>
+      <div class="conv-info" id="convInfo"></div>
+
+      <div class="fx-rates" aria-label="Aktualne notowania walut">
+        <div class="fx-rates-head">
+          <div class="fx-rates-title">Aktualne notowania</div>
+          <button class="btn sm ghost" id="fxResetBtn" type="button" data-testid="fx-reset-btn">Reset</button>
+        </div>
+        <div class="fx-rates-grid">
+          <div class="fx-rate-field">
+            <label for="fxEUR">EUR / PLN</label>
+            <input id="fxEUR" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-eur"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxUSD">USD / PLN</label>
+            <input id="fxUSD" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-usd"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxGBP">GBP / PLN</label>
+            <input id="fxGBP" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-gbp"/>
+          </div>
+          <div class="fx-rate-field">
+            <label for="fxCHF">CHF / PLN</label>
+            <input id="fxCHF" type="number" min="0" step="0.0001" inputmode="decimal" data-testid="fx-chf"/>
+          </div>
+        </div>
+        <div class="fx-rate-note">Wpisz kurs jako wartość PLN za 1 jednostkę waluty. Zmiana kursu od razu aktualizuje wynik konwersji.</div>
+      </div>
+
+      <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">VAT</h4>
+      <div class="conv-row">
+        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt"/ aria-label="Kwota VAT">
+        <select id="vatRate" data-testid="vat-rate" aria-label="Stawka VAT"><option>23</option><option>8</option><option>5</option><option>0</option></select>
+        <span class="conv-arrow">%</span>
+        <select id="vatDir" data-testid="vat-dir" aria-label="Kierunek przeliczenia VAT">
+          <option value="net2gross">netto → brutto</option>
+          <option value="gross2net">brutto → netto</option>
+        </select>
+        <input id="vatOut" type="text" readonly data-testid="vat-out"/ aria-label="Wynik VAT">
+      </div>
+      <div class="conv-info" id="vatInfo"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn primary" data-close="convModal">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- QR code modal (D3) -->
+  <div class="modal" id="qrModal" role="dialog" aria-labelledby="qrTitle" hidden>
+    <div class="modal-h">
+      <h3 id="qrTitle">Kod QR</h3>
+      <button type="button" class="btn ghost sm x" data-close="qrModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b qr-body">
+      <div class="qr-host" id="qrHost"></div>
+      <div class="qr-text" id="qrText"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="qrModal">Zamknij</button>
+      <button type="button" class="btn primary" id="qrDownload" data-testid="qr-download">Pobierz SVG</button>
+    </div>
+  </div>
+
+  <!-- Time/Date calculator (B3) -->
+  <div class="modal" id="timeModal" role="dialog" aria-labelledby="timeTitle" hidden>
+    <div class="modal-h">
+      <h3 id="timeTitle">Kalkulator czasu i dat roboczych</h3>
+      <button type="button" class="btn ghost sm x" data-close="timeModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <h4 style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Suma czasu (HH:MM)</h4>
+      <textarea id="timeInput" rows="4" placeholder="00:30
+1:15
+0:45
+2h 10m" data-testid="time-input" style="width:100%;background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);padding:10px;color:var(--text);font-family:ui-monospace,Consolas,monospace;font-size:13px;outline:0;resize:vertical" aria-label="Czasy do zsumowania"></textarea>
+      <div class="conv-info" id="timeOut" style="margin-top:8px;font-size:13px;color:var(--text)"></div>
+
+      <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Data robocza</h4>
+      <div class="conv-row" style="grid-template-columns:1fr 90px auto 90px 1fr">
+        <input id="wdStart" type="date" data-testid="wd-start"/ aria-label="Data początkowa">
+        <select id="wdOp" data-testid="wd-op" aria-label="Operacja na dniach roboczych"><option value="add">+</option><option value="sub">−</option></select>
+        <input id="wdDays" type="number" min="0" value="5" data-testid="wd-days"/ aria-label="Liczba dni roboczych">
+        <span class="conv-arrow">dni rob.</span>
+        <input id="wdOut" type="text" readonly data-testid="wd-out"/ aria-label="Wynik daty">
+      </div>
+      <div class="conv-info" id="wdInfo">Pomija soboty, niedziele i dni wolne PL.</div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn primary" data-close="timeModal">Zamknij</button>
+    </div>
+  </div>
+
+  <!-- ID generator (D2) -->
+  <div class="modal" id="idModal" role="dialog" aria-labelledby="idTitle" hidden>
+    <div class="modal-h">
+      <h3 id="idTitle">Generator identyfikatorów</h3>
+      <button type="button" class="btn ghost sm x" data-close="idModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <div class="conv-row" style="grid-template-columns:140px 1fr auto">
+        <select id="idKind" data-testid="id-kind" aria-label="Rodzaj identyfikatora">
+          <option value="uuid">UUID v4</option>
+          <option value="ulid">ULID-like</option>
+          <option value="order">WD-2026-XXXX</option>
+          <option value="token">Token base32 (16)</option>
+          <option value="numeric">Numer 8 cyfr</option>
+        </select>
+        <input id="idValue" type="text" readonly data-testid="id-value" style="font-family:ui-monospace,Consolas,monospace"/ aria-label="Wygenerowany identyfikator">
+        <button type="button" class="btn primary" id="idGen" data-testid="id-gen">Generuj</button>
+      </div>
+      <div class="conv-info" id="idInfo" style="margin-top:8px"></div>
+      <div class="id-history" id="idHistory" style="margin-top:14px;display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="idModal">Zamknij</button>
+      <button type="button" class="btn primary" id="idCopy" data-testid="id-copy">Kopiuj</button>
+    </div>
+  </div>
+
+  <!-- CSV import preview modal -->
+  <div class="modal lg" id="csvImportModal" role="dialog" aria-labelledby="csvImportTitle" hidden>
+    <div class="modal-h">
+      <h3 id="csvImportTitle">Import CSV — podgląd</h3>
+      <button type="button" class="btn ghost sm x" data-close="csvImportModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <p style="margin-top:0;color:var(--text-dim);font-size:12.5px">
+        Oczekiwany format: <code>Sekcja,Grupa,Email</code> (z nagłówkiem lub bez). Obsługa <code>,</code> i <code>;</code> jako separatora.
+        Duplikaty są pomijane, brakujące sekcje/grupy są tworzone.
+      </p>
+      <div class="csv-stats" id="csvStats"></div>
+      <div class="csv-preview" id="csvPreview"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="csvImportModal">Anuluj</button>
+      <button type="button" class="btn primary" id="csvImportApply" data-testid="csv-import-apply">Zaimportuj</button>
+    </div>
+  </div>
+
+  <!-- Backups (C5) -->
+  <div class="modal lg" id="backupModal" role="dialog" aria-labelledby="backupTitle" hidden>
+    <div class="modal-h">
+      <h3 id="backupTitle">Punkty przywracania</h3>
+      <button type="button" class="btn ghost sm x" data-close="backupModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-b">
+      <p style="margin-top:0;color:var(--text-dim);font-size:12.5px">
+        Lokalnie przechowywane są maksymalnie dwa punkty: <b>bieżący</b> i <b>poprzedni poprawny</b>. Pełny backup tygodniowy zapisuj także jako plik poza przeglądarką.
+      </p>
+      <div id="backupList" class="backup-list"></div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn" data-close="backupModal">Zamknij</button>
+      <button type="button" class="btn primary" id="backupNow" data-testid="backup-now">Odśwież punkt bieżący</button>
+    </div>
+  </div>
+
+  <!-- Command palette modal (A1) -->
+  <div class="modal cmd-modal" id="cmdModal" role="dialog" aria-labelledby="cmdTitle" hidden>
+    <div class="modal-h">
+      <h3 id="cmdTitle" style="font-size:13px;color:var(--text-mute);font-weight:500">Paleta poleceń · <kbd>Ctrl</kbd>+<kbd>K</kbd></h3>
+      <button type="button" class="btn ghost sm x" data-close="cmdModal" aria-label="Zamknij">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="cmd-input">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query"/ aria-label="Wyszukaj polecenie">
+    </div>
+    <div class="cmd-list" id="cmdList" role="listbox"></div>
+    <div class="cmd-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> nawiguj</span>
+      <span><kbd>Enter</kbd> wykonaj</span>
+      <span><kbd>Esc</kbd> zamknij</span>
+    </div>
+  </div>
+  <div class="modal" id="todoArchiveModal" hidden role="dialog" aria-labelledby="todoArchiveTitle"><div class="modal-h"><h3 id="todoArchiveTitle">Archiwum wykonanych TODO — 30 dni</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="archive-list" id="todoArchiveList"></div></div><div class="modal-f"><button type="button" class="btn" data-close>Zamknij</button></div></div>
+  <div class="modal" id="quickActionsModal" hidden role="dialog" aria-labelledby="quickActionsTitle"><div class="modal-h"><h3 id="quickActionsTitle">Polecenia</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="form-grid"><button type="button" class="btn" id="qaTemplate">Nowa wiadomość z szablonu</button><button type="button" class="btn" id="qaSelectionTodo">Dodaj TODO z zaznaczonego tekstu</button><button type="button" class="btn" id="qaTodoJournal">Przenieś wybrane TODO do journalu</button><button type="button" class="btn" id="qaTodoReminder">Utwórz przypomnienie z TODO</button></div></div></div>
+  <div class="modal" id="recentActionsModal" hidden role="dialog" aria-labelledby="recentActionsTitle"><div class="modal-h"><h3 id="recentActionsTitle">Ostatnie akcje</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="recent-actions" id="recentActionsList"></div></div></div>
+</div>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<!-- ============= DRAG & DROP OVERLAY (import danych JSON) ============= -->
+<div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+  <div class="drop-card">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="drop-ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+    <div class="drop-title">Upuść plik JSON, aby zaimportować dane</div>
+    <div class="drop-sub">Oczekiwana struktura: <code>{ sections, templates, tiles, frequentLinks, knownMails }</code></div>
+  </div>
+</div>
+
+<!-- ============= SCRIPT ============= -->
+<script>
+{{SCRIPTS}}
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+/* =========================================================
+   LIGHT THEME OVERRIDES
+   --------------------------------------------------------
+   Włącza się przez atrybut data-theme="light" na <html>.
+   Nadpisuje tylko zmienne CSS + nieliczne miejsca z hardcoded
+   kolorami (gradients, popovers, code blocks itp.).
+   ========================================================= */
+:root[data-theme="light"]{
+  --bg-0:#f4f6fa;
+  --bg-1:#ffffff;
+  --bg-2:#f4f6fa;
+  --bg-3:#e6eaf2;
+  --bg-4:#d0d6e0;
+  --line:#cfd4dd;
+  --line-soft:#e6eaf2;
+  --text:#1a1d24;
+  --text-dim:#4a5060;
+  --text-mute:#737a8a;
+  --accent:#3a5bb8;
+  --accent-2:#1e8868;
+  --tile:#ffffff;
+  --tile-hover:#f4f6fa;
+  --shadow-sm:0 1px 2px rgba(20,28,50,.06);
+  --shadow-md:0 4px 14px rgba(20,28,50,.10), 0 1px 0 rgba(255,255,255,.6) inset;
+  --shadow-lg:0 24px 50px rgba(20,28,50,.18), 0 1px 0 rgba(255,255,255,.7) inset;
+}
+[data-theme="light"] body{background:#eef1f7}
+[data-theme="light"] ::selection{background:rgba(58,91,184,.25);color:#0c1320}
+[data-theme="light"] *::-webkit-scrollbar-thumb{background:#c0c8d4;border:2px solid #eef1f7}
+[data-theme="light"] *::-webkit-scrollbar-thumb:hover{background:#a8b3c2}
+
+/* navbar / header */
+[data-theme="light"] .navbar{background:linear-gradient(180deg,#ffffff,#f4f6fa);border-bottom-color:var(--line)}
+[data-theme="light"] .brand .logo{color:var(--accent)}
+
+/* tiles */
+[data-theme="light"] .tile{background:linear-gradient(180deg,#ffffff,#f4f6fa);box-shadow:var(--shadow-sm)}
+[data-theme="light"] .tile:hover{background:linear-gradient(180deg,#fafbfd,#eaf0f8);border-color:#a8b3c2}
+[data-theme="light"] .tile .t-icon{background:#e6eaf2;color:var(--accent)}
+[data-theme="light"] .tile .t-value{background:var(--bg-2);color:var(--text-dim);border-color:var(--line)}
+[data-theme="light"] .tile .tag{background:var(--bg-2);color:var(--text-dim);border-color:var(--line)}
+[data-theme="light"] .tile .tag.ie{background:#fff1e3;color:#8a4a1c;border-color:#e8c9a8}
+[data-theme="light"] .tile .tag.copy{background:#e0f5ec;color:#1a6b4a;border-color:#a8d8c2}
+[data-theme="light"] .tile.pinned{border-color:#d8b878;background:linear-gradient(180deg,#fffbf0,#fdf3da)}
+
+/* inputs, textareas, selects */
+[data-theme="light"] .field input,
+[data-theme="light"] .field textarea,
+[data-theme="light"] .field select,
+[data-theme="light"] .pwd-out input,
+[data-theme="light"] .conv-row input,
+[data-theme="light"] .conv-row select,
+[data-theme="light"] .todo-add input,
+[data-theme="light"] .journal-add input,
+[data-theme="light"] .search input,
+[data-theme="light"] .id-history .h-item,
+[data-theme="light"] .backup-list .b-row{background:#ffffff}
+[data-theme="light"] .field input:focus,
+[data-theme="light"] .field textarea:focus,
+[data-theme="light"] .field select:focus,
+[data-theme="light"] .todo-add input:focus,
+[data-theme="light"] .journal-add input:focus{border-color:var(--accent);background:#f8faff}
+[data-theme="light"] .field input.invalid-input{background:#fdf0f2;border-color:#d88a8a}
+[data-theme="light"] .fx-rates{background:#ffffff}
+[data-theme="light"] .fx-rate-field input{background:#ffffff}
+[data-theme="light"] .fx-rate-field input:focus{background:#f8faff;border-color:var(--accent)}
+
+/* popovers */
+[data-theme="light"] .sugg,
+[data-theme="light"] .snip-pop,
+[data-theme="light"] .cmd-modal,
+[data-theme="light"] .modal{background:#ffffff;box-shadow:var(--shadow-lg)}
+[data-theme="light"] .cmd-item:hover,
+[data-theme="light"] .cmd-item.active,
+[data-theme="light"] .sugg .item:hover,
+[data-theme="light"] .sugg .item.active,
+[data-theme="light"] .snip-pop .item:hover,
+[data-theme="light"] .snip-pop .item.active{background:#eef1f7}
+[data-theme="light"] .cmd-item .ci-ic{background:#e6eaf2}
+[data-theme="light"] .cmd-foot,
+[data-theme="light"] .modal-f{background:#f4f6fa}
+
+/* code blocks */
+[data-theme="light"] .code-block{background:#f4f6fa;color:#1a1d24;border-color:#d8dce4}
+[data-theme="light"] kbd{background:#f0f2f6;color:#3a4050;border-color:#cdd3de;box-shadow:0 1px 0 rgba(20,28,50,.1)}
+
+/* checkboxy / customowe */
+[data-theme="light"] .checkbox input,
+[data-theme="light"] .todo-item input[type=checkbox],
+[data-theme="light"] .pwd-opts .checkbox input{background:#ffffff;border-color:#a8b0bc}
+[data-theme="light"] .checkbox.on{background:#e8efff;border-color:var(--accent);color:#1a4abc}
+[data-theme="light"] .checkbox:hover{background:#eef1f7;color:var(--text)}
+
+/* groups / panels */
+[data-theme="light"] .panel{background:#ffffff}
+[data-theme="light"] .panel-h{background:linear-gradient(180deg,#f8fafd,#f1f4fa)}
+[data-theme="light"] .group{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .group:hover{background:#f8fafd;border-color:#b8c2d2}
+[data-theme="light"] .sidebar,
+[data-theme="light"] .sidebar-right{background:#f4f6fa;border-color:var(--line)}
+
+/* email panel */
+[data-theme="light"] .email-bar{background:#f4f6fa}
+[data-theme="light"] .email-bar:hover{background:#eef1f7}
+[data-theme="light"] .email-panel{background:linear-gradient(180deg,#fbfcfe,#f4f6fa)}
+
+/* todo */
+[data-theme="light"] .todo-item{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .todo-item input[type=checkbox]:checked{background:var(--ok);border-color:var(--ok)}
+
+/* timer pills */
+[data-theme="light"] .timer{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .timer .dot{box-shadow:0 0 8px rgba(30,136,104,.4)}
+[data-theme="light"] .pomo{background:#ffffff;box-shadow:var(--shadow-sm)}
+
+/* calendar */
+[data-theme="light"] .cal-grid .day.today{background:#e8efff;border-color:var(--accent);color:#1a4abc}
+[data-theme="light"] .cal-grid .day.hol{color:#c14a4a}
+[data-theme="light"] .cal-grid .day:hover{background:#eef1f7;border-color:#cfd4dd}
+
+/* journal */
+[data-theme="light"] .journal-item{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .journal-item .ts{color:#1a6b4a}
+
+/* notes — w light theme JS używa innej palety, ale podstawowy fallback */
+[data-theme="light"] .note-card{box-shadow:var(--shadow-sm)}
+
+/* drop overlay */
+[data-theme="light"] .drop-overlay{background:rgba(238,241,247,.85)}
+[data-theme="light"] .drop-card{background:#ffffff;border-color:var(--accent)}
+
+/* qr — qr-host pozostaje białe; w light theme dodajmy delikatną ramkę */
+[data-theme="light"] .qr-host{border:1px solid var(--line)}
+
+/* csv preview / backup list */
+[data-theme="light"] .csv-preview tr.dup td{background:#f4f6fa}
+[data-theme="light"] .csv-preview tr.bad td{background:#fdf0f2;color:#a04444}
+[data-theme="light"] .csv-preview th{background:#f4f6fa}
+[data-theme="light"] .backup-list .b-row.is-today{border-color:var(--accent);background:#eef4ff}
+
+/* tag-y per kategoria */
+[data-theme="light"] .csv-preview .row-tag.new{background:#e0f5ec;color:#1a6b4a;border-color:#a8d8c2}
+[data-theme="light"] .csv-preview .row-tag.dup{background:var(--bg-2);color:var(--text-mute);border-color:var(--line)}
+[data-theme="light"] .csv-preview .row-tag.bad{background:#fae0e3;color:#a04444;border-color:#d88a8a}
+[data-theme="light"] .badge{background:#ffffff}
+[data-theme="light"] .tile-filter-badges .filter-badge{background:#ffffff}
+[data-theme="light"] .tile-filter-badges .filter-badge:hover{background:#f4f6fa}
+[data-theme="light"] .tile-filter-badges .filter-badge.active{background:#e8efff;border-color:var(--accent);color:#1a4abc}
+[data-theme="light"] #dataState.dirty{background:#fff7e0;border-color:#e8c98a;color:#7a5b1a}
+
+/* buttons */
+[data-theme="light"] .btn{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .btn:hover{background:#f4f6fa;border-color:#b8c2d2}
+[data-theme="light"] .btn.primary{background:linear-gradient(180deg,#5478d8,#3a5bb8);border-color:#3a5bb8;color:#fff}
+[data-theme="light"] .btn.ghost{background:transparent;box-shadow:none}
+[data-theme="light"] .btn.ghost:hover{background:#eef1f7}
+[data-theme="light"] .btn.danger{background:#fae0e3;border-color:#d88a8a;color:#a04444}
+
+/* toasts */
+[data-theme="light"] .toast{background:#ffffff;box-shadow:var(--shadow-md)}
+
+/* sticky / flink */
+[data-theme="light"] .flink{background:#ffffff;box-shadow:var(--shadow-sm)}
+[data-theme="light"] .flink:hover{background:#f4f6fa;border-color:#b8c2d2}
+
+/* tools out */
+[data-theme="light"] .tools-out{color:var(--text-dim)}
+
+/* group count badge */
+[data-theme="light"] .group .g-name .count,
+[data-theme="light"] .panel-h .count{background:#e6eaf2;color:var(--text-dim)}
+
+/* section title line */
+[data-theme="light"] .section-title{color:var(--text-mute)}
+[data-theme="light"] .section-title .line{background:var(--line)}
+
+/* overlay z modalami */
+[data-theme="light"] .overlay{background:rgba(20,28,50,.35)}
+
