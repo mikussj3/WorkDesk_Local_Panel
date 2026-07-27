@@ -1,0 +1,107 @@
+/* =========================================================
+   QUICK JOURNAL (C2)
+   ========================================================= */
+.journal-add{display:flex;gap:6px}
+.journal-add input{
+  flex:1;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:8px 10px;outline:0;font-size:13px;
+}
+.journal-add input:focus{border-color:#3e5fbf}
+.journal-list{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto}
+.journal-empty{color:var(--text-mute);font-size:12px;padding:8px;text-align:center}
+.journal-item{
+  display:grid;grid-template-columns:60px 1fr auto;gap:8px;align-items:start;
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:7px 9px;font-size:12.5px;
+}
+.journal-item .ts{
+  font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--accent-2);
+  white-space:nowrap;
+}
+.journal-item .text{line-height:1.4;word-break:break-word}
+.journal-item .day-sep{grid-column:1/-1;color:var(--text-mute);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.journal-item .acts{opacity:.5;transition:opacity var(--t)}
+.journal-item:hover .acts{opacity:1}
+.journal-foot{display:flex;gap:6px;margin-top:10px}
+.journal-foot .btn{flex:1}
+
+.journal-day-head{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 4px;color:var(--text-mute);font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;margin-top:4px;
+}
+.journal-day-head .line{flex:1;height:1px;background:var(--line-soft)}
+
+/* =========================================================
+   ID HISTORY (D2)
+   ========================================================= */
+.id-history .h-item{
+  display:flex;justify-content:space-between;gap:8px;
+  padding:6px 10px;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:var(--r-md);font-family:ui-monospace,Consolas,monospace;font-size:12px;
+}
+.id-history .h-item .h-val{color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.id-history .h-item button{
+  background:transparent;border:0;color:var(--accent);cursor:pointer;font-size:12px;
+}
+
+
+/* =========================================================
+   BACKUPS (C5)
+   ========================================================= */
+.backup-list{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.backup-list .b-row{
+  display:grid;grid-template-columns:140px 1fr auto;gap:8px;align-items:center;
+  padding:9px 12px;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:var(--r-md);font-size:13px;
+}
+.backup-list .b-row.is-today{border-color:#3a5bb8;background:#161f31}
+.backup-list .b-date{font-family:ui-monospace,Consolas,monospace}
+.backup-list .b-size{color:var(--text-mute);font-size:12px}
+.backup-list .b-acts{display:flex;gap:4px}
+.backup-empty{padding:30px;text-align:center;color:var(--text-mute);font-size:13px}
+
+/* =========================================================
+   CSV IMPORT PREVIEW
+   ========================================================= */
+.csv-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;
+}
+.csv-stats .stat{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:10px 12px;
+}
+.csv-stats .stat .v{font-size:18px;font-weight:600;color:var(--text)}
+.csv-stats .stat.ok .v{color:var(--ok)}
+.csv-stats .stat.warn .v{color:var(--warn)}
+.csv-stats .stat.err .v{color:var(--danger)}
+.csv-stats .stat .l{font-size:12px;color:var(--text-mute);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+
+.csv-preview{
+  max-height:42vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r-md);
+}
+.csv-preview table{width:100%;border-collapse:collapse;font-size:12.5px}
+.csv-preview th{
+  position:sticky;top:0;background:var(--bg-1);color:var(--text-mute);
+  font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-align:left;
+  padding:8px 10px;border-bottom:1px solid var(--line);font-weight:500;
+}
+.csv-preview td{padding:6px 10px;border-bottom:1px solid var(--line-soft)}
+.csv-preview tr.dup td{color:var(--text-mute);background:var(--bg-1);font-style:italic}
+.csv-preview tr.bad td{background:#1c1416;color:#ff8a8a}
+.csv-preview tr.new td{color:var(--text)}
+.csv-preview .row-tag{font-size:12px;padding:1px 6px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
+.csv-preview .row-tag.new{background:#10221c;color:#9cffd1;border:1px solid #1d4438}
+.csv-preview .row-tag.dup{background:var(--bg-3);color:var(--text-mute);border:1px solid var(--line)}
+.csv-preview .row-tag.bad{background:#3a1f23;color:#ff8a8a;border:1px solid #5a2b30}
+
+/* =========================================================
+   THEME TOGGLE (E4)
+   ========================================================= */
+.theme-sun{display:none}
+[data-theme="light"] .theme-sun{display:inline-block}
+[data-theme="light"] .theme-moon{display:none}
+.theme-lbl{font-size:12px;color:var(--text-mute);text-transform:lowercase}
+#themeToggle{padding:6px 9px}
+#themeToggle .ic{width:14px;height:14px}
+

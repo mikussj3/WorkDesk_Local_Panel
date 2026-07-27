@@ -1,0 +1,149 @@
+
+/* =========================================================
+   ZMIENNE / TOKENY
+   – łatwa edycja kolorów, odstępów, cieni i zaokrągleń
+   ========================================================= */
+:root{
+  --bg-0:#0e1014;
+  --bg-1:#14171d;
+  --bg-2:#191d24;
+  --bg-3:#222731;
+  --bg-4:#2a3140;
+  --line:#2c333f;
+  --line-soft:#232934;
+  --text:#e6e8ec;
+  --text-dim:#a4abb8;
+  --text-mute:#6b7385;
+  --accent:#7aa2ff;        /* delikatny błękit, niezbyt jaskrawy */
+  --accent-2:#9cffd1;      /* miętowy akcent kontrastowy */
+  --warn:#ffb86b;
+  --danger:#ff6b6b;
+  --ok:#6bd6a4;
+  --tile:#1b2029;
+  --tile-hover:#222837;
+  --shadow-sm:0 1px 0 rgba(255,255,255,.03), 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 4px 12px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.03) inset;
+  --shadow-lg:0 18px 40px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.04) inset;
+  --r-sm:6px;
+  --r-md:10px;
+  --r-lg:14px;
+  --r-xl:18px;
+  --pad:14px;
+  --gap:12px;
+  --nav-h:54px;
+  --bar-h:40px;
+  --side-w:clamp(250px,22vw,320px);
+  --side-right-w:clamp(250px,22vw,320px);
+  --email-side-w:clamp(260px,28vw,320px);
+  --t:160ms cubic-bezier(.2,.7,.2,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --text-xs:12px;
+  --text-sm:13px;
+  --text-md:14px;
+  --text-lg:18px;
+  --text-xl:22px;
+  --content-max:1500px;
+  --surface-page:var(--bg-0);
+  --surface-panel:var(--bg-1);
+  --surface-raised:var(--bg-2);
+  --surface-hover:var(--bg-3);
+  --field-bg:var(--bg-2);
+  --field-focus-bg:#171c25;
+  --danger-surface:#3a1f23;
+  --warning-surface:#2a2010;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg-0);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Verdana,sans-serif;
+  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit}
+input,textarea,select{font-family:inherit;color:var(--text)}
+::selection{background:rgba(122,162,255,.35);color:#fff}
+
+/* ochrona długich wartości przed rozsadzaniem układu */
+.tile,.panel,.group,.email-select-visible,.todo-item,.journal-item,.note-card,
+.backup-list .b-row,.modal,.field,.flink,.storage-summary,.cleanup-row,
+.t-title,.t-desc,.text,.b-date,.b-size,.qr-text,.code-block{
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+/* scrollbars */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:#2a3140;border-radius:10px;border:2px solid var(--bg-0)}
+*::-webkit-scrollbar-thumb:hover{background:#384055}
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+.navbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:18px;
+  height:var(--nav-h);padding:0 18px;
+  background:linear-gradient(180deg,#161a21,#11141a);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(140%) blur(6px);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.2px}
+.brand .logo{width:28px;height:28px;color:var(--accent)}
+.brand .name{font-size:14px}
+.brand .name b{color:var(--text)}
+.brand .name span{color:var(--text-mute);font-weight:400;margin-left:6px}
+
+.nav-links{display:flex;gap:4px;margin-left:8px}
+.nav-links a{
+  color:var(--text-dim);padding:8px 12px;border-radius:var(--r-md);
+  font-size:13px;transition:background var(--t),color var(--t);
+}
+.nav-links a:hover{background:var(--bg-3);color:var(--text);text-decoration:none}
+
+.nav-spacer{flex:1}
+
+.timer{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:var(--bg-2);border:1px solid var(--line);
+  font-variant-numeric:tabular-nums;font-size:13px;color:var(--text-dim);
+}
+.timer .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 10px rgba(156,255,209,.6)}
+.timer.warn .dot{background:var(--warn);box-shadow:0 0 10px rgba(255,184,107,.6)}
+.timer .label{color:var(--text-mute)}
+.timer .val{color:var(--text);font-weight:600}
+
+.clock{font-size:12px;color:var(--text-mute);font-variant-numeric:tabular-nums}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--bg-3);color:var(--text);border:1px solid var(--line);
+  padding:8px 12px;border-radius:var(--r-md);cursor:pointer;font-size:13px;
+  transition:background var(--t),border-color var(--t),transform var(--t),color var(--t);
+}
+.btn:hover{background:var(--bg-4);border-color:#3a4255}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:linear-gradient(180deg,#2c4ea8,#22408c);border-color:#3a5bb8;color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.ghost:hover{background:var(--bg-3)}
+.btn.danger{background:#3a1f23;border-color:#5a2b30;color:#ffb1b1}
+.btn.danger:hover{background:#4a262c}
+.btn.sm{padding:5px 9px;font-size:12px;border-radius:7px}
+.btn .ic{width:14px;height:14px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  padding:2px 8px;border-radius:999px;background:var(--bg-3);color:var(--text-dim);
+  border:1px solid var(--line);
+}
+
