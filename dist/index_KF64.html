@@ -2162,6 +2162,8 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.3 1.8c-.8.8-1.8 1.2-1.8 2.2"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
   </button>
 
+  <!-- Awaryjny eksport (Faza 4 audytu): zawsze dostępny, także przy zdegradowanym storage -->
+  <button type="button" class="btn sm ghost" id="emergencyExportBtn" data-testid="emergency-export" title="Zapisz pełną kopię danych do pliku JSON teraz" aria-label="Eksportuj kopię danych teraz">⤓ Kopia</button>
   <!-- Theme toggle (E4) — klik: light/dark; Alt+klik lub długie przytrzymanie: reset do systemu -->
   <button type="button" class="btn sm ghost" id="themeToggle" data-testid="theme-toggle" title="Motyw: klik = jasny/ciemny, Alt+klik = wg systemu" aria-label="Motyw">
     <svg class="ic theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M5 5l2 2M17 17l2 2M2 12h3M19 12h3M5 19l2-2M17 7l2-2"/></svg>
@@ -2258,7 +2260,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     <div class="email-main">
       <div class="tmpl-row">
         <div class="field" style="margin:0">
-          <label for="tmplPick">Szablon wiadomości</label>
+          <label for="tmplSearch">Szablon wiadomości</label>
           <input id="tmplSearch" type="text" placeholder="Szukaj szablonu…" list="tmplList" data-testid="template-search" aria-label="Szukaj szablonu">
           <button type="button" class="clear" data-clear="tmplSearch" aria-label="Wyczyść szablon wiadomości" data-testid="template-clear-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -2431,7 +2433,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     <div class="tiles-toolbar">
       <div class="search" style="flex:1;max-width:360px">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/ aria-label="Szukaj kafelka">
+        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search" aria-label="Szukaj kafelka">
       </div>
       <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
       <span style="flex:1"></span>
@@ -2520,7 +2522,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
       </div>
       <div class="panel-b">
         <div class="journal-add">
-          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input"/ aria-label="Nowy wpis dziennika">
+          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input" aria-label="Nowy wpis dziennika">
           <button type="button" class="btn sm primary" id="journalAdd" data-testid="journal-add" title="Zapisz wpis z aktualnym timestampem">+</button>
         </div>
         <div class="business-tools" id="journalControls">
@@ -2550,6 +2552,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
       <div class="panel-b">
         <div class="data-primary-actions">
           <button type="button" class="btn sm primary" id="dataExport" data-testid="data-export" title="Pobierz pełną kopię danych jako plik JSON">Eksportuj backup</button>
+          <button type="button" class="btn sm" id="autoBackupBtn" data-testid="auto-backup" title="Eksperymentalne: automatyczna kopia do wybranego katalogu po każdej istotnej zmianie">Auto-backup do katalogu… (beta)</button>
           <button type="button" class="btn sm" id="dataImport" data-testid="data-import" title="Wczytaj wcześniej zapisany backup JSON">Importuj backup…</button>
           <button type="button" class="btn sm" id="dataBackups" data-testid="data-backups" title="Lokalne punkty przywracania">Punkty przywracania…</button>
         </div>
@@ -2725,7 +2728,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     </div>
     <div class="modal-b">
       <div class="pwd-out">
-        <input id="pwdValue" type="text" readonly data-testid="pwd-value"/ aria-label="Wygenerowane hasło">
+        <input id="pwdValue" type="text" readonly data-testid="pwd-value" aria-label="Wygenerowane hasło">
         <button type="button" class="btn primary" id="pwdCopy" data-testid="pwd-copy">Kopiuj</button>
       </div>
       <div class="pwd-row">
@@ -2759,7 +2762,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     <div class="modal-b">
       <h4 style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Waluty · <span class="manual-rate-label">kurs ręczny</span></h4>
       <div class="conv-row">
-        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt"/ aria-label="Kwota do przeliczenia">
+        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt" aria-label="Kwota do przeliczenia">
         <select id="convFrom" data-testid="conv-from" aria-label="Waluta źródłowa">
           <option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
         </select>
@@ -2767,7 +2770,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
         <select id="convTo" data-testid="conv-to" aria-label="Waluta docelowa">
           <option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
         </select>
-        <input id="convOut" type="text" readonly data-testid="conv-out"/ aria-label="Wynik przeliczenia">
+        <input id="convOut" type="text" readonly data-testid="conv-out" aria-label="Wynik przeliczenia">
       </div>
       <div class="conv-info" id="convInfo"></div>
 
@@ -2799,14 +2802,14 @@ body,input,textarea,select,button{font-size:var(--text-md)}
 
       <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">VAT</h4>
       <div class="conv-row">
-        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt"/ aria-label="Kwota VAT">
+        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt" aria-label="Kwota VAT">
         <select id="vatRate" data-testid="vat-rate" aria-label="Stawka VAT"><option>23</option><option>8</option><option>5</option><option>0</option></select>
         <span class="conv-arrow">%</span>
         <select id="vatDir" data-testid="vat-dir" aria-label="Kierunek przeliczenia VAT">
           <option value="net2gross">netto → brutto</option>
           <option value="gross2net">brutto → netto</option>
         </select>
-        <input id="vatOut" type="text" readonly data-testid="vat-out"/ aria-label="Wynik VAT">
+        <input id="vatOut" type="text" readonly data-testid="vat-out" aria-label="Wynik VAT">
       </div>
       <div class="conv-info" id="vatInfo"></div>
     </div>
@@ -2851,11 +2854,11 @@ body,input,textarea,select,button{font-size:var(--text-md)}
 
       <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Data robocza</h4>
       <div class="conv-row" style="grid-template-columns:1fr 90px auto 90px 1fr">
-        <input id="wdStart" type="date" data-testid="wd-start"/ aria-label="Data początkowa">
+        <input id="wdStart" type="date" data-testid="wd-start" aria-label="Data początkowa">
         <select id="wdOp" data-testid="wd-op" aria-label="Operacja na dniach roboczych"><option value="add">+</option><option value="sub">−</option></select>
-        <input id="wdDays" type="number" min="0" value="5" data-testid="wd-days"/ aria-label="Liczba dni roboczych">
+        <input id="wdDays" type="number" min="0" value="5" data-testid="wd-days" aria-label="Liczba dni roboczych">
         <span class="conv-arrow">dni rob.</span>
-        <input id="wdOut" type="text" readonly data-testid="wd-out"/ aria-label="Wynik daty">
+        <input id="wdOut" type="text" readonly data-testid="wd-out" aria-label="Wynik daty">
       </div>
       <div class="conv-info" id="wdInfo">Pomija soboty, niedziele i dni wolne PL.</div>
     </div>
@@ -2881,7 +2884,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
           <option value="token">Token base32 (16)</option>
           <option value="numeric">Numer 8 cyfr</option>
         </select>
-        <input id="idValue" type="text" readonly data-testid="id-value" style="font-family:ui-monospace,Consolas,monospace"/ aria-label="Wygenerowany identyfikator">
+        <input id="idValue" type="text" readonly data-testid="id-value" style="font-family:ui-monospace,Consolas,monospace" aria-label="Wygenerowany identyfikator">
         <button type="button" class="btn primary" id="idGen" data-testid="id-gen">Generuj</button>
       </div>
       <div class="conv-info" id="idInfo" style="margin-top:8px"></div>
@@ -2945,7 +2948,7 @@ body,input,textarea,select,button{font-size:var(--text-md)}
     </div>
     <div class="cmd-input">
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query"/ aria-label="Wyszukaj polecenie">
+      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query" aria-label="Wyszukaj polecenie">
     </div>
     <div class="cmd-list" id="cmdList" role="listbox"></div>
     <div class="cmd-foot">
@@ -3582,6 +3585,37 @@ const DEFAULT_FX = Object.freeze({
         }
     });
 })();
+// Fundament i18n WorkDesk (Faza 4 audytu) — jedno miejsce na słownik interfejsu.
+//
+// UI pozostaje polskie; mechanizm jest gotowy na pakiet EN: wystarczy dodać
+// drugi zamrożony słownik i przełączyć I18N_LANG. Zasada migracji (z audytu):
+// nowe i zmieniane komunikaty używają t("klucz"), a nie literałów w kodzie.
+// t() nigdy nie rzuca — brak klucza zwraca fallback albo sam klucz.
+
+const I18N = Object.freeze({
+    pl: Object.freeze({
+        "confirm.title": "Potwierdź operację",
+        "confirm.confirm": "Potwierdź",
+        "confirm.cancel": "Anuluj",
+        "storage.degraded.title": "Dane nie są zapisywane na dysk",
+        "storage.degraded.message": "Przeglądarka zablokowała trwałą pamięć lokalną (tryb prywatny, limit pojemności lub polityka bezpieczeństwa). Bieżąca sesja pracuje na kopii ulotnej — wyeksportuj dane do pliku JSON.",
+        "storage.degraded.export": "Eksportuj dane",
+        "storage.blocked.title": "Zapis danych zablokowany",
+        "storage.blocked.message": "Zapisany zestaw danych ma nieprawidłową strukturę. Skorzystaj z panelu Dane → Import, aby przywrócić kopię zapasową.",
+        "storage.blocked.openData": "Otwórz panel Dane",
+        "uierror.title": "Coś nie zadziałało",
+        "uierror.message": "Aplikacja napotkała błąd. Zobacz szczegóły albo skopiuj opis do zgłoszenia.",
+        "uierror.details": "Szczegóły",
+        "uierror.copy": "Skopiuj do zgłoszenia"
+    })
+});
+
+const I18N_LANG = "pl";
+
+function t(key, fallback) {
+    const pack = I18N[I18N_LANG];
+    return pack && Object.prototype.hasOwnProperty.call(pack, key) ? pack[key] : void 0 !== fallback ? fallback : key;
+}
 
 function toast(msg, kind = "ok") {
     const wrap = $("#toasts");
@@ -3786,9 +3820,9 @@ function toggleEmail() {
     $("#emailBar").setAttribute("aria-expanded", open ? "true" : "false"), open || flushPendingWrites();
 }
 
-$("#emailBar").addEventListener("click", toggleEmail), $("#emailBar").addEventListener("keydown", e => {
+EventLifecycle.on($("#emailBar"), "click", toggleEmail, { owner: "email-panel", key: "toggle" }), EventLifecycle.on($("#emailBar"), "keydown", e => {
     "Enter" !== e.key && " " !== e.key || (e.preventDefault(), toggleEmail());
-});
+}, { owner: "email-panel", key: "toggle-keyboard" });
 
 let activeModal = null;
 
@@ -3798,10 +3832,6 @@ let UIRuntime = null, AccessibilityRuntime = null, BulkMailFlow = null, ModuleRe
 let MODAL_POLICIES = Object.freeze({}), announceA11y = () => {};
 const UI_ERRORS = [];
 const businessUid = () => Date.now().toString(36) + "_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
-const csvSafeCell = value => {
-    const text = String(value ?? "");
-    return /^[=+\-@]/.test(text) ? "'" + text : text;
-};
 
 UIRuntime = (() => {
     const entries = new Map, stack = [], defaults = Object.freeze({
@@ -3825,7 +3855,7 @@ UIRuntime = (() => {
             open ? el.setAttribute("aria-modal", entry === modalTop ? "true" : "false") : el.removeAttribute("aria-modal"), 
             el.inert = open && entry !== modalTop;
         }), Array.from(document.body.children).forEach(el => {
-            el === ovEl || el.classList.contains("toast-wrap") || el.classList.contains("drop-overlay") || (modalTop ? (el.setAttribute("aria-hidden", "true"), el.inert = !0) : (el.removeAttribute("aria-hidden"), el.inert = !1));
+            el === ovEl || el.classList.contains("toast-wrap") || el.classList.contains("drop-overlay") || "a11yLive" === el.id || "workdeskTooltip" === el.id || (modalTop ? (el.setAttribute("aria-hidden", "true"), el.inert = !0) : (el.removeAttribute("aria-hidden"), el.inert = !1));
         }), activeModal = modalTop?.el || null;
     }, register = def => {
         const el = resolve(def?.el || def?.id);
@@ -3866,7 +3896,11 @@ UIRuntime = (() => {
         setExpanded(entry.opener, !1), entry.openedAt = 0, entry.onClose?.({
             reason: reason,
             entry: entry
-        }), syncModalLayer(), restoreFocus && entry.opener?.isConnected && "context-switch" !== reason && requestAnimationFrame(() => entry.opener.focus?.()), 
+        }), syncModalLayer(), restoreFocus && ("context-switch" === reason || entry.opener?.isConnected ? entry.opener?.isConnected && "context-switch" !== reason && requestAnimationFrame(() => entry.opener.focus?.()) : requestAnimationFrame(() => {
+            (document.querySelector("main.main") || document.body).focus?.({
+                preventScroll: !0
+            });
+        })),
         !0;
     }, unregister = id => {
         const entry = "string" == typeof id ? entries.get(id) : id?.id ? entries.get(id.id) : stack.find(x => x.el === id);
@@ -3948,11 +3982,11 @@ UIRuntime = (() => {
                 modal: modal,
                 type: type || entry.type || (modal ? "modal" : "surface")
             }), entry.priority = Number(options.priority ?? entry.priority ?? (modal ? 80 : 10)), 
-            entry.closeOnContextChange && closeAll({
+            entry.closeOnContextChange && !1 !== options.contextCloseOthers && closeAll({
                 reason: "context-switch",
                 belowPriority: entry.priority,
                 except: entry.id
-            }), entry.opener = resolve(options.opener) || entry.opener || (document.activeElement instanceof HTMLElement ? document.activeElement : null), 
+            }), entry.opener = resolve(options.opener) || (document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null) || entry.opener, 
             entry.openedAt = ++sequence, entry.closePolicy = options.closePolicy || entry.closePolicy;
             const old = stack.indexOf(entry);
             if (old >= 0 && stack.splice(old, 1), stack.push(entry), modal) {
@@ -4143,8 +4177,12 @@ const audit=(root=document)=>{
 AccessibilityRuntime=Object.freeze({normalize,audit,labelText});
 EventLifecycle.on(document,'keydown',event=>{
   const target=event.target instanceof Element?event.target:null;if(!target)return;
-  const role=target.getAttribute('role');
-  if((event.key==='Enter'||event.key===' ')&&['button','checkbox','switch'].includes(role)&&!target.matches('#emailBar,.panel-h,[data-toggle]')){event.preventDefault();target.click();return;}
+  if(event.key==='Enter'||event.key===' '){
+    const activatable=target.closest('.ui-row.row--interactive,.ui-row.row--selectable,.filter-badge,.tile,[data-note-id] .note-color,[role="option"]');
+    const roleTarget=!activatable&&['button','checkbox','switch'].includes(target.getAttribute('role'))?target:null;
+    const hit=activatable||roleTarget;
+    if(hit&&!target.closest('button,a,input,select,textarea,summary')&&!target.closest('#emailBar,.panel-h,[data-toggle]')){event.preventDefault();hit.click();return;}
+  }
   const nav=target.closest('.nav-links');if(nav&&(event.key==='ArrowRight'||event.key==='ArrowLeft')){const links=[...nav.querySelectorAll('a[href],button:not([disabled])')];const current=links.indexOf(document.activeElement);if(links.length){event.preventDefault();links[(current+(event.key==='ArrowRight'?1:-1)+links.length)%links.length].focus();}}
 },{owner:'accessibility',key:'keyboard-contract'});
 "loading"===document.readyState?EventLifecycle.once(document,'DOMContentLoaded',()=>normalize(document),{owner:'accessibility',key:'dom-ready'}):queueMicrotask(()=>normalize(document));
@@ -4383,27 +4421,97 @@ try {
         configurable: !0
     });
 } catch {}
+// Czyste funkcje pomocnicze WorkDesk — bez DOM, bez stanu globalnego aplikacji.
+// Wydzielone w Fazie 4 audytu: jedno źródło prawdy (koniec duplikacji csvEscape/csvSafeCell)
+// i testowalność jednostkowa (tools/unit_tests.mjs, node:test, zero zależności).
+// Kolejność ładowania: po 27-storage-capability, przed resztą runtime.
 
-Object.freeze({
-    run() {
-        const key = "__pf97__";
+function cloneData(value) {
+    if (void 0 !== value) {
+        if (null === value) return null;
         try {
-            GuardedStorage.setItem(key, "1");
-            const ok = "1" === GuardedStorage.getItem(key);
-            return GuardedStorage.removeItem(key), {
-                ok: ok,
-                degraded: GuardedStorage.degraded,
-                reason: GuardedStorage.reason,
-                lengthSafe: Number.isFinite(GuardedStorage.length)
-            };
-        } catch (e) {
-            return {
-                ok: !1,
-                error: e?.message || String(e)
-            };
+            if ("function" == typeof structuredClone) return structuredClone(value);
+        } catch {}
+        try {
+            const json = JSON.stringify(value);
+            return void 0 === json ? void 0 : JSON.parse(json);
+        } catch {
+            return value;
         }
     }
-});
+}
+
+function parseTimestamp(value) {
+    const n = "number" == typeof value ? value : Date.parse(value);
+    return Number.isFinite(n) ? n : null;
+}
+
+function normalizeTimestamp(value) {
+    if ("number" == typeof value) return Number.isFinite(value) && value >= 0 ? value : null;
+    const ts = parseTimestamp(value);
+    return null !== ts && ts >= 0 ? ts : null;
+}
+
+function validDateISO(value) {
+    if ("string" != typeof value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return !1;
+    const [y, m, d] = value.split("-").map(Number), dt = new Date(y, m - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+}
+
+function validTime(value) {
+    return "string" == typeof value && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
+function csvEscape(value, delimiter = ";") {
+    return function(value, delimiter = ";") {
+        let text = String(value ?? "");
+        /^[=+\-@]/.test(text) && (text = "'" + text);
+        const escaped = text.replace(/"/g, '""');
+        return escaped.includes(delimiter) || escaped.includes("\n") || escaped.includes("\r") || escaped.includes('"') ? `"${escaped}"` : escaped;
+    }(value, delimiter);
+}
+
+// Usuwa apostrof ochronny dodany przez csvEscape (round-trip własnych eksportów).
+function csvUnguardCell(value) {
+    const text = String(value ?? "").trim();
+    return /^'[=+\-@]/.test(text) ? text.slice(1) : text;
+}
+
+// Alternatywny, prosty wariant ochrony CSV-injection (bez cytowania) — pozostały po
+// konsolidacji wyłącznie w celach kompatybilności; nowy kod powinien używać csvEscape.
+function csvSafeCell(value) {
+    const text = String(value ?? "");
+    return /^[=+\-@]/.test(text) ? "'" + text : text;
+}
+
+function normalizeSearchText(value) {
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[łŁ]/g, "l")
+        .replace(/[đĐ]/g, "d")
+        .toLocaleLowerCase("pl-PL")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function searchScore(entry, queryTokens, normalizedQuery) {
+    let score = 0;
+    if (entry.normalizedTitle === normalizedQuery) score += 120;
+    else if (entry.normalizedTitle.startsWith(normalizedQuery)) score += 80;
+    else if (entry.normalizedTitle.includes(normalizedQuery)) score += 55;
+    if (entry.normalizedCategory === normalizedQuery) score += 45;
+    else if (entry.normalizedCategory.startsWith(normalizedQuery)) score += 25;
+    for (const token of queryTokens) {
+        if (entry.normalizedTitle.startsWith(token)) score += 24;
+        else if (entry.normalizedTitle.includes(token)) score += 16;
+        if (entry.normalizedSubtitle.includes(token)) score += 8;
+        if (entry.normalizedCategory.includes(token)) score += 6;
+        if (entry.normalizedKeywords.includes(token)) score += 4;
+        if (![entry.normalizedTitle, entry.normalizedSubtitle, entry.normalizedCategory, entry.normalizedKeywords].some(field => field.includes(token))) return -1;
+    }
+    return score;
+}
 
 const DEFAULT_EMAIL_SIGNATURE = "—\nImię Nazwisko";
 const EMAIL_FORM_FIELDS = Object.freeze({
@@ -4468,8 +4576,8 @@ const EMAIL_FORM_FIELDS = Object.freeze({
         }), !1 !== options.render && render(changed), !1 !== options.persist && requestFullSnapshot(), 
         read();
     }, groups = kind => state().selectedGroups[kind] || (state().selectedGroups[kind] = []), buildBody = () => {
-        const {body: body, signature: signature} = state().form;
-        return signature ? body.replace(/\s+$/, "") + "\n\n" + signature : body;
+        const {body: body, signature: signature} = state().form, core = body.replace(/\s+$/, "");
+        return signature ? core ? core + "\n\n" + signature : signature : body;
     };
     return Object.freeze({
         state: state,
@@ -4514,16 +4622,24 @@ const EMAIL_FORM_FIELDS = Object.freeze({
         mailto: (to, overrides = {}) => {
             const form = state().form;
             const params = new URLSearchParams();
-            const toList = formatRecipientsForMailto(to);
-            const ccList = formatRecipientsForMailto(overrides.cc ?? form.cc);
-            const bccList = formatRecipientsForMailto(overrides.bcc ?? form.bcc);
+            const seen = new Set, take = value => {
+                const addresses = uniq(parseEmails(value)).filter(address => {
+                    const key = address.toLowerCase();
+                    return seen.has(key) ? !1 : (seen.add(key), !0);
+                });
+                return addresses.join(",");
+            };
+            const toList = take(to);
+            const ccList = take(overrides.cc ?? form.cc);
+            const bccList = take(overrides.bcc ?? form.bcc);
             const subject = overrides.subject ?? form.subject;
             const body = overrides.body ?? buildBody();
             if (ccList) params.set("cc", ccList);
             if (bccList) params.set("bcc", bccList);
             if (subject) params.set("subject", subject);
             params.set("body", body);
-            return `mailto:${toList}?${params.toString().replace(/\+/g, "%20")}`;
+            const toUri = toList.split(",").filter(Boolean).map(encodeURIComponent).join(",");
+            return `mailto:${toUri}?${params.toString().replace(/\+/g, "%20")}`;
         },
         draft: () => ({
             version: 2,
@@ -4781,10 +4897,7 @@ function onGroupToggle(e) {
 }
 
 function parseEmails(str) {
-    return String(str || "").split(/[,;\n]/).map(address => address.trim()).filter(Boolean);
-}
-function formatRecipientsForMailto(value) {
-    return uniq(parseEmails(value)).join(",");
+    return String(str || "").split(/[\s,;\n]+/).map(address => address.trim()).filter(Boolean);
 }
 function formatEmailField(value) {
     return uniq(parseEmails(value)).join("; ");
@@ -4969,6 +5082,8 @@ function prepareEmailSend({ navigate = true } = {}) {
 $("#sendBtn").addEventListener("click", () => prepareEmailSend()), $("#bulkBtn").addEventListener("click", () => {
     const recipients = parseEmails(EmailComposerState.read().to);
     if (recipients.length < 2) return toast("Wpisz co najmniej 2 adresy w polu „Do”.", "err");
+    const invalid = recipients.filter(address => !EMAIL_RE.test(address));
+    if (invalid.length) return toast(`Popraw nieprawidłowe adresy: ${invalid.slice(0, 2).join(", ")}`, "err");
     BulkMailFlow.open(recipients);
 }), $("#fBody").addEventListener("input", () => {
     updateCharBadge(), function() {
@@ -5123,6 +5238,33 @@ const StorageService = (() => {
     function isQuotaExceeded(error) {
         return !!error && ("QuotaExceededError" === error.name || "NS_ERROR_DOM_QUOTA_REACHED" === error.name || 22 === error.code || 1014 === error.code);
     }
+    let storageDegradedSignalled = !1;
+    function signalStorageDegraded(key) {
+        if (storageDegradedSignalled) return;
+        storageDegradedSignalled = !0;
+        recordDiagnostic("safeCommit", key, new Error("Pamięć ulotna — zapis trwały niedostępny"), {
+            degraded: !0
+        });
+        try {
+            AttentionCenter.notify({
+                id: "storage-degraded",
+                priority: "danger",
+                rank: 100,
+                title: t("storage.degraded.title"),
+                message: t("storage.degraded.message"),
+                actions: [ {
+                    id: "export",
+                    label: t("storage.degraded.export"),
+                    primary: !0,
+                    run: () => {
+                        try {
+                            exportData();
+                        } catch {}
+                    }
+                } ]
+            });
+        } catch {}
+    }
     function rawUsage() {
         let bytes = 0;
         const perKey = {};
@@ -5169,11 +5311,18 @@ const StorageService = (() => {
     }
     function safeCommit(key, value) {
         const raw = String(value), tempKey = key + ".__tmp__";
+        if (GuardedStorage.degraded) return signalStorageDegraded(key), {
+            ok: !1,
+            key: key,
+            reason: "degraded",
+            degraded: !0
+        };
         let previous = null, hadPrevious = !1;
         try {
-            if (previous = GuardedStorage.getItem(key), hadPrevious = null !== previous, 
+            if (previous = GuardedStorage.getItem(key), hadPrevious = null !== previous,
             preflight(key, raw), GuardedStorage.setItem(tempKey, raw), GuardedStorage.getItem(tempKey) !== raw) throw new Error("Weryfikacja zapisu tymczasowego nie powiodła się.");
             if (GuardedStorage.setItem(key, raw), GuardedStorage.getItem(key) !== raw) throw new Error("Weryfikacja zapisu docelowego nie powiodła się.");
+            if (GuardedStorage.degraded) throw new Error("Pamięć ulotna — zapis trwały niedostępny.");
             return GuardedStorage.removeItem(tempKey), {
                 ok: !0,
                 key: key,
@@ -5188,13 +5337,15 @@ const StorageService = (() => {
             } catch (rollbackError) {
                 recordDiagnostic("rollback", key, rollbackError);
             }
+            GuardedStorage.degraded && signalStorageDegraded(key);
             return recordDiagnostic("safeCommit", key, error, {
                 attemptedBytes: new Blob([ raw ]).size
-            }), notify(isQuotaExceeded(error) ? "Brak miejsca w pamięci lokalnej. Dane nie zostały nadpisane." : "Nie udało się bezpiecznie zapisać danych. Poprzednia wersja została zachowana."), 
+            }), notify(isQuotaExceeded(error) ? "Brak miejsca w pamięci lokalnej. Dane nie zostały nadpisane." : "Nie udało się bezpiecznie zapisać danych. Poprzednia wersja została zachowana."),
             {
                 ok: !1,
                 key: key,
                 error: error,
+                reason: GuardedStorage.degraded ? "degraded" : void 0,
                 quotaExceeded: isQuotaExceeded(error)
             };
         }
@@ -5311,6 +5462,7 @@ const StorageService = (() => {
             return this.snapshot();
         },
         safeCommit: safeCommit,
+        isPersistent: () => !GuardedStorage.degraded,
         safeCommitJSON: function(key, value) {
             let raw;
             try {
@@ -5408,8 +5560,10 @@ const StorageService = (() => {
 
 
 function applyBuildMetadata() {
-    document.title = `${APP_NAME} ${APP_VERSION}-${APP_META.buildTag} — Panel pracy lokalny`, 
-    document.querySelectorAll("[data-app-name]").forEach(el => {
+    const documentTitle = () => `${APP_NAME} ${APP_VERSION}-${APP_META.buildTag}${"diagnostic" === document.documentElement.dataset.workdeskBuild ? "-D" : ""} — Panel pracy lokalny`;
+    document.title = documentTitle(), queueMicrotask(() => {
+        document.title = documentTitle();
+    }), document.querySelectorAll("[data-app-name]").forEach(el => {
         el.textContent = APP_NAME;
     }), document.querySelectorAll("[data-app-version]").forEach(el => {
         el.textContent = APP_VERSION;
@@ -5708,20 +5862,6 @@ EventLifecycle.on($("#toolClean"), "click", () => {
 }, { owner: "text-tools", key: "copy-code" });
 
 
-function cloneData(value) {
-    if (void 0 !== value) {
-        if (null === value) return null;
-        try {
-            if ("function" == typeof structuredClone) return structuredClone(value);
-        } catch {}
-        try {
-            const json = JSON.stringify(value);
-            return void 0 === json ? void 0 : JSON.parse(json);
-        } catch {
-            return value;
-        }
-    }
-}
 
 
 function byteSize(value) {
@@ -5828,10 +5968,6 @@ function getRetentionMeta() {
     }), prefs.retentionMeta;
 }
 
-function parseTimestamp(value) {
-    const n = "number" == typeof value ? value : Date.parse(value);
-    return Number.isFinite(n) ? n : null;
-}
 
 function restorePointAgeCandidate(key, label, now) {
     const read = StorageService.getJSON(key, null, {
@@ -5847,12 +5983,12 @@ function restorePointAgeCandidate(key, label, now) {
         apply: () => StorageService.remove(key)
     };
     const snap = read.value, ts = parseTimestamp(snap.createdAt || snap.exportedAt);
-    return null === ts || now - ts <= 864e5 * RETENTION_RULES.restorePointDays ? null : {
+    return null !== ts && now - ts <= 864e5 * RETENTION_RULES.restorePointDays ? null : {
         id: `restore-old-${label}`,
         category: "Punkt przywracania",
         count: 1,
-        label: `Punkt ${label} starszy niż ${RETENTION_RULES.restorePointDays} dni`,
-        size: byteSize(raw),
+        label: `Punkt ${label} ${null === ts ? "bez znacznika czasu" : `starszy niż ${RETENTION_RULES.restorePointDays} dni`}`,
+        size: byteSize(StorageService.get(key) || ""),
         apply: () => StorageService.remove(key)
     };
 }
@@ -6019,7 +6155,7 @@ function normalizeFxState(raw) {
 
 const IMPORT_LIMITS = Object.freeze({
     id: 120,
-    todoText: 2e3,
+    todoText: StorageLimits.DEFAULTS.todoTextChars,
     journalText: 5e3,
     reminderText: 2e3,
     noteText: 2e4,
@@ -6071,20 +6207,13 @@ function cleanString(value, max, required = !1) {
     };
 }
 
-function isValidTimestamp(value) {
-    const n = Number(value);
-    return Number.isFinite(n) && n >= 0 && !Number.isNaN(new Date(n).getTime());
+
+function droppedFieldsWarning(value, knownFields) {
+    const dropped = Object.keys(value || {}).filter(key => !knownFields.includes(key));
+    return dropped.length ? `usunięto nieznane pola: ${dropped.join(", ")}` : null;
 }
 
-function validDateISO(value) {
-    if ("string" != typeof value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return !1;
-    const [y, m, d] = value.split("-").map(Number), dt = new Date(y, m - 1, d);
-    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
-}
 
-function validTime(value) {
-    return "string" == typeof value && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
-}
 
 function createImportId(prefix, seed) {
     let h = 2166136261;
@@ -6115,46 +6244,97 @@ function validateKnownMail(value) {
     c.warning && r.warnings.push(c.warning), r) : invalidResult(value, "niepoprawny adres e-mail");
 }
 
+const TODO_KNOWN_FIELDS = Object.freeze([ "id", "text", "done", "archived", "priority", "dueDate", "createdAt", "updatedAt", "completedAt" ]);
+
 function validateTodoItem(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "rekord TODO musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.todoText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    "boolean" != typeof value.done && (r.value.done = !!value.done, r.repaired = !0, 
-    r.warnings.push("naprawiono pole done")), isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), 
-    r.repaired = !0, r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("todo", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `TODO.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.todoText, !0);
+    if (!text.valid) return invalidResult(value, `TODO.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, TODO_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    r.value.done = !!value.done, "boolean" != typeof value.done && (r.repaired = !0,
+    r.warnings.push("naprawiono pole done"));
+    r.value.archived = !!value.archived;
+    r.value.priority = [ "low", "normal", "high" ].includes(value.priority) ? value.priority : "normal";
+    void 0 !== value.priority && r.value.priority !== value.priority && (r.repaired = !0, r.warnings.push("naprawiono priorytet"));
+    r.value.dueDate = validDateISO(value.dueDate) ? value.dueDate : "", value.dueDate && !r.value.dueDate && (r.repaired = !0,
+    r.warnings.push("naprawiono termin"));
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    const updated = normalizeTimestamp(value.updatedAt);
+    r.value.updatedAt = null !== updated ? updated : r.value.createdAt;
+    r.value.completedAt = normalizeTimestamp(value.completedAt);
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("todo", text.value + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const JOURNAL_KNOWN_FIELDS = Object.freeze([ "id", "text", "type", "createdAt" ]);
 
 function validateJournalEntry(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "wpis journalu musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.journalText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), r.repaired = !0, 
-    r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("journal", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `journal.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.journalText, !0);
+    if (!text.valid) return invalidResult(value, `journal.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, JOURNAL_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    const type = cleanString(value.type, 32, !1);
+    r.value.type = type.value || "info", type.value !== (value.type || "") && (r.repaired = !0, r.warnings.push("naprawiono typ wpisu"));
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("journal", text.value + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const REMINDER_KNOWN_FIELDS = Object.freeze([ "id", "text", "date", "time", "done", "doneAt", "createdAt", "lastNotifiedAt", "snoozedUntil" ]);
 
 function validateReminder(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "przypomnienie musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.reminderText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    validDateISO(value.date) ? (validTime(value.time) || (r.value.time = "09:00", r.repaired = !0, 
-    r.warnings.push("naprawiono godzinę na 09:00")), "boolean" != typeof value.done && (r.value.done = !!value.done, 
-    r.repaired = !0, r.warnings.push("naprawiono pole done")), [ "createdAt", "lastNotifiedAt", "snoozedUntil" ].forEach(k => {
-        isValidTimestamp(value[k]) || (r.value[k] = "createdAt" === k ? Date.now() : 0, 
-        r.repaired = !0, r.warnings.push(`naprawiono ${k}`));
-    }), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("rem", value.date + value.time + text.value), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, "reminder.date ma niepoprawny format lub datę")) : invalidResult(value, `reminder.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.reminderText, !0);
+    if (!text.valid) return invalidResult(value, `reminder.text: ${text.error}`);
+    if (!validDateISO(value.date)) return invalidResult(value, "reminder.date ma niepoprawny format lub datę");
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, REMINDER_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    r.value.date = value.date;
+    r.value.time = validTime(value.time) ? value.time : "09:00", validTime(value.time) || (r.repaired = !0,
+    r.warnings.push("naprawiono godzinę na 09:00"));
+    r.value.done = !!value.done, "boolean" != typeof value.done && (r.repaired = !0,
+    r.warnings.push("naprawiono pole done"));
+    r.value.doneAt = normalizeTimestamp(value.doneAt);
+    [ "createdAt", "lastNotifiedAt", "snoozedUntil" ].forEach(k => {
+        const ts = normalizeTimestamp(value[k]);
+        null === ts ? (r.value[k] = "createdAt" === k ? Date.now() : 0, r.repaired = !0,
+        r.warnings.push(`naprawiono ${k}`)) : r.value[k] = ts;
+    });
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("rem", value.date + value.time + text.value),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const NOTE_KNOWN_FIELDS = Object.freeze([ "id", "title", "text", "color", "pinned", "createdAt", "updatedAt" ]);
 
 function validateNote(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "notatka musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.noteText, !1);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    ALLOWED_NOTE_COLORS.includes(value.color) || (r.value.color = "amber", r.repaired = !0, 
-    r.warnings.push("naprawiono kolor notatki")), isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), 
-    r.repaired = !0, r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("note", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `note.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.noteText, !1);
+    if (!text.valid) return invalidResult(value, `note.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, NOTE_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    const title = cleanString(value.title, 100, !1);
+    r.value.title = title.value;
+    ALLOWED_NOTE_COLORS.includes(value.color) || (r.value.color = "amber", r.repaired = !0,
+    r.warnings.push("naprawiono kolor notatki")), ALLOWED_NOTE_COLORS.includes(value.color) && (r.value.color = value.color);
+    r.value.pinned = !!value.pinned;
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    const updated = normalizeTimestamp(value.updatedAt);
+    r.value.updatedAt = null !== updated ? updated : r.value.createdAt;
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("note", (title.value || text.value) + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
 
 function validateTile(value) {
@@ -6936,7 +7116,7 @@ const MODULE_REGISTRY = Object.freeze([ {
     }
 } ]), MODULE_CONTRACT_METHODS = Object.freeze([ "id", "init", "bind", "render", "serialize", "deserialize", "reset", "teardown", "smokeTest", "getStats" ]);
 ModuleRegistry = (() => {
-    const definitions = new Map, hosts = new Map, listeners = new Map, register = def => {
+    const definitions = new Map, listeners = new Map, register = def => {
         const normalized = (def => {
             if (!def || "string" != typeof def.id || !def.id.trim()) throw new TypeError("ModuleRegistry.register: wymagane id");
             const id = def.id.trim(), hostSelector = def.hostSelector || {
@@ -6957,8 +7137,7 @@ ModuleRegistry = (() => {
                 version: Number(def.version) || 1
             };
             return wrapped.init = "function" == typeof def.init ? def.init.bind(wrapped) : () => !0, 
-            wrapped.bind = "function" == typeof def.bind ? def.bind.bind(wrapped) : root => (hosts.set(id, root || document.querySelector(hostSelector) || document), 
-            !0), wrapped.render = "function" == typeof def.render ? def.render.bind(wrapped) : () => !0, 
+            wrapped.bind = "function" == typeof def.bind ? def.bind.bind(wrapped) : () => !0, wrapped.render = "function" == typeof def.render ? def.render.bind(wrapped) : () => !0, 
             wrapped.serialize = "function" == typeof def.serialize ? def.serialize.bind(wrapped) : "function" == typeof def.export ? def.export.bind(wrapped) : () => cloneData(ensureAppState().modules[id]), 
             wrapped.deserialize = "function" == typeof def.deserialize ? def.deserialize.bind(wrapped) : "function" == typeof def.import ? def.import.bind(wrapped) : data => {
                 ensureAppState().modules[id] = cloneData(data);
@@ -7207,8 +7386,11 @@ function applyAppData(data) {
             merged.modules[id] = cloneData(next.modules[id]);
         }), appState = normalizeCurrentData(merged);
     } else appState = normalizeCurrentData(next);
-    getModuleIds(next.moduleIds).forEach(id => MODULE_BY_ID[id].import(appState.modules[id])), 
+    getModuleIds(next.moduleIds).forEach(id => MODULE_BY_ID[id].import(appState.modules[id])),
     persistData(!0);
+    try {
+        BusinessWorkflow?.reconcileAll({ persist: !0 });
+    } catch {}
 }
 
 function refreshDataBadge() {
@@ -7496,8 +7678,10 @@ function downloadJSON(snapshot, filename) {
     const blob = new Blob([ JSON.stringify(snapshot, null, 2) ], {
         type: "application/json"
     }), url = URL.createObjectURL(blob), a = document.createElement("a");
-    a.href = url, a.download = filename, document.body.appendChild(a), a.click(), a.remove(), 
-    SchedulerService.scheduleTimeout(() => URL.revokeObjectURL(url), 1e3, { owner: "persistence", key: "revoke-download-url" });
+    a.href = url, a.download = filename, document.body.appendChild(a), a.click(),
+    SchedulerService.scheduleTimeout(() => {
+        a.remove(), URL.revokeObjectURL(url);
+    }, 2e3, { owner: "persistence", key: "cleanup-download-anchor" });
 }
 
 async function exportData(moduleIds) {
@@ -7575,18 +7759,18 @@ function importDataFromFile(file) {
 }
 
 async function resetData() {
-    if (!await showConfirmModal("Przywrócić dane wbudowane w aplikację?\n\nPrzed zmianą zostanie automatycznie utworzony punkt przywracania. Wszystkie obecne dane modułów zostaną zastąpione.", {
+    if (!await showConfirmModal("Przywrócić dane wbudowane w aplikacji?\n\nPrzed zmianą zostanie automatycznie utworzony punkt przywracania. Wszystkie obecne dane modułów zostaną zastąpione.", {
         confirmLabel: "Utwórz punkt i przywróć",
         danger: !0
     })) return;
     const guard = await savePreviousGoodRestorePoint();
     if (!guard || !1 === guard.ok) return void toast("Nie udało się utworzyć punktu bezpieczeństwa. Operacja została anulowana.", "err");
-    StorageService.remove(DATA_KEY), appState = normalizeCurrentData(defaultDataV3()), applyAppData(appState),
-    StorageService.remove(DATA_KEY), rerenderAllFromData(), await saveCurrentRestorePoint(), renderBackupList(),
+    appState = normalizeCurrentData(defaultDataV3()), applyAppData(appState), LEGACY_SNAPSHOT_KEYS.concat(LEGACY_MODULE_KEYS).forEach(key => StorageService.remove(key)),
+    rerenderAllFromData(), await saveCurrentRestorePoint(), renderBackupList(),
     renderDailyStart(), toast("Przywrócono dane wbudowane. Poprzedni stan zachowano w punktach przywracania.");
 }
 
-EventLifecycle.on($("#dataExport"), "click", () => exportData(), { owner: "persistence-ui", key: "export" }), EventLifecycle.on($("#dataExportPartial"), "click", exportPartialData, { owner: "persistence-ui", key: "export-partial" }), 
+EventLifecycle.on($("#dataExport"), "click", () => exportData(), { owner: "persistence-ui", key: "export" }), EventLifecycle.on($("#emergencyExportBtn"), "click", () => exportData(), { owner: "persistence-ui", key: "emergency-export" }), EventLifecycle.on($("#dataExportPartial"), "click", exportPartialData, { owner: "persistence-ui", key: "export-partial" }), 
 EventLifecycle.on($("#dataResetModule"), "click", async function() {
     const ids = await selectModuleIds("Reset pojedynczego modułu", {
         single: !0
@@ -8016,7 +8200,7 @@ $("#fBody").addEventListener("input", function() {
 }), 120));
 
 const ReminderTimeService = (() => {
-    const timestamp = reminder => [ Number(reminder?.snoozedUntil), Number(reminder?.dueAt) ].find(Number.isFinite) || new Date(`${reminder?.date || localISODate()}T${reminder?.time || ensureAppState().modules.userConfig?.defaultReminder || "09:00"}:00`).getTime();
+    const timestamp = reminder => [ Number(reminder?.snoozedUntil), Number(reminder?.dueAt) ].find(Number.isFinite) || new Date(`${reminder?.date || dateKeyLocal(new Date())}T${reminder?.time || ensureAppState().modules.userConfig?.defaultReminder || "09:00"}:00`).getTime();
     return Object.freeze({
         dueAt: timestamp,
         snooze: function(reminder, minutes = 10) {
@@ -8169,7 +8353,7 @@ function openReminderEditor(reminder) {
         modal = SafeDOM.el("section", { className: "modal", attrs: { id: "reminderEditorModal", hidden: true, role: "dialog", "aria-label": "Edytuj przypomnienie" } });
         document.getElementById("overlay")?.append(modal);
     }
-    const dateInput = SafeDOM.el("input", { value: reminder.date || localISODate(), attrs: { type: "date", "aria-label": "Data przypomnienia" } });
+    const dateInput = SafeDOM.el("input", { value: reminder.date || dateKeyLocal(new Date()), attrs: { type: "date", "aria-label": "Data przypomnienia" } });
     const timeInput = SafeDOM.el("input", { value: reminder.time || "09:00", attrs: { type: "time", "aria-label": "Godzina przypomnienia" } });
     const textInput = SafeDOM.el("input", { value: reminder.text || "", attrs: { type: "text", maxlength: StorageLimits.current().reminderTextChars, "aria-label": "Treść przypomnienia" } });
     const cancel = SafeDOM.el("button", { className: "btn ghost", text: "Anuluj", attrs: { type: "button", "data-close": "reminderEditorModal" } });
@@ -8185,7 +8369,7 @@ function openReminderEditor(reminder) {
     ]);
     bindEvent(save, "click", () => {
         const text = textInput.value.trim();
-        if (!text || !/^\d{4}-\d{2}-\d{2}$/.test(dateInput.value) || !/^\d{2}:\d{2}$/.test(timeInput.value)) return toast("Uzupełnij poprawną datę, godzinę i treść.", "err");
+        if (!text || !validDateISO(dateInput.value) || !validTime(timeInput.value)) return toast("Uzupełnij poprawną datę, godzinę i treść.", "err");
         CoreModuleState.calendarReminders.update(reminder.id, { text, date: dateInput.value, time: timeInput.value, snoozedUntil: 0, lastNotifiedAt: 0 });
         closeModal("reminderEditorModal"); toast("Zapisano przypomnienie.");
     });
@@ -8222,6 +8406,7 @@ function checkCalendarReminders() {
         changed = !0, function(r) {
             const wrap = $("#toasts");
             if (!wrap) return;
+            wrap.querySelector(`[data-reminder-toast="${CSS.escape(r.id)}"]`)?.remove();
             const el = document.createElement("div");
             el.className = "toast reminder ok", el.dataset.reminderToast = r.id;
             const content = document.createElement("div");
@@ -8243,8 +8428,8 @@ function checkCalendarReminders() {
                 CoreModuleState.calendarReminders.snooze(r.id, 10), el.remove(), toast("Odłożono przypomnienie o 10 minut.");
             }), done.addEventListener("click", () => {
                 CoreModuleState.calendarReminders.done(r.id), el.remove(), toast("Przypomnienie oznaczone jako wykonane.");
-            }), actions.append(snooze, done), content.append(title, message, actions), el.append(content), 
-            wrap.append(el);
+            }), actions.append(snooze, done), content.append(title, message, actions), el.append(content),
+            wrap.append(el), SchedulerService.scheduleTimeout(() => el.remove(), 1e4, { owner: "reminder-toast", key: `auto-remove-${r.id}` });
         }(r));
     }), changed && (saveCalendarReminders(rows), renderCalendarReminderList());
 }
@@ -8300,8 +8485,11 @@ function renderCalendar() {
 const PWD_AMBIG = /[O0lI1|`'"]/g;
 
 function rngInt(max) {
-    const buf = new Uint32Array(1);
-    return (window.crypto || window.msCrypto).getRandomValues(buf), buf[0] % max;
+    const limit = Math.floor(4294967296 / max) * max, buf = new Uint32Array(1);
+    do {
+        (window.crypto || window.msCrypto).getRandomValues(buf);
+    } while (buf[0] >= limit);
+    return buf[0] % max;
 }
 
 function generatePassword() {
@@ -8315,6 +8503,7 @@ function generatePassword() {
     if (!all.length || all.some(p => !p.length)) return $("#pwdValue").value = "", void setPwdStrength(0);
     const out = [];
     all.forEach(p => out.push(p[rngInt(p.length)]));
+    out.length = Math.min(out.length, len);
     const combined = all.join("");
     for (;out.length < len; ) out.push(combined[rngInt(combined.length)]);
     for (let i = out.length - 1; i > 0; i--) {
@@ -8409,239 +8598,6 @@ $("#toolConv").addEventListener("click", () => {
     syncFxInputsFromData(), recalcConv(), recalcVat(), showModal("convModal");
 });
 
-const QR = function() {
-    const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
-    !function() {
-        let x = 1;
-        for (let i = 0; i < 255; i++) EXP[i] = x, LOG[x] = i, x <<= 1, 256 & x && (x ^= 285);
-        for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
-    }();
-    const gfMul = (a, b) => a && b ? EXP[LOG[a] + LOG[b]] : 0;
-    function rsEncode(data, ecLen) {
-        const gen = function(degree) {
-            let poly = [ 1 ];
-            for (let i = 0; i < degree; i++) {
-                const next = new Array(poly.length + 1).fill(0);
-                for (let j = 0; j < poly.length; j++) next[j] ^= poly[j], next[j + 1] ^= gfMul(poly[j], EXP[i]);
-                poly = next;
-            }
-            return poly;
-        }(ecLen), result = new Array(ecLen).fill(0);
-        for (const b of data) {
-            const factor = b ^ result[0];
-            if (result.shift(), result.push(0), factor) for (let i = 0; i < ecLen; i++) result[i] ^= gfMul(gen[i + 1], factor);
-        }
-        return result;
-    }
-    const CAPS_M = [ {
-        v: 1,
-        total: 26,
-        data: 16,
-        ec: 10,
-        blocks: [ [ 16, 10 ] ]
-    }, {
-        v: 2,
-        total: 44,
-        data: 28,
-        ec: 16,
-        blocks: [ [ 28, 16 ] ]
-    }, {
-        v: 3,
-        total: 70,
-        data: 44,
-        ec: 26,
-        blocks: [ [ 44, 26 ] ]
-    }, {
-        v: 4,
-        total: 100,
-        data: 64,
-        ec: 18,
-        blocks: [ [ 32, 18 ], [ 32, 18 ] ]
-    }, {
-        v: 5,
-        total: 134,
-        data: 86,
-        ec: 24,
-        blocks: [ [ 43, 24 ], [ 43, 24 ] ]
-    }, {
-        v: 6,
-        total: 172,
-        data: 108,
-        ec: 16,
-        blocks: [ [ 27, 16 ], [ 27, 16 ], [ 27, 16 ], [ 27, 16 ] ]
-    }, {
-        v: 7,
-        total: 196,
-        data: 124,
-        ec: 18,
-        blocks: [ [ 31, 18 ], [ 31, 18 ], [ 31, 18 ], [ 31, 18 ] ]
-    }, {
-        v: 8,
-        total: 242,
-        data: 154,
-        ec: 22,
-        blocks: [ [ 38, 22 ], [ 38, 22 ], [ 39, 22 ], [ 39, 22 ] ]
-    }, {
-        v: 9,
-        total: 292,
-        data: 182,
-        ec: 22,
-        blocks: [ [ 36, 22 ], [ 36, 22 ], [ 36, 22 ], [ 36, 22 ], [ 37, 22 ] ]
-    }, {
-        v: 10,
-        total: 346,
-        data: 216,
-        ec: 26,
-        blocks: [ [ 43, 26 ], [ 43, 26 ], [ 43, 26 ], [ 43, 26 ], [ 44, 26 ], [ 44, 26 ] ]
-    } ], ALIGN_POS = [ [], [ 6, 18 ], [ 6, 22 ], [ 6, 26 ], [ 6, 30 ], [ 6, 34 ], [ 6, 22, 38 ], [ 6, 24, 42 ], [ 6, 26, 46 ], [ 6, 28, 50 ] ];
-    function newMatrix(size) {
-        return Array.from({
-            length: size
-        }, () => new Int8Array(size).fill(-1));
-    }
-    function placeFinder(m, x, y) {
-        const size = m.length;
-        for (let dy = -1; dy <= 7; dy++) for (let dx = -1; dx <= 7; dx++) {
-            const px = x + dx, py = y + dy;
-            if (px < 0 || py < 0 || px >= size || py >= size) continue;
-            const onBorder = dx >= 0 && dx <= 6 && (0 === dy || 6 === dy) || dy >= 0 && dy <= 6 && (0 === dx || 6 === dx), inner = dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4;
-            m[py][px] = onBorder || inner ? 1 : 0;
-        }
-    }
-    function placeAlignment(m, x, y) {
-        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-            const onBorder = 2 === Math.abs(dx) || 2 === Math.abs(dy), center = 0 === dx && 0 === dy;
-            m[y + dy][x + dx] = onBorder || center ? 1 : 0;
-        }
-    }
-    function placeFormat(m, maskNum) {
-        const size = m.length, fmt = function(maskNum) {
-            let data = 0 | maskNum, rem = data;
-            for (let i = 0; i < 10; i++) rem <<= 1, 1024 & rem && (rem ^= 1335);
-            return 21522 ^ (data << 10 | rem);
-        }(maskNum);
-        for (let i = 0; i < 15; i++) {
-            const bit = fmt >> i & 1;
-            i < 6 ? m[i][8] = bit : i < 8 ? m[i + 1][8] = bit : i < 9 ? m[8][7] = bit : m[8][14 - i] = bit, 
-            i < 8 ? m[8][size - 1 - i] = bit : m[size - 1 - (14 - i)][8] = bit;
-        }
-        m[size - 8][8] = 1;
-    }
-    function placeData(m, codewords, maskNum) {
-        const size = m.length, mask = [ (y, x) => (y + x) % 2 == 0, (y, x) => y % 2 == 0, (y, x) => x % 3 == 0, (y, x) => (y + x) % 3 == 0, (y, x) => (Math.floor(y / 2) + Math.floor(x / 3)) % 2 == 0, (y, x) => y * x % 2 + y * x % 3 == 0, (y, x) => (y * x % 2 + y * x % 3) % 2 == 0, (y, x) => ((y + x) % 2 + y * x % 3) % 2 == 0 ][maskNum];
-        let bitIx = 0;
-        const totalBits = 8 * codewords.length;
-        let up = !0;
-        for (let col = size - 1; col > 0; col -= 2) {
-            6 === col && col--;
-            for (let i = 0; i < size; i++) {
-                const y = up ? size - 1 - i : i;
-                for (let c = 0; c < 2; c++) {
-                    const x = col - c;
-                    if (-1 !== m[y][x]) continue;
-                    let bit = 0;
-                    bitIx < totalBits && (bit = codewords[bitIx >> 3] >> 7 - (7 & bitIx) & 1, bitIx++), 
-                    mask(y, x) && (bit ^= 1), m[y][x] = bit;
-                }
-            }
-            up = !up;
-        }
-    }
-    function penalty(m) {
-        const size = m.length;
-        let p = 0;
-        for (let y = 0; y < size; y++) {
-            let rc = 1, cc = 1;
-            for (let x = 1; x < size; x++) m[y][x] === m[y][x - 1] ? (rc++, 5 === rc ? p += 3 : rc > 5 && p++) : rc = 1, 
-            m[x][y] === m[x - 1][y] ? (cc++, 5 === cc ? p += 3 : cc > 5 && p++) : cc = 1;
-        }
-        for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) {
-            const v = m[y][x];
-            v === m[y][x + 1] && v === m[y + 1][x] && v === m[y + 1][x + 1] && (p += 3);
-        }
-        return p;
-    }
-    return {
-        make: function(text) {
-            const {cap: cap, bytes: bytes} = function(text) {
-                const data = (str = text, Array.from((new TextEncoder).encode(str)));
-                var str;
-                const cap = function(dataBytes) {
-                    const needBits = 4 + (dataBytes < 256 ? 8 : 16) + 8 * dataBytes;
-                    for (const cap of CAPS_M) if (cap.v, cap.data, 8 * cap.data >= needBits) return cap;
-                    return null;
-                }(data.length);
-                if (!cap) throw new Error("Tekst za długi dla QR v1–10 ECC M");
-                const ccBits = cap.v < 10 ? 8 : 16, buf = function() {
-                    const bits = [];
-                    return {
-                        push(value, len) {
-                            for (let i = len - 1; i >= 0; i--) bits.push(value >>> i & 1);
-                        },
-                        length: () => bits.length,
-                        toBytes() {
-                            for (;bits.length % 8 != 0; ) bits.push(0);
-                            const out = [];
-                            for (let i = 0; i < bits.length; i += 8) {
-                                let b = 0;
-                                for (let j = 0; j < 8; j++) b = b << 1 | bits[i + j];
-                                out.push(b);
-                            }
-                            return out;
-                        }
-                    };
-                }();
-                buf.push(4, 4), buf.push(data.length, ccBits);
-                for (const b of data) buf.push(b, 8);
-                const maxBits = 8 * cap.data, term = Math.min(4, maxBits - buf.length());
-                term > 0 && buf.push(0, term);
-                let cw = buf.toBytes();
-                const padBytes = [ 236, 17 ];
-                for (;cw.length < cap.data; ) cw.push(padBytes[cw.length - cap.data & 1 ? 0 : 1] ?? padBytes[cw.length % 2]);
-                cw = cw.slice(0, cap.data);
-                const dataBlocks = [], ecBlocks = [];
-                let offset = 0;
-                for (const [bDataLen, bEcLen] of cap.blocks) {
-                    const block = cw.slice(offset, offset + bDataLen);
-                    dataBlocks.push(block), ecBlocks.push(rsEncode(block, bEcLen)), offset += bDataLen;
-                }
-                const maxData = Math.max(...dataBlocks.map(b => b.length)), result = [];
-                for (let i = 0; i < maxData; i++) for (const b of dataBlocks) i < b.length && result.push(b[i]);
-                const maxEc = Math.max(...ecBlocks.map(b => b.length));
-                for (let i = 0; i < maxEc; i++) for (const b of ecBlocks) i < b.length && result.push(b[i]);
-                return {
-                    cap: cap,
-                    bytes: result
-                };
-            }(text), size = 17 + 4 * cap.v;
-            let best = null;
-            for (let mask = 0; mask < 8; mask++) {
-                const m = newMatrix(size);
-                placeFinder(m, 0, 0), placeFinder(m, size - 7, 0), placeFinder(m, 0, size - 7);
-                for (let i = 0; i < 8; i++) -1 === m[7][i] && (m[7][i] = 0), -1 === m[i][7] && (m[i][7] = 0), 
-                -1 === m[size - 8][i] && (m[size - 8][i] = 0), -1 === m[i][size - 8] && (m[i][size - 8] = 0), 
-                -1 === m[7][size - 1 - i] && (m[7][size - 1 - i] = 0), -1 === m[size - 1 - i][7] && (m[size - 1 - i][7] = 0);
-                for (let i = 8; i < size - 8; i++) m[6][i] = i % 2 == 0 ? 1 : 0, m[i][6] = i % 2 == 0 ? 1 : 0;
-                const positions = ALIGN_POS[cap.v - 1];
-                for (const cy of positions) for (const cx of positions) cx <= 7 && cy <= 7 || cx <= 7 && cy >= size - 8 || cx >= size - 8 && cy <= 7 || placeAlignment(m, cx, cy);
-                placeFormat(m, mask), placeData(m, bytes, mask), placeFormat(m, mask);
-                const sc = penalty(m);
-                (!best || sc < best.score) && (best = {
-                    matrix: m,
-                    score: sc,
-                    mask: mask
-                });
-            }
-            return best.matrix;
-        },
-        toSVG: function(matrix, scale = 8) {
-            const size = matrix.length, total = (size + 8) * scale, off = 4 * scale;
-            let path = "";
-            for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) 1 === matrix[y][x] && (path += `M${off + x * scale},${off + y * scale}h${scale}v${scale}h-${scale}z`);
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">\n      <rect width="100%" height="100%" fill="#fff"/>\n      <path d="${path}" fill="#000"/>\n    </svg>`;
-        }
-    };
-}();
 
 let lastQrSVG = "", lastQrText = "";
 
@@ -8652,7 +8608,7 @@ function showQrModal(text, label) {
         $("#qrText").textContent = label ? `${label}\n${text}` : text, $("#qrTitle").textContent = "Kod QR" + (label ? ` · ${label}` : ""), 
         showModal("qrModal");
     } catch (err) {
-        toast("Tekst za długi dla QR (max ~200 znaków).", "err");
+        toast(`Tekst za długi dla QR (limit ${QR.capacityBytes} bajtów — polskie znaki liczą się podwójnie).`, "err");
     }
 }
 
@@ -8877,14 +8833,6 @@ function recalcWorkdays() {
     $("#wdOut").value = ds, $("#wdInfo").textContent = `${dow.charAt(0).toUpperCase() + dow.slice(1)}. Pomija weekendy i dni wolne PL.`;
 }
 
-function csvEscape(value, delimiter = ";") {
-    return function(value, delimiter = ";") {
-        let text = String(value ?? "");
-        /^[=+\-@]/.test(text) && (text = "'" + text);
-        const escaped = text.replace(/"/g, '""');
-        return escaped.includes(delimiter) || escaped.includes("\n") || escaped.includes("\r") || escaped.includes('"') ? `"${escaped}"` : escaped;
-    }(value, delimiter);
-}
 
 $("#pomoStart").addEventListener("click", () => {
     pomoLeft = POMO_WORK, pomoMode = "work", pomoStart();
@@ -8909,6 +8857,248 @@ $("#toolTime").addEventListener("click", () => {
     a.href = url, a.download = fname, document.body.appendChild(a), a.click(), a.remove(), 
     SchedulerService.scheduleTimeout(() => URL.revokeObjectURL(url), 1e3, { owner: "utilities", key: "revoke-download-url" }), toast(`Wyeksportowano ${rows.length - 1} adresów do CSV.`);
 });
+// Koder QR (ISO/IEC 18004, poziom M, wersje 1-10) — czysty moduł bez zależności od DOM.
+// Wydzielony z 110-utilities-widgets.js w Fazie 4 audytu, aby umożliwić testy jednostkowe
+// i mieć jedno źródło tabel CAPS_M (poprawki W12 Faz 2-3).
+const QR = function() {
+    const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+    !function() {
+        let x = 1;
+        for (let i = 0; i < 255; i++) EXP[i] = x, LOG[x] = i, x <<= 1, 256 & x && (x ^= 285);
+        for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+    }();
+    const gfMul = (a, b) => a && b ? EXP[LOG[a] + LOG[b]] : 0;
+    function rsEncode(data, ecLen) {
+        const gen = function(degree) {
+            let poly = [ 1 ];
+            for (let i = 0; i < degree; i++) {
+                const next = new Array(poly.length + 1).fill(0);
+                for (let j = 0; j < poly.length; j++) next[j] ^= poly[j], next[j + 1] ^= gfMul(poly[j], EXP[i]);
+                poly = next;
+            }
+            return poly;
+        }(ecLen), result = new Array(ecLen).fill(0);
+        for (const b of data) {
+            const factor = b ^ result[0];
+            if (result.shift(), result.push(0), factor) for (let i = 0; i < ecLen; i++) result[i] ^= gfMul(gen[i + 1], factor);
+        }
+        return result;
+    }
+    const CAPS_M = [ {
+        v: 1,
+        total: 26,
+        data: 16,
+        ec: 10,
+        blocks: [ [ 16, 10 ] ]
+    }, {
+        v: 2,
+        total: 44,
+        data: 28,
+        ec: 16,
+        blocks: [ [ 28, 16 ] ]
+    }, {
+        v: 3,
+        total: 70,
+        data: 44,
+        ec: 26,
+        blocks: [ [ 44, 26 ] ]
+    }, {
+        v: 4,
+        total: 100,
+        data: 64,
+        ec: 18,
+        blocks: [ [ 32, 18 ], [ 32, 18 ] ]
+    }, {
+        v: 5,
+        total: 134,
+        data: 86,
+        ec: 24,
+        blocks: [ [ 43, 24 ], [ 43, 24 ] ]
+    }, {
+        v: 6,
+        total: 172,
+        data: 108,
+        ec: 16,
+        blocks: [ [ 27, 16 ], [ 27, 16 ], [ 27, 16 ], [ 27, 16 ] ]
+    }, {
+        v: 7,
+        total: 196,
+        data: 124,
+        ec: 18,
+        blocks: [ [ 31, 18 ], [ 31, 18 ], [ 31, 18 ], [ 31, 18 ] ]
+    }, {
+        v: 8,
+        total: 242,
+        data: 154,
+        ec: 22,
+        blocks: [ [ 38, 22 ], [ 38, 22 ], [ 39, 22 ], [ 39, 22 ] ]
+    }, {
+        v: 9,
+        total: 292,
+        data: 182,
+        ec: 22,
+        blocks: [ [ 36, 22 ], [ 36, 22 ], [ 36, 22 ], [ 37, 22 ], [ 37, 22 ] ]
+    }, {
+        v: 10,
+        total: 346,
+        data: 216,
+        ec: 26,
+        blocks: [ [ 43, 26 ], [ 43, 26 ], [ 43, 26 ], [ 43, 26 ], [ 44, 26 ] ]
+    } ], ALIGN_POS = [ [], [ 6, 18 ], [ 6, 22 ], [ 6, 26 ], [ 6, 30 ], [ 6, 34 ], [ 6, 22, 38 ], [ 6, 24, 42 ], [ 6, 26, 46 ], [ 6, 28, 50 ] ];
+    function newMatrix(size) {
+        return Array.from({
+            length: size
+        }, () => new Int8Array(size).fill(-1));
+    }
+    function placeFinder(m, x, y) {
+        const size = m.length;
+        for (let dy = -1; dy <= 7; dy++) for (let dx = -1; dx <= 7; dx++) {
+            const px = x + dx, py = y + dy;
+            if (px < 0 || py < 0 || px >= size || py >= size) continue;
+            const onBorder = dx >= 0 && dx <= 6 && (0 === dy || 6 === dy) || dy >= 0 && dy <= 6 && (0 === dx || 6 === dx), inner = dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4;
+            m[py][px] = onBorder || inner ? 1 : 0;
+        }
+    }
+    function placeAlignment(m, x, y) {
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const onBorder = 2 === Math.abs(dx) || 2 === Math.abs(dy), center = 0 === dx && 0 === dy;
+            m[y + dy][x + dx] = onBorder || center ? 1 : 0;
+        }
+    }
+    function placeFormat(m, maskNum) {
+        const size = m.length, fmt = function(maskNum) {
+            let data = 0 | maskNum, rem = data;
+            for (let i = 0; i < 10; i++) rem <<= 1, 1024 & rem && (rem ^= 1335);
+            return 21522 ^ (data << 10 | rem);
+        }(maskNum);
+        for (let i = 0; i < 15; i++) {
+            const bit = fmt >> i & 1;
+            i < 6 ? m[i][8] = bit : i < 8 ? m[i + 1][8] = bit : i < 9 ? m[8][7] = bit : m[8][14 - i] = bit, 
+            i < 8 ? m[8][size - 1 - i] = bit : m[size - 1 - (14 - i)][8] = bit;
+        }
+        m[size - 8][8] = 1;
+    }
+    function placeData(m, codewords, maskNum) {
+        const size = m.length, mask = [ (y, x) => (y + x) % 2 == 0, (y, x) => y % 2 == 0, (y, x) => x % 3 == 0, (y, x) => (y + x) % 3 == 0, (y, x) => (Math.floor(y / 2) + Math.floor(x / 3)) % 2 == 0, (y, x) => y * x % 2 + y * x % 3 == 0, (y, x) => (y * x % 2 + y * x % 3) % 2 == 0, (y, x) => ((y + x) % 2 + y * x % 3) % 2 == 0 ][maskNum];
+        let bitIx = 0;
+        const totalBits = 8 * codewords.length;
+        let up = !0;
+        for (let col = size - 1; col > 0; col -= 2) {
+            6 === col && col--;
+            for (let i = 0; i < size; i++) {
+                const y = up ? size - 1 - i : i;
+                for (let c = 0; c < 2; c++) {
+                    const x = col - c;
+                    if (-1 !== m[y][x]) continue;
+                    let bit = 0;
+                    bitIx < totalBits && (bit = codewords[bitIx >> 3] >> 7 - (7 & bitIx) & 1, bitIx++), 
+                    mask(y, x) && (bit ^= 1), m[y][x] = bit;
+                }
+            }
+            up = !up;
+        }
+    }
+    function penalty(m) {
+        const size = m.length;
+        let p = 0;
+        for (let y = 0; y < size; y++) {
+            let rc = 1, cc = 1;
+            for (let x = 1; x < size; x++) m[y][x] === m[y][x - 1] ? (rc++, 5 === rc ? p += 3 : rc > 5 && p++) : rc = 1, 
+            m[x][y] === m[x - 1][y] ? (cc++, 5 === cc ? p += 3 : cc > 5 && p++) : cc = 1;
+        }
+        for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) {
+            const v = m[y][x];
+            v === m[y][x + 1] && v === m[y + 1][x] && v === m[y + 1][x + 1] && (p += 3);
+        }
+        return p;
+    }
+    return {
+        make: function(text) {
+            const {cap: cap, bytes: bytes} = function(text) {
+                const data = (str = text, Array.from((new TextEncoder).encode(str)));
+                var str;
+                const cap = function(dataBytes) {
+                    for (const cap of CAPS_M) if (8 * cap.data >= 4 + (cap.v < 10 ? 8 : 16) + 8 * dataBytes) return cap;
+                    return null;
+                }(data.length);
+                if (!cap) throw new Error("Tekst za długi dla QR v1–10 ECC M");
+                const ccBits = cap.v < 10 ? 8 : 16, buf = function() {
+                    const bits = [];
+                    return {
+                        push(value, len) {
+                            for (let i = len - 1; i >= 0; i--) bits.push(value >>> i & 1);
+                        },
+                        length: () => bits.length,
+                        toBytes() {
+                            for (;bits.length % 8 != 0; ) bits.push(0);
+                            const out = [];
+                            for (let i = 0; i < bits.length; i += 8) {
+                                let b = 0;
+                                for (let j = 0; j < 8; j++) b = b << 1 | bits[i + j];
+                                out.push(b);
+                            }
+                            return out;
+                        }
+                    };
+                }();
+                buf.push(4, 4), buf.push(data.length, ccBits);
+                for (const b of data) buf.push(b, 8);
+                const maxBits = 8 * cap.data, term = Math.min(4, maxBits - buf.length());
+                term > 0 && buf.push(0, term);
+                let cw = buf.toBytes();
+                const padBytes = [ 236, 17 ];
+                for (;cw.length < cap.data; ) cw.push(padBytes[cw.length - cap.data & 1 ? 0 : 1] ?? padBytes[cw.length % 2]);
+                cw = cw.slice(0, cap.data);
+                const dataBlocks = [], ecBlocks = [];
+                let offset = 0;
+                for (const [bDataLen, bEcLen] of cap.blocks) {
+                    const block = cw.slice(offset, offset + bDataLen);
+                    dataBlocks.push(block), ecBlocks.push(rsEncode(block, bEcLen)), offset += bDataLen;
+                }
+                const maxData = Math.max(...dataBlocks.map(b => b.length)), result = [];
+                for (let i = 0; i < maxData; i++) for (const b of dataBlocks) i < b.length && result.push(b[i]);
+                const maxEc = Math.max(...ecBlocks.map(b => b.length));
+                for (let i = 0; i < maxEc; i++) for (const b of ecBlocks) i < b.length && result.push(b[i]);
+                return {
+                    cap: cap,
+                    bytes: result
+                };
+            }(text), size = 17 + 4 * cap.v;
+            let best = null;
+            for (let mask = 0; mask < 8; mask++) {
+                const m = newMatrix(size);
+                placeFinder(m, 0, 0), placeFinder(m, size - 7, 0), placeFinder(m, 0, size - 7);
+                for (let i = 0; i < 8; i++) -1 === m[7][i] && (m[7][i] = 0), -1 === m[i][7] && (m[i][7] = 0), 
+                -1 === m[size - 8][i] && (m[size - 8][i] = 0), -1 === m[i][size - 8] && (m[i][size - 8] = 0), 
+                -1 === m[7][size - 1 - i] && (m[7][size - 1 - i] = 0), -1 === m[size - 1 - i][7] && (m[size - 1 - i][7] = 0);
+                for (let i = 8; i < size - 8; i++) m[6][i] = i % 2 == 0 ? 1 : 0, m[i][6] = i % 2 == 0 ? 1 : 0;
+                const positions = ALIGN_POS[cap.v - 1];
+                for (const cy of positions) for (const cx of positions) cx <= 7 && cy <= 7 || cx <= 7 && cy >= size - 8 || cx >= size - 8 && cy <= 7 || placeAlignment(m, cx, cy);
+                placeFormat(m, mask), placeData(m, bytes, mask), placeFormat(m, mask);
+                const sc = penalty(m);
+                (!best || sc < best.score) && (best = {
+                    matrix: m,
+                    score: sc,
+                    mask: mask
+                });
+            }
+            return best.matrix;
+        },
+        toSVG: function(matrix, scale = 8) {
+            const size = matrix.length, total = (size + 8) * scale, off = 4 * scale;
+            let path = "";
+            for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) 1 === matrix[y][x] && (path += `M${off + x * scale},${off + y * scale}h${scale}v${scale}h-${scale}z`);
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">\n      <rect width="100%" height="100%" fill="#fff"/>\n      <path d="${path}" fill="#000"/>\n    </svg>`;
+        },
+        get capacityBytes() {
+            const last = CAPS_M[CAPS_M.length - 1];
+            return Math.floor((8 * last.data - 4 - (last.v < 10 ? 8 : 16)) / 8);
+        },
+        get caps() {
+            return CAPS_M;
+        }
+    };
+}();
 
 let csvPending = null;
 
@@ -8942,7 +9132,7 @@ EventLifecycle.on($("#csvImportFile"), "change", e => {
             let nNew = 0, nDup = 0, nBad = 0;
             const newGroupKeys = new Set, newSectionNames = new Set, existingSecNames = new Set(runtimeData.sections.map(s => s.name));
             for (const r of dataRows) {
-                const sec = (r[0] || "").trim(), grp = (r[1] || "").trim(), email = (r[2] || "").trim();
+                const sec = csvUnguardCell(r[0]), grp = csvUnguardCell(r[1]), email = (r[2] || "").trim();
                 if (!sec && !grp && !email) continue;
                 if (!sec || !grp || !email) {
                     out.push({
@@ -9017,7 +9207,7 @@ EventLifecycle.on($("#csvImportFile"), "change", e => {
                 }) : null]);
                 $("#csvImportApply").disabled = stats.nNew === 0;
                 $("#csvImportApply").textContent = stats.nNew ? `Zaimportuj (${stats.nNew})` : "Brak nowych do importu";
-            }, showModal("csvImportModal");
+            }(srcName), showModal("csvImportModal");
         }(String(reader.result || ""), file.name), reader.readAsText(file, "utf-8");
     }(f), e.target.value = "";
 }, { owner: "csv-import", key: "file-change" }), EventLifecycle.on($("#csvImportApply"), "click", function() {
@@ -9222,9 +9412,43 @@ EventLifecycle.on($("#dataConfidenceBackup"), "click", async () => {
     renderBackupList(), renderStorageDashboard(), renderDailyStart();
     toast(!1 === result?.ok ? "Nie udało się utworzyć punktu przywracania." : "Utworzono punkt przywracania.", !1 === result?.ok ? "err" : "ok");
 }, { owner: "journal-backup", key: "confidence-backup" });
-let idHistory = [];
+
+// Auto-backup do katalogu (Faza 4 audytu, eksperymentalne) — File System Access API.
+// Zgodne z offline-first: katalog wybiera użytkownik, nic nie opuszcza jego maszyny.
+// Uchytu nie da się trwale przechować bez IndexedDB, więc działa do zamknięcia karty;
+// kopia zapisuje się po każdej istotnej zmianie (min. 5 min przerwy) i przy pagehide.
+let autoBackupHandle = null, autoBackupLastAt = 0;
+
+async function writeAutoBackup() {
+    if (!autoBackupHandle) return !1;
+    const snap = await buildExportArtifact();
+    const file = await autoBackupHandle.getFileHandle("workdesk-autobackup.json", { create: !0 });
+    const writable = await file.createWritable();
+    await writable.write(JSON.stringify(snap, null, 2)), await writable.close();
+    return autoBackupLastAt = Date.now(), !0;
+}
+
+EventLifecycle.on($("#autoBackupBtn"), "click", async () => {
+    if ("function" != typeof window.showDirectoryPicker) return toast("Ta przeglądarka nie obsługuje wyboru katalogu (File System Access API).", "err");
+    try {
+        autoBackupHandle = await window.showDirectoryPicker({ id: "workdesk-autobackup", mode: "readwrite", startIn: "documents" });
+        await writeAutoBackup();
+        toast("Auto-backup włączony — kopia zapisuje się do workdesk-autobackup.json po zmianach (do zamknięcia karty).", "ok");
+    } catch (error) {
+        "AbortError" === error?.name || toast("Nie udało się włączyć auto-backup: " + (error?.message || error), "err");
+    }
+}, { owner: "auto-backup", key: "enable" });
+
+SchedulerService.scheduleInterval(() => {
+    autoBackupHandle && lastFullSnapshotAt > autoBackupLastAt && Date.now() - autoBackupLastAt > 3e5 && writeAutoBackup().catch(() => {});
+}, 6e4, { owner: "auto-backup", key: "tick" });
 
 EventLifecycle.on(window, "pagehide", () => {
+    autoBackupHandle && lastFullSnapshotAt > autoBackupLastAt && writeAutoBackup().catch(() => {});
+}, { owner: "auto-backup", key: "pagehide" });
+let idHistory = [];
+
+EventLifecycle.on(window, "pagehide", event => {
     try {
         flushPendingWrites({
             commitNow: !0
@@ -9232,6 +9456,7 @@ EventLifecycle.on(window, "pagehide", () => {
     } catch (error) {
         console.error("Nie udało się zapisać danych przy zamknięciu.", error);
     }
+    if (event?.persisted) return;
     !function() {
         idHistory = [];
         const host = $("#idHistory");
@@ -9240,6 +9465,10 @@ EventLifecycle.on(window, "pagehide", () => {
 }, {
     capture: !0
 });
+
+EventLifecycle.on(window, "pageshow", event => {
+    event?.persisted && (checkCalendarReminders(), "function" == typeof renderDataConfidence && renderDataConfidence());
+}, { owner: "id-theme-notes", key: "pageshow-bfcache" });
 
 const BASE32_ALPHA = "ABCDEFGHJKMNPQRSTVWXYZ23456789";
 
@@ -9485,7 +9714,7 @@ $("#storageLimitsSave").addEventListener("click", function() {
             replaceArrayContents(todos, todos.filter(x => !ids.has(x.id)));
         }), addExcess("journal-excess", "Journal ponad limit", journal, l.journalRecords, protectedJournalIds, ids => {
             replaceArrayContents(journal, journal.filter(x => !ids.has(x.id)));
-        }), addExcess("notes-excess", "Notatki ponad limit", notes, l.notesRecords, new Set, ids => {
+        }), addExcess("notes-excess", "Notatki ponad limit", notes, l.notesRecords, new Set(notes.filter(x => x.pinned).map(x => x.id)), ids => {
             replaceArrayContents(notes, notes.filter(x => !ids.has(x.id)));
         }), addExcess("reminders-excess", "Przypomnienia ponad limit", calReminders, l.remindersRecords, protectedReminderIds, ids => {
             replaceArrayContents(calReminders, calReminders.filter(x => !ids.has(x.id)));
@@ -9557,6 +9786,41 @@ EventLifecycle.on(document, 'input', event => {
 }, false, { owner: 'email-signature', key: 'sync-preset' });
 SchedulerService.scheduleTimeout(syncSignaturePresetState, 0, { owner: 'email-signature', key: 'initial-state' });
 
+const LEGACY_SNAPSHOT_KEYS = Object.freeze([ "wd.data.v4", "wd.data.v3", "wd.data.v2", "wd.data.v1" ]), LEGACY_MODULE_KEYS = Object.freeze([ "wd.todos.v1", "wd.journal.v1", "wd.calendar.reminders.v1", "wd.notes.v2", "wd.theme.v1", "wd.tileOrder.v1", "wd.tilePins.v1" ]), MIGRATION_MARKER_KEY = "wd.migration.v5.complete";
+
+function notifyStorageLoadBlocked() {
+    try {
+        AttentionCenter.notify({
+            id: "storage-load-blocked",
+            priority: "danger",
+            rank: 110,
+            title: t("storage.blocked.title"),
+            message: t("storage.blocked.message"),
+            actions: [ {
+                id: "open-data",
+                label: t("storage.blocked.openData"),
+                primary: !0,
+                run: () => {
+                    document.getElementById("dataPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            } ]
+        });
+    } catch {}
+}
+
+function quarantineStructuredSnapshot(raw) {
+    try {
+        let hash = 2166136261;
+        for (let index = 0; index < raw.length; index++) hash ^= raw.charCodeAt(index), hash = Math.imul(hash, 16777619);
+        const fingerprint = (hash >>> 0).toString(16).padStart(8, "0"), quarantineKey = `wd.corrupt.${fingerprint}.wd_data_v5`;
+        if (StorageService.get(quarantineKey, null) === raw) return !0;
+        const committed = StorageService.safeCommit(quarantineKey, raw);
+        return !!committed && !1 !== committed.ok;
+    } catch {
+        return !1;
+    }
+}
+
 function recoverSnapshotAfterQuarantine() {
     for (const key of [ RESTORE_CURRENT_KEY, RESTORE_PREVIOUS_GOOD_KEY ]) {
         const candidate = StorageService.getJSON(key, null, {
@@ -9566,7 +9830,7 @@ function recoverSnapshotAfterQuarantine() {
         const normalized = normalizeCurrentData(candidate.value);
         if (!validateCurrentData(normalized).valid) continue;
         const committed = StorageService.safeCommitJSON(DATA_KEY, normalized);
-        if (committed && !1 !== committed.ok) return storageLoadBlocked = !1, toast(`Odzyskano dane z punktu „${key === RESTORE_CURRENT_KEY ? "current" : "previous-good"}”.`, "ok"), 
+        if (committed && !1 !== committed.ok) return storageLoadBlocked = !1, toast(`Odzyskano dane z punktu „${key === RESTORE_CURRENT_KEY ? "current" : "previous-good"}”.`, "ok"),
         normalized;
     }
     return storageLoadBlocked = !1, null;
@@ -9578,22 +9842,30 @@ const _stored = function() {
         if (current.exists) {
             if (!current.ok) return recoverSnapshotAfterQuarantine();
             const parsed = normalizeCurrentData(current.value);
-            return validateCurrentData(parsed).valid ? parsed : (toast("Bieżący snapshot ma nieprawidłową strukturę i nie został nadpisany.", "err"), 
-            storageLoadBlocked = !0, null);
+            if (validateCurrentData(parsed).valid) return parsed;
+            const raw = StorageService.get(DATA_KEY) || "", quarantined = quarantineStructuredSnapshot(raw), recovered = quarantined ? recoverSnapshotAfterQuarantine() : null;
+            if (recovered) return recovered;
+            if (quarantined) return toast("Bieżący snapshot ma nieprawidłową strukturę — przeniesiono go do kwarantanny i wczytano dane domyślne.", "err"), null;
+            return toast("Bieżący snapshot ma nieprawidłową strukturę i nie został nadpisany.", "err"), notifyStorageLoadBlocked(),
+            storageLoadBlocked = !0, null;
         }
-        const migrated = function() {
-            for (const key of [ "wd.data.v4", "wd.data.v3", "wd.data.v2", "wd.data.v1" ]) {
+        const marker = StorageService.getJSON(MIGRATION_MARKER_KEY, null, {
+            notify: !1
+        }), migrationDone = marker.exists && marker.ok && !!marker.value, migrated = function() {
+            if (!migrationDone) for (const key of LEGACY_SNAPSHOT_KEYS) {
                 const parsed = StorageService.getJSON(key, null, {
                     notify: !1
                 });
                 if (parsed.exists && parsed.ok && parsed.value) return migrateData(parsed.value);
             }
-            const base = defaultDataV3(), readArray = (key, fallback = []) => {
+            const base = defaultDataV3();
+            if (migrationDone) return base;
+            const readArray = (key, fallback = []) => {
                 const r = StorageService.getJSON(key, fallback);
                 return Array.isArray(r.value) ? r.value : fallback;
             };
-            return base.modules.todo = readArray("wd.todos.v1", []), base.modules.journal = readArray("wd.journal.v1", []), 
-            base.modules.calendarReminders = readArray("wd.calendar.reminders.v1", []), base.modules.notes = readArray("wd.notes.v2", []), 
+            return base.modules.todo = readArray("wd.todos.v1", []), base.modules.journal = readArray("wd.journal.v1", []),
+            base.modules.calendarReminders = readArray("wd.calendar.reminders.v1", []), base.modules.notes = readArray("wd.notes.v2", []),
             base.modules.preferences = normalizePreferences({
                 theme: StorageService.get("wd.theme.v1") || null,
                 tileOrder: readArray("wd.tileOrder.v1", []),
@@ -9601,18 +9873,18 @@ const _stored = function() {
             }), base;
         }();
         if (!migrated) return null;
-        if (migrated.migratedFrom = Number(migrated.schemaVersion || 3), migrated.schemaVersion = DATA_SCHEMA_VERSION, 
+        if (migrated.migratedFrom = Number(migrated.schemaVersion || 3), migrated.schemaVersion = DATA_SCHEMA_VERSION,
         migrated.migratedAt = (new Date).toISOString(), !validateCurrentData(migrated).valid) return null;
         appState = normalizeCurrentData(migrated);
         const saved = StorageService.safeCommitJSON(DATA_KEY, appState);
-        return saved && !1 !== saved.ok && StorageService.safeCommitJSON("wd.migration.v5.complete", {
+        return saved && !1 !== saved.ok && (StorageService.safeCommitJSON(MIGRATION_MARKER_KEY, {
             completedAt: (new Date).toISOString(),
             appVersion: APP_VERSION,
-            fromKeys: [ "wd.data.v4", "wd.data.v3", "wd.data.v2", "wd.data.v1" ]
-        }), appState;
+            fromKeys: LEGACY_SNAPSHOT_KEYS
+        }), LEGACY_SNAPSHOT_KEYS.concat(LEGACY_MODULE_KEYS).forEach(key => StorageService.remove(key))), appState;
     } catch (error) {
-        return storageLoadBlocked = !0, console.error("Migracja do wd.data.v5 nie powiodła się", error), 
-        toast("Nie udało się wczytać danych. Poprzedni zapis pozostaje nienaruszony.", "err"), 
+        return storageLoadBlocked = !0, console.error("Migracja do wd.data.v5 nie powiodła się", error),
+        toast("Nie udało się wczytać danych. Poprzedni zapis pozostaje nienaruszony.", "err"), notifyStorageLoadBlocked(),
         null;
     }
 }();
@@ -9667,6 +9939,14 @@ const ModuleRenderMetrics = (() => {
 
 const {clone: cloneCoreState, now: coreNow, getModuleState, setModuleState, updateArray, find: findCoreRecord} = CoreModuleHelpers;
 
+function unlinkRemovedRecord(linkType, id) {
+    try {
+        BusinessWorkflow?.removeReferences?.(linkType, id);
+    } catch (error) {
+        UI_ERROR_REGISTRY?.record("workflow", "unlink-removed", error, { linkType });
+    }
+}
+
 CoreModuleState = Object.freeze({
         todo: {
             list: () => getModuleState("todo") || [],
@@ -9702,8 +9982,8 @@ CoreModuleState = Object.freeze({
             },
             remove(id) {
                 let removed = null;
-                return updateArray("todo", rows => rows.filter(record => record.id !== id || (removed = record, 
-                !1))), removed;
+                return updateArray("todo", rows => rows.filter(record => record.id !== id || (removed = record,
+                !1))), removed && unlinkRemovedRecord("todos", id), removed;
             },
             archive(id) {
                 const item = findCoreRecord("todo", id);
@@ -9822,7 +10102,7 @@ CoreModuleState = Object.freeze({
             list: () => getModuleState("calendarReminders") || [],
             create(payload) {
                 const text = String(payload?.text || "").trim(), date = String(payload?.date || "").trim(), time = String(payload?.time || "09:00").trim();
-                if (!text || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
+                if (!text || !validDateISO(date) || !validTime(time)) return null;
                 const item = {
                     id: payload.id || businessUid(),
                     text: text,
@@ -9851,8 +10131,8 @@ CoreModuleState = Object.freeze({
             },
             remove(id) {
                 let removed = null;
-                return updateArray("calendarReminders", rows => rows.filter(record => record.id !== id || (removed = record, 
-                !1))), removed;
+                return updateArray("calendarReminders", rows => rows.filter(record => record.id !== id || (removed = record,
+                !1))), removed && unlinkRemovedRecord("reminders", id), removed;
             },
             snooze(id, minutes = 10) {
                 const item = findCoreRecord("calendarReminders", id);
@@ -9889,12 +10169,14 @@ function renderTodos() {
     const activeFilter = $("#todoFilter")?.value || "all";
     const todayKey = dateKeyLocal(new Date());
     const visibleItems = allItems.filter(todoItem => {
-        if (activeFilter === "today") return todoItem.dueDate === todayKey;
+        if (activeFilter === "today") return !todoItem.done && todoItem.dueDate === todayKey;
         if (activeFilter === "high") return todoItem.priority === "high" && !todoItem.done;
         if (activeFilter === "overdue") return Boolean(todoItem.dueDate) && todoItem.dueDate < todayKey && !todoItem.done;
         if (activeFilter === "done") return todoItem.done;
         return true;
     });
+    const PRIORITY_ORDER = { high: 0, normal: 1, low: 2 };
+    const sortedItems = [ ...visibleItems ].sort((a, b) => Number(!!a.done) - Number(!!b.done) || (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1) || (a.dueDate && b.dueDate ? a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0 : a.dueDate ? 1 : b.dueDate ? -1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
 
     const actionButton = (action, label, text) => SafeDOM.el("button", {
         className: "icon-btn",
@@ -9903,7 +10185,7 @@ function renderTodos() {
         dataset: { action }
     });
 
-    const nodes = visibleItems.map(todoItem => {
+    const nodes = sortedItems.map(todoItem => {
         const checkbox = SafeDOM.el("input", {
             checked: Boolean(todoItem.done),
             attrs: { type: "checkbox", "aria-label": "Oznacz wykonane" },
@@ -10102,10 +10384,6 @@ function addJournalEntry() {
         return item && input && (input.value = ""), item;
     }
 
-function removeCalendarReminder(id) {
-    return !!CoreModuleState.calendarReminders.remove(id);
-}
-
 function saveTodos(rows) { return setModuleState("todo", Array.isArray(rows) ? rows : CoreModuleState.todo.list()); }
 function saveNotes(rows) { return setModuleState("notes", Array.isArray(rows) ? rows : CoreModuleState.notes.list()); }
 function saveJournal(rows) { return setModuleState("journal", Array.isArray(rows) ? rows : CoreModuleState.journal.list()); }
@@ -10148,11 +10426,11 @@ function latestBackupAge() {
 }
 
 function dataConfidenceState() {
-    const usage = StorageService.usage(), age = latestBackupAge(), blocked = !!storageLoadBlocked;
-    const state = blocked || usage.level === "danger" ? "danger" : age === null || age >= 7 || usage.level === "warning" ? "warning" : "ok";
+    const usage = StorageService.usage(), age = latestBackupAge(), blocked = !!storageLoadBlocked, degraded = usage.persistent !== !0;
+    const state = blocked || degraded || usage.level === "danger" ? "danger" : age === null || age >= 7 || usage.level === "warning" ? "warning" : "ok";
     const saved = lastFullSnapshotAt ? new Date(lastFullSnapshotAt).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "w tej sesji jeszcze nie zapisano zmian";
     const backup = age === null ? "brak punktu przywracania" : age === 0 ? "backup dzisiaj" : `backup ${age} dni temu`;
-    return { state, age, usage, text: blocked ? "Zapis zablokowany — sprawdź komunikaty o danych" : `Dane zapisane: ${saved} · ${backup} · pamięć ${Math.round(usage.percent)}%` };
+    return { state, age, usage, text: blocked ? "Zapis zablokowany — sprawdź komunikaty o danych" : degraded ? "Pamięć ulotna — dane nie są zapisywane. Wyeksportuj kopię do pliku JSON." : `Dane zapisane: ${saved} · ${backup} · pamięć ${Math.round(usage.percent)}%` };
 }
 
 function renderDataConfidence() {
@@ -10165,7 +10443,7 @@ function renderDataConfidence() {
 
 function renderDailyStart() {
     if (!$("#dailyStart")) return;
-    const now = new Date(), today = now.toDateString(), activeRows = todos.filter(x => !x.done), overdue = activeRows.filter(x => x.due && new Date(x.due).getTime() < now.setHours(0, 0, 0, 0)).length, todayTodos = activeRows.filter(x => x.due && new Date(x.due).toDateString() === today).length, rem = (calReminders || []).filter(x => !x.done && new Date(x.date).toDateString() === today).length, age = latestBackupAge(), draft = !!readMeaningfulDraft(), usage = StorageService.usage();
+    const now = new Date(), today = now.toDateString(), todayKey = dateKeyLocal(now), activeRows = todos.filter(x => !x.done), overdue = activeRows.filter(x => x.dueDate && x.dueDate < todayKey).length, todayTodos = activeRows.filter(x => x.dueDate && x.dueDate === todayKey).length, rem = (calReminders || []).filter(x => !x.done && new Date(x.date).toDateString() === today).length, age = latestBackupAge(), draft = !!readMeaningfulDraft(), usage = StorageService.usage();
     const card = (value, label, alert = false) => SafeDOM.el("div", { className: `daily-card${alert ? " is-alert" : ""}` }, [ SafeDOM.el("div", { className: "v", text: value }), SafeDOM.el("div", { className: "l", text: label }) ]);
     SafeDOM.replace($("#dailyStart"), [
         card(todayTodos, "zadania na dziś", overdue > 0),
@@ -10183,23 +10461,13 @@ _draft && (pendingDraftRestore = _draft, AttentionCenter.notify({
         { id: "discard", label: "Odrzuć", run: () => discardPendingDraft() }
     ]
 })), EventLifecycle.on(window, "keydown", e => {
-    "cmdModal" !== UIRuntime.top()?.id && ((e.ctrlKey || e.metaKey) && "Enter" === e.key ? (e.preventDefault(), 
-    $("#sendBtn").click()) : !e.ctrlKey && !e.metaKey || "e" !== e.key.toLowerCase() || e.shiftKey || [ "INPUT", "TEXTAREA" ].includes(document.activeElement?.tagName) || (e.preventDefault(), 
+    "cmdModal" !== UIRuntime.top()?.id && ((e.ctrlKey || e.metaKey) && "Enter" === e.key ? (e.target instanceof Element && e.target.closest("#email") && (e.preventDefault(),
+    $("#sendBtn").click())) : !e.ctrlKey && !e.metaKey || "e" !== e.key.toLowerCase() || e.shiftKey || [ "INPUT", "TEXTAREA" ].includes(document.activeElement?.tagName) || (e.preventDefault(),
     toggleEmail()));
 });
 let globalSearchIndex = [];
 let globalSearchActiveIndex = -1;
 
-function normalizeSearchText(value) {
-    return String(value || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[łŁ]/g, "l")
-        .replace(/[đĐ]/g, "d")
-        .toLocaleLowerCase("pl-PL")
-        .replace(/\s+/g, " ")
-        .trim();
-}
 
 function searchTokens(value) {
     return normalizeSearchText(value).split(" ").filter(Boolean);
@@ -10242,7 +10510,7 @@ function buildGlobalSearchIndex() {
         id: `todo:${todoItem.id}`,
         category: "TODO",
         title: todoItem.text,
-        subtitle: [todoItem.done ? "wykonane" : "aktywne", todoItem.priority, todoItem.due || ""].filter(Boolean).join(" · "),
+        subtitle: [todoItem.done ? "wykonane" : "aktywne", todoItem.priority, todoItem.dueDate || ""].filter(Boolean).join(" · "),
         keywords: `zadanie ${todoItem.done ? "zrobione zakonczone" : "otwarte"}`,
         action: () => focusSearchResult(`[data-todo-id="${CSS.escape(todoItem.id)}"]`, "#todoList")
     })));
@@ -10388,23 +10656,6 @@ function buildGlobalSearchIndex() {
     return rows;
 }
 
-function searchScore(entry, queryTokens, normalizedQuery) {
-    let score = 0;
-    if (entry.normalizedTitle === normalizedQuery) score += 120;
-    else if (entry.normalizedTitle.startsWith(normalizedQuery)) score += 80;
-    else if (entry.normalizedTitle.includes(normalizedQuery)) score += 55;
-    if (entry.normalizedCategory === normalizedQuery) score += 45;
-    else if (entry.normalizedCategory.startsWith(normalizedQuery)) score += 25;
-    for (const token of queryTokens) {
-        if (entry.normalizedTitle.startsWith(token)) score += 24;
-        else if (entry.normalizedTitle.includes(token)) score += 16;
-        if (entry.normalizedSubtitle.includes(token)) score += 8;
-        if (entry.normalizedCategory.includes(token)) score += 6;
-        if (entry.normalizedKeywords.includes(token)) score += 4;
-        if (![entry.normalizedTitle, entry.normalizedSubtitle, entry.normalizedCategory, entry.normalizedKeywords].some(field => field.includes(token))) return -1;
-    }
-    return score;
-}
 
 function findGlobalSearchResults(query, limit = 30) {
     const normalizedQuery = normalizeSearchText(query);
@@ -10844,13 +11095,12 @@ const BusinessActions = (() => {
     $(".email-main")?.prepend(tools), bindEvent($("#emailProfilesBtn"), "click", () => {
         ModuleRegistry.get("emailProfiles").render(), showModal("emailProfilesModal"), SchedulerService.scheduleTimeout(() => bindEvent($("#epSave"), "click", save));
     }), bindEvent($("#emailPreviewBtn"), "click", function() {
-        const form = EmailComposerState.read(), previewValues_subject = replaceVars(form.subject), previewValues_body = replaceVars(form.body), emails = (replaceVars(form.signature), 
-        [ ...parseEmails(form.to), ...parseEmails(form.cc), ...parseEmails(form.bcc) ]), bad = emails.filter(x => !isValidEmail(x)), placeholders = (form.subject + " " + form.body).match(/\{\{[^}]+\}\}|\[[^\]]+\]/g) || [];
+        const form = EmailComposerState.read(), previewValues_subject = replaceVars(form.subject), previewValues_body = replaceVars(form.body), emails = [ ...parseEmails(form.to), ...parseEmails(form.cc), ...parseEmails(form.bcc) ], bad = emails.filter(x => !EMAIL_RE.test(x)), placeholders = (form.subject + " " + form.body).match(/\{\{[^}]+\}\}|\[[^\]]+\]/g) || [];
         showInfoDialog("Kontrola wiadomości", `Odbiorcy: ${new Set(emails.map(x => x.toLowerCase())).size}\nBłędne adresy: ${bad.length}\nTemat: ${form.subject ? "jest" : "BRAK"}\nTreść: ${form.body.trim() ? "jest" : "BRAK"}\nPozostawione placeholdery: ${placeholders.length}\n\nTemat po podstawieniu:\n` + previewValues_subject + "\n\nTreść po podstawieniu:\n" + previewValues_body);
     });
 }(), delegateEvent($("#calendarReminderTools"), "click", "[data-days]", (event, button) => {
     const d = new Date;
-    d.setDate(d.getDate() + Number(button.dataset.days)), openCalendarDayMenu?.(d, button);
+    d.setDate(d.getDate() + Number(button.dataset.days)), showCalendarDayMenu(null, d, button);
 }), $("#upcomingBtn")?.addEventListener("click", () => {
     !function() {
         if ($("#upcomingModal")) return;
@@ -11280,7 +11530,7 @@ function offerUndo(id, title, message, undo) {
             resetFormMode();
             render();
         });
-        bindEvent($("#phCsv"), "click", () => downloadText(`workdesk-phone-${dateKeyLocal(new Date())}.csv`, "Data;Numer;Kontakt;Organizacja;Kierunek;Status;Czas sekund;Oddzwonić;Notatka\n" + ensureAppState().modules.phoneLog.map(item => [new Date(item.at).toISOString(), item.phoneNumber, item.contactName, item.organization, DIRECTION_LABELS[item.direction], STATUS_LABELS[item.status], item.durationSec, item.callbackRequired ? "TAK" : "NIE", item.note].map(value => csvEscape(csvSafeCell(value))).join(";")).join("\n"), "text/csv"));
+        bindEvent($("#phCsv"), "click", () => downloadText(`workdesk-phone-${dateKeyLocal(new Date())}.csv`, "Data;Numer;Kontakt;Organizacja;Kierunek;Status;Czas sekund;Oddzwonić;Notatka\n" + ensureAppState().modules.phoneLog.map(item => [new Date(item.at).toISOString(), item.phoneNumber, item.contactName, item.organization, DIRECTION_LABELS[item.direction], STATUS_LABELS[item.status], item.durationSec, item.callbackRequired ? "TAK" : "NIE", item.note].map(value => csvEscape(value)).join(";")).join("\n"), "text/csv"));
         delegateEvent($("#phList"), "click", "[data-del-ph],[data-edit-ph],[data-copy-phone],[data-call-phone],[data-phone-case]", async (event, button) => {
             const id = button.dataset.delPh || button.dataset.editPh || button.dataset.copyPhone || button.dataset.callPhone || button.dataset.phoneCase;
             const record = requireBusinessRecord("phoneLog", id);
@@ -11371,83 +11621,6 @@ function offerUndo(id, title, message, undo) {
     }
     renderPhoneLogModule = render;
     BusinessActions.register({ id: "phoneLog", label: "Telefony", run() { ensureModal(); resetFormMode(); ModuleRegistry.get("phoneLog").render(); showModal("phoneModal"); } });
-}();
-!function() {
-    const defs = {
-        delay: ["Opóźnienie", "Informujemy, że dla {{unit}} występuje opóźnienie realizacji. Przewidywana godzina: {{time}}."],
-        pickup: ["Zmiana godziny odbioru", "Odbiór dla {{unit}} w dniu {{date}} odbędzie się o godzinie {{time}}."],
-        cancel: ["Anulowanie trasy", "Informujemy o anulowaniu trasy dla {{unit}} w dniu {{date}}."],
-        docs: ["Prośba o dokumenty", "Prosimy {{unit}} o przesłanie wymaganych dokumentów do dnia {{date}}."],
-        failure: ["Awaria systemu", "Z powodu awarii systemu mogą wystąpić opóźnienia dotyczące {{unit}}."]
-    };
-    function build() { const definition = defs[$("#mgType").value]; const unit = $("#mgUnit").value.trim() || "wskazanego oddziału"; return definition[1].replaceAll("{{date}}", $("#mgDate").value || dateKeyLocal(new Date())).replaceAll("{{time}}", $("#mgTime").value || "do uzupełnienia").replaceAll("{{unit}}", unit); }
-    function ensureModal() {
-        let modal = $("#messageGenModal"); if (modal) return modal;
-        modal = document.createElement("div"); modal.className = "modal"; modal.id = "messageGenModal"; modal.hidden = true;
-        modal.innerHTML = '<div class="modal-h"><h3>Generator komunikatów</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="form-grid"><div class="field"><label>Typ</label><select id="mgType"></select></div><div class="field"><label>Data</label><input id="mgDate" type="date"></div><div class="field"><label>Godzina</label><input id="mgTime" type="time"></div><div class="field"><label>Oddział / adresat</label><input id="mgUnit" maxlength="300"></div><div class="field"><label>Podgląd</label><textarea id="mgPreview" readonly></textarea></div><button type="button" class="btn primary" id="mgBuild">Utwórz wiadomość</button></div></div>';
-        $("#overlay").appendChild(modal); SafeDOM.replace($("#mgType"), Object.entries(defs).map(([key, value]) => SafeDOM.el("option", { text: value[0], attrs: { value: key } })));
-        const preview = () => $("#mgPreview").value = build();
-        ["mgType","mgDate","mgTime","mgUnit"].forEach(id => bindEvent($("#" + id), "input", preview));
-        bindEvent($("#mgBuild"), "click", async () => {
-            if (!$("#mgUnit").value.trim() && !await showConfirmModal("Nie podano oddziału/adresata. Kontynuować?", { confirmLabel: "Kontynuuj", danger: false })) return;
-            emailEl.classList.contains("expanded") || toggleEmail();
-            const subject = defs[$("#mgType").value][0] + ($("#mgUnit").value ? " — " + $("#mgUnit").value : "");
-            EmailComposerState.update({ subject, body: build() }); scheduleDraftSave(); recordRecentAction?.("message.generated", subject); closeModal(); toast("Utworzono komunikat.");
-        });
-        return modal;
-    }
-    BusinessActions.register({ id: "messageGenerator", label: "Generator komunikatów", className: "btn sm primary", run() { ensureModal(); $("#mgDate").value = dateKeyLocal(new Date()); $("#mgPreview").value = build(); showModal("messageGenModal"); } });
-}(), function() {
-    function resetFormMode() {
-        const addButton = $("#prAdd");
-        if (!addButton) return;
-        $("#prTitle").value = ""; $("#prCategory").value = ""; $("#prText").value = "";
-        delete addButton.dataset.edit; addButton.textContent = "Dodaj"; $("#prCancel").hidden = true;
-    }
-    function ensureModal() {
-        let modal = $("#proceduresModal"); if (modal) return modal;
-        modal = document.createElement("div"); modal.className = "modal lg"; modal.id = "proceduresModal"; modal.hidden = true;
-        modal.innerHTML = '<div class="modal-h"><h3>Procedury</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="business-tools"><input id="prTitle" class="business-input" maxlength="300" placeholder="Tytuł"><input id="prCategory" class="business-input" maxlength="120" placeholder="Kategoria"><textarea id="prText" class="business-input" maxlength="20000" placeholder="Opis / kroki, każdy krok w osobnym wierszu"></textarea><button type="button" id="prAdd" class="btn primary">Dodaj</button><button type="button" id="prCancel" class="btn ghost" hidden>Anuluj edycję</button><input id="prSearch" class="business-input" placeholder="Szukaj"></div><div id="prList" class="business-list"></div></div>';
-        $("#overlay").appendChild(modal);
-        bindEvent($("#prSearch"), "input", render);
-        bindEvent($("#prCancel"), "click", resetFormMode);
-        bindEvent(modal, "click", event => { if (event.target.closest("[data-close]")) resetFormMode(); });
-        bindEvent($("#prAdd"), "click", () => {
-            const title = $("#prTitle").value.trim(); const body = $("#prText").value.trim(); const category = $("#prCategory").value.trim();
-            if (!title || !body) return toast("Podaj tytuł i opis.", "err");
-            const editId = $("#prAdd").dataset.edit;
-            if (editId) { AppServices.procedures.update(editId, { title, body, category }); toast("Zaktualizowano procedurę."); }
-            else { if (ensureAppState().modules.procedures.length >= 300) return toast("Osiągnięto limit 300 procedur.", "err"); AppServices.procedures.create({ title, body, category, pinned: false }); toast("Dodano procedurę."); }
-            resetFormMode(); render();
-        });
-        delegateEvent($("#prList"), "click", "[data-copy-pr],[data-del-pr],[data-pin-pr],[data-edit-pr]", async (event, button) => {
-            const id = button.dataset.copyPr || button.dataset.delPr || button.dataset.pinPr || button.dataset.editPr;
-            const record = requireBusinessRecord("procedures", id); if (!record) return;
-            if (button.dataset.copyPr) { const copied = await copyToClipboard(record.body); toast(copied ? "Skopiowano procedurę." : "Nie udało się skopiować procedury.", copied ? "ok" : "err"); return; }
-            if (button.dataset.delPr) { if (await showConfirmModal(`Usunąć procedurę „${record.title}”?`, { confirmLabel: "Usuń" })) { const snapshot = AppServices.procedures.remove(record.id); if ($("#prAdd").dataset.edit === record.id) resetFormMode(); snapshot && offerUndo(`undo-procedure-${record.id}`, "Usunięto procedurę", `Usunięto „${record.title}”.`, () => AppServices.procedures.restore(snapshot)); } return; }
-            if (button.dataset.pinPr) { AppServices.procedures.togglePinned(record.id); render(); toast(record.pinned ? "Odpięto procedurę." : "Przypięto procedurę."); return; }
-            $("#prTitle").value = record.title; $("#prCategory").value = record.category; $("#prText").value = record.body; $("#prAdd").dataset.edit = record.id; $("#prAdd").textContent = "Zapisz"; $("#prCancel").hidden = false;
-        });
-        return modal;
-    }
-    function render() {
-        ensureModal(); const query = ($("#prSearch")?.value || "").toLowerCase();
-        const rows = ensureAppState().modules.procedures.filter(item => `${item.title} ${item.body} ${item.category}`.toLowerCase().includes(query)).sort((a, b) => Number(b.pinned) - Number(a.pinned) || Number(b.updatedAt || b.createdAt) - Number(a.updatedAt || a.createdAt));
-        SafeDOM.replace($("#prList"), rows.length ? rows.map(item => SafeDOM.el("div", { className: "business-card", dataset: { businessRecordId: item.id } }, [
-            SafeDOM.el("div", { className: "business-row" }, [SafeDOM.el("div", {}, [SafeDOM.el("h4", { text: `${item.pinned ? "📌 " : ""}${item.title}` }), SafeDOM.el("div", { className: "business-meta", text: `${item.category || "bez kategorii"} · zmiana ${new Date(item.updatedAt || item.createdAt).toLocaleString("pl-PL")}` })]), SafeDOM.el("div", { className: "actions" }, [
-                SafeDOM.el("button", { className: "btn sm", text: item.pinned ? "Odepnij" : "Przypnij", attrs: { type: "button" }, dataset: { pinPr: item.id } }),
-                SafeDOM.el("button", { className: "btn sm", text: "Edytuj", attrs: { type: "button" }, dataset: { editPr: item.id } }),
-                SafeDOM.el("button", { className: "btn sm", text: "Kopiuj", attrs: { type: "button" }, dataset: { copyPr: item.id } }),
-                SafeDOM.el("button", { className: "btn sm danger", text: "Usuń", attrs: { type: "button" }, dataset: { delPr: item.id } })
-            ])]), SafeDOM.el("div", { className: "text-prewrap", text: item.body })
-        ])) : SafeDOM.empty("business-empty", "Brak procedur."));
-    }
-    renderProceduresModule = render;
-    BusinessActions.register({ id: "procedures", label: "Procedury", run() { ensureModal(); resetFormMode(); ModuleRegistry.get("procedures").render(); showModal("proceduresModal"); } });
-}(), function() {
-    const beforePreferences = JSON.stringify(ensureAppState().modules.preferences || {}), normalizedPreferences = normalizePreferences(ensureAppState().modules.preferences);
-    ensureAppState().modules.preferences = normalizedPreferences, JSON.stringify(normalizedPreferences) !== beforePreferences && requestFullSnapshot(), 
-    BusinessActions.render();
 }();
 const DomainServices = Object.freeze({
     todo: {
@@ -11607,12 +11780,94 @@ function focusSearchResult(selector, fallback) {
         restoreFocus: !1
     }));
 }();
+!function() {
+    const defs = {
+        delay: ["Opóźnienie", "Informujemy, że dla {{unit}} występuje opóźnienie realizacji. Przewidywana godzina: {{time}}."],
+        pickup: ["Zmiana godziny odbioru", "Odbiór dla {{unit}} w dniu {{date}} odbędzie się o godzinie {{time}}."],
+        cancel: ["Anulowanie trasy", "Informujemy o anulowaniu trasy dla {{unit}} w dniu {{date}}."],
+        docs: ["Prośba o dokumenty", "Prosimy {{unit}} o przesłanie wymaganych dokumentów do dnia {{date}}."],
+        failure: ["Awaria systemu", "Z powodu awarii systemu mogą wystąpić opóźnienia dotyczące {{unit}}."]
+    };
+    function build() { const definition = defs[$("#mgType").value]; const unit = $("#mgUnit").value.trim() || "wskazanego oddziału"; return definition[1].replaceAll("{{date}}", $("#mgDate").value || dateKeyLocal(new Date())).replaceAll("{{time}}", $("#mgTime").value || "do uzupełnienia").replaceAll("{{unit}}", unit); }
+    function ensureModal() {
+        let modal = $("#messageGenModal"); if (modal) return modal;
+        modal = document.createElement("div"); modal.className = "modal"; modal.id = "messageGenModal"; modal.hidden = true;
+        modal.innerHTML = '<div class="modal-h"><h3>Generator komunikatów</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="form-grid"><div class="field"><label>Typ</label><select id="mgType"></select></div><div class="field"><label>Data</label><input id="mgDate" type="date"></div><div class="field"><label>Godzina</label><input id="mgTime" type="time"></div><div class="field"><label>Oddział / adresat</label><input id="mgUnit" maxlength="300"></div><div class="field"><label>Podgląd</label><textarea id="mgPreview" readonly></textarea></div><button type="button" class="btn primary" id="mgBuild">Utwórz wiadomość</button></div></div>';
+        $("#overlay").appendChild(modal); SafeDOM.replace($("#mgType"), Object.entries(defs).map(([key, value]) => SafeDOM.el("option", { text: value[0], attrs: { value: key } })));
+        const preview = () => $("#mgPreview").value = build();
+        ["mgType","mgDate","mgTime","mgUnit"].forEach(id => bindEvent($("#" + id), "input", preview));
+        bindEvent($("#mgBuild"), "click", async () => {
+            if (!$("#mgUnit").value.trim() && !await showConfirmModal("Nie podano oddziału/adresata. Kontynuować?", { confirmLabel: "Kontynuuj", danger: false })) return;
+            emailEl.classList.contains("expanded") || toggleEmail();
+            const subject = defs[$("#mgType").value][0] + ($("#mgUnit").value ? " — " + $("#mgUnit").value : "");
+            EmailComposerState.update({ subject, body: build() }); scheduleDraftSave(); recordRecentAction?.("message.generated", subject); closeModal(); toast("Utworzono komunikat.");
+        });
+        return modal;
+    }
+    BusinessActions.register({ id: "messageGenerator", label: "Generator komunikatów", className: "btn sm primary", run() { ensureModal(); $("#mgDate").value = dateKeyLocal(new Date()); $("#mgPreview").value = build(); showModal("messageGenModal"); } });
+}(), function() {
+    function resetFormMode() {
+        const addButton = $("#prAdd");
+        if (!addButton) return;
+        $("#prTitle").value = ""; $("#prCategory").value = ""; $("#prText").value = "";
+        delete addButton.dataset.edit; addButton.textContent = "Dodaj"; $("#prCancel").hidden = true;
+    }
+    function ensureModal() {
+        let modal = $("#proceduresModal"); if (modal) return modal;
+        modal = document.createElement("div"); modal.className = "modal lg"; modal.id = "proceduresModal"; modal.hidden = true;
+        modal.innerHTML = '<div class="modal-h"><h3>Procedury</h3><button type="button" class="icon-btn x" data-close aria-label="Zamknij">✕</button></div><div class="modal-b"><div class="business-tools"><input id="prTitle" class="business-input" maxlength="300" placeholder="Tytuł"><input id="prCategory" class="business-input" maxlength="120" placeholder="Kategoria"><textarea id="prText" class="business-input" maxlength="20000" placeholder="Opis / kroki, każdy krok w osobnym wierszu"></textarea><button type="button" id="prAdd" class="btn primary">Dodaj</button><button type="button" id="prCancel" class="btn ghost" hidden>Anuluj edycję</button><input id="prSearch" class="business-input" placeholder="Szukaj"></div><div id="prList" class="business-list"></div></div>';
+        $("#overlay").appendChild(modal);
+        bindEvent($("#prSearch"), "input", render);
+        bindEvent($("#prCancel"), "click", resetFormMode);
+        bindEvent(modal, "click", event => { if (event.target.closest("[data-close]")) resetFormMode(); });
+        bindEvent($("#prAdd"), "click", () => {
+            const title = $("#prTitle").value.trim(); const body = $("#prText").value.trim(); const category = $("#prCategory").value.trim();
+            if (!title || !body) return toast("Podaj tytuł i opis.", "err");
+            const editId = $("#prAdd").dataset.edit;
+            if (editId) { AppServices.procedures.update(editId, { title, body, category }); toast("Zaktualizowano procedurę."); }
+            else { if (ensureAppState().modules.procedures.length >= 300) return toast("Osiągnięto limit 300 procedur.", "err"); AppServices.procedures.create({ title, body, category, pinned: false }); toast("Dodano procedurę."); }
+            resetFormMode(); render();
+        });
+        delegateEvent($("#prList"), "click", "[data-copy-pr],[data-del-pr],[data-pin-pr],[data-edit-pr]", async (event, button) => {
+            const id = button.dataset.copyPr || button.dataset.delPr || button.dataset.pinPr || button.dataset.editPr;
+            const record = requireBusinessRecord("procedures", id); if (!record) return;
+            if (button.dataset.copyPr) { const copied = await copyToClipboard(record.body); toast(copied ? "Skopiowano procedurę." : "Nie udało się skopiować procedury.", copied ? "ok" : "err"); return; }
+            if (button.dataset.delPr) { if (await showConfirmModal(`Usunąć procedurę „${record.title}”?`, { confirmLabel: "Usuń" })) { const snapshot = AppServices.procedures.remove(record.id); if ($("#prAdd").dataset.edit === record.id) resetFormMode(); snapshot && offerUndo(`undo-procedure-${record.id}`, "Usunięto procedurę", `Usunięto „${record.title}”.`, () => AppServices.procedures.restore(snapshot)); } return; }
+            if (button.dataset.pinPr) { AppServices.procedures.togglePinned(record.id); render(); toast(record.pinned ? "Odpięto procedurę." : "Przypięto procedurę."); return; }
+            $("#prTitle").value = record.title; $("#prCategory").value = record.category; $("#prText").value = record.body; $("#prAdd").dataset.edit = record.id; $("#prAdd").textContent = "Zapisz"; $("#prCancel").hidden = false;
+        });
+        return modal;
+    }
+    function render() {
+        ensureModal(); const query = ($("#prSearch")?.value || "").toLowerCase();
+        const rows = ensureAppState().modules.procedures.filter(item => `${item.title} ${item.body} ${item.category}`.toLowerCase().includes(query)).sort((a, b) => Number(b.pinned) - Number(a.pinned) || Number(b.updatedAt || b.createdAt) - Number(a.updatedAt || a.createdAt));
+        SafeDOM.replace($("#prList"), rows.length ? rows.map(item => SafeDOM.el("div", { className: "business-card", dataset: { businessRecordId: item.id } }, [
+            SafeDOM.el("div", { className: "business-row" }, [SafeDOM.el("div", {}, [SafeDOM.el("h4", { text: `${item.pinned ? "📌 " : ""}${item.title}` }), SafeDOM.el("div", { className: "business-meta", text: `${item.category || "bez kategorii"} · zmiana ${new Date(item.updatedAt || item.createdAt).toLocaleString("pl-PL")}` })]), SafeDOM.el("div", { className: "actions" }, [
+                SafeDOM.el("button", { className: "btn sm", text: item.pinned ? "Odepnij" : "Przypnij", attrs: { type: "button" }, dataset: { pinPr: item.id } }),
+                SafeDOM.el("button", { className: "btn sm", text: "Edytuj", attrs: { type: "button" }, dataset: { editPr: item.id } }),
+                SafeDOM.el("button", { className: "btn sm", text: "Kopiuj", attrs: { type: "button" }, dataset: { copyPr: item.id } }),
+                SafeDOM.el("button", { className: "btn sm danger", text: "Usuń", attrs: { type: "button" }, dataset: { delPr: item.id } })
+            ])]), SafeDOM.el("div", { className: "text-prewrap", text: item.body })
+        ])) : SafeDOM.empty("business-empty", "Brak procedur."));
+    }
+    renderProceduresModule = render;
+    BusinessActions.register({ id: "procedures", label: "Procedury", run() { ensureModal(); resetFormMode(); ModuleRegistry.get("procedures").render(); showModal("proceduresModal"); } });
+}(), function() {
+    const beforePreferences = JSON.stringify(ensureAppState().modules.preferences || {}), normalizedPreferences = normalizePreferences(ensureAppState().modules.preferences);
+    ensureAppState().modules.preferences = normalizedPreferences, JSON.stringify(normalizedPreferences) !== beforePreferences && requestFullSnapshot(), 
+    BusinessActions.render();
+}();
+
+const BUSINESS_LINK_TYPE_BY_MODULE = Object.freeze({ responseCases: "cases", todo: "todos", calendarReminders: "reminders", journal: "journal" });
 
 function removeBusinessModuleRecord(moduleId, id) {
     const module = MODULE_BY_ID[moduleId], rows = module?.serialize?.() || [], index = rows.findIndex(record => record.id === id);
     if (!module || index < 0) return null;
     const snapshot = { record: cloneData(rows[index]), index };
     module.deserialize(rows.filter(record => record.id !== id));
+    try {
+        BusinessWorkflow?.removeReferences?.(BUSINESS_LINK_TYPE_BY_MODULE[moduleId], id);
+    } catch {}
     module.render({ reason: "business-remove" });
     requestFullSnapshot({ immediate: true });
     return snapshot;
@@ -11902,7 +12157,7 @@ const AppServices = Object.freeze({
     }
 });
 
-function showConfirmModal(message, {title: title = "Potwierdź operację", confirmLabel: confirmLabel = "Potwierdź", danger: danger = !0} = {}) {
+function showConfirmModal(message, {title: title = t("confirm.title"), confirmLabel: confirmLabel = t("confirm.confirm"), danger: danger = !0} = {}) {
     return new Promise(resolve => {
         let settled = !1, modal = $("#unifiedConfirmModal");
         modal || (modal = document.createElement("div"), modal.className = "modal", modal.id = "unifiedConfirmModal", 
@@ -11912,15 +12167,16 @@ function showConfirmModal(message, {title: title = "Potwierdź operację", confi
         const yes = $("#unifiedConfirmYes");
         yes.textContent = confirmLabel, yes.className = danger ? "btn danger" : "btn primary";
         const finish = value => {
-            settled || (settled = !0, bindEvent(modal, "click", null), closeModal({
-                notifyCancel: !1
+            settled || (settled = !0, bindEvent(modal, "click", null), UIRuntime.close(modal, {
+                reason: "confirm-finish"
             }), resolve(value));
         };
         bindEvent(modal, "click", e => {
             const b = e.target.closest("[data-answer]");
             b && finish("true" === b.dataset.answer);
         }), showModal(modal, {
-            onCancel: () => finish(!1)
+            onCancel: () => finish(!1),
+            onClose: () => finish(!1)
         }), requestAnimationFrame(() => yes.focus());
     });
 }
@@ -11986,6 +12242,20 @@ const BusinessWorkflow = Object.freeze({
         service.update(recordId, {links});
         return true;
     },
+    removeReferences(linkType, id) {
+        let changed = 0;
+        for (const moduleId of ["phoneLog", "responseCases"]) {
+            const service = AppServices[moduleId];
+            if (!service?.update) continue;
+            for (const record of [...(ensureAppState().modules[moduleId] || [])]) {
+                const links = normalizeWorkflowLinks(record.links);
+                if (!(links[linkType] || []).includes(id)) continue;
+                const next = Object.fromEntries(Object.entries(links).map(([type, ids]) => [type, ids.filter(x => x !== id)]));
+                service.update(record.id, {links: next}), changed += 1;
+            }
+        }
+        return changed;
+    },
     phoneToCase(phoneId) {
         const phone = (ensureAppState().modules.phoneLog || []).find(item => item.id === phoneId);
         if (!phone) return null;
@@ -12040,7 +12310,7 @@ const BusinessWorkflow = Object.freeze({
         const selectors = {cases: `[data-business-record-id="${CSS.escape(id)}"]`, todos: `[data-todo-id="${CSS.escape(id)}"]`, reminders: `[data-reminder-id="${CSS.escape(id)}"]`, journal: `[data-journal-id="${CSS.escape(id)}"]`};
         if (type === "cases") BusinessActions.run("responseCases");
         else {
-            hideModals();
+            UIRuntime.closeAll({reason: "workflow-open", modal: !0});
             ModuleRegistry.get(type === "todos" ? "todo" : type === "reminders" ? "calendarReminders" : "journal")?.render?.();
         }
         SchedulerService.scheduleTimeout(() => {
@@ -12102,7 +12372,7 @@ EventLifecycle.on(window, "error", event => {
         writeForm: form => EmailComposerState.update(form),
         syncGroups: () => EmailComposerState.state().selectedGroups,
         render() {
-            EmailComposerState.render(), renderGroups($("#grpSearch")?.value || ""), renderEmailSelections?.(), 
+            EmailComposerState.render(), renderGroups($("#grpSearch")?.value || ""),
             normalizeA11y(this.root());
         },
         clearField(name) {
@@ -12125,136 +12395,6 @@ EventLifecycle.on(window, "error", event => {
                 groups: runtimeData?.sections?.reduce((n, s) => n + (s.groups?.length || 0), 0) || 0,
                 templates: runtimeData?.templates?.length || 0,
                 form: this.readForm()
-            };
-        }
-    };
-    EmailSubsystem = EmailSubsystem;
-    const TilesSubsystem = {
-        id: "tiles",
-        normalize(raw, index = 0) {
-            const t = validateTile?.(raw, new Set)?.value || raw || {}, type = t.type || (t.url ? "link" : void 0 !== t.value ? "copy" : "custom");
-            return {
-                ...t,
-                id: t.id || `tile_${index}_${String(t.title || "").toLowerCase().replace(/\W+/g, "_")}`,
-                type: type,
-                hidden: Boolean(t.hidden)
-            };
-        },
-        models() {
-            return (runtimeData.tiles || []).map((t, i) => this.normalize(t, i));
-        },
-        visible({query: query = tileSearchQuery || "", filter: filter = activeTileFilter || "all"} = {}) {
-            const q = String(query).toLowerCase();
-            return this.models().filter(t => !t.hidden).filter(t => !q || `${t.title} ${t.desc || ""} ${(t.tags || []).join(" ")}`.toLowerCase().includes(q)).filter(t => "all" === filter || "pinned" === filter ? "all" === filter || pinnedTiles.has(t.id) : (t.tags || []).includes(filter));
-        },
-        sort(list = this.visible()) {
-            const order = new Map(loadTileOrder().map((id, i) => [ id, i ]));
-            return [ ...list ].sort((a, b) => Number(pinnedTiles.has(b.id)) - Number(pinnedTiles.has(a.id)) || (order.get(a.id) ?? 9999) - (order.get(b.id) ?? 9999) || a.title.localeCompare(b.title, "pl"));
-        },
-        render() {
-            renderTiles(), normalizeA11y($("#tilesHost") || document);
-        },
-        diagnostics() {
-            return {
-                total: this.models().length,
-                visible: this.visible().length,
-                pinned: pinnedTiles.size,
-                types: [ ...new Set(this.models().map(x => x.type)) ]
-            };
-        }
-    };
-    
-    const TaskPipeline = {
-        normalize: t => ({
-            id: t.id || businessUid(),
-            text: String(t.text || "").trim(),
-            priority: [ "low", "normal", "high" ].includes(t.priority) ? t.priority : "normal",
-            dueDate: t.dueDate || "",
-            done: Boolean(t.done),
-            duplicate: Boolean(t.duplicate),
-            archivedAt: Number(t.archivedAt) || 0,
-            createdAt: Number(t.createdAt) || Date.now()
-        }),
-        list(filter = $("#todoFilter")?.value || "all") {
-            const today = dateKeyLocal(new Date);
-            return todos.map(x => this.normalize(x)).filter(t => "all" === filter || "today" === filter && t.dueDate === today || "high" === filter && "high" === t.priority && !t.done || "overdue" === filter && t.dueDate && t.dueDate < today && !t.done || "done" === filter && t.done);
-        },
-        command(action, id, payload = {}) {
-            const item = todos.find(x => x.id === id);
-            return "archive" === action && item ? "function" == typeof deleteTodo && deleteTodo(item) : !("toggle" !== action || !item || (item.done = payload.done ?? !item.done, 
-            saveTodos(todos), renderTodos(), 0));
-        }
-    }, JournalPipeline = {
-        list({query: query = "", type: type = "all"} = {}) {
-            const q = query.toLowerCase();
-            return journal.filter(x => ("all" === type || x.type === type) && (!q || x.text.toLowerCase().includes(q))).sort((a, b) => b.createdAt - a.createdAt);
-        },
-        groups(opts = {}) {
-            return Object.groupBy ? Object.groupBy(this.list(opts), x => dateKeyLocal(new Date(x.createdAt))) : this.list(opts).reduce((a, x) => ((a[dateKeyLocal(new Date(x.createdAt))] ||= []).push(x), 
-            a), {});
-        },
-        summary(opts = {}) {
-            const rows = this.list(opts);
-            return {
-                count: rows.length,
-                days: new Set(rows.map(x => dateKeyLocal(new Date(x.createdAt)))).size,
-                characters: rows.reduce((n, x) => n + x.text.length, 0)
-            };
-        }
-    }, ModuleCommands = {
-        noteToTodo(id) {
-            const n = notes.find(x => x.id === id);
-            return !!n && (DomainServices.todo.create({
-                text: n.text
-            }), !0);
-        },
-        noteToJournal(id) {
-            const n = notes.find(x => x.id === id);
-            return !!n && (DomainServices.journal.create({
-                text: n.text,
-                type: "note"
-            }), !0);
-        },
-        reminderDone: id => removeCalendarReminder(id),
-        reminderSnooze: (id, minutes = 10) => !!CoreModuleState.calendarReminders.snooze(id, minutes)
-    };
-    
-    const CalendarSubsystem = {
-        parse(r) {
-            const time = /^\d{2}:\d{2}$/.test(r.time || "") ? r.time : "00:00", date = /^\d{4}-\d{2}-\d{2}$/.test(r.date || "") ? r.date : dateKeyLocal(new Date);
-            return new Date(`${date}T${time}:00`);
-        },
-        normalize: r => ({
-            ...r,
-            date: /^\d{4}-\d{2}-\d{2}$/.test(r.date || "") ? r.date : dateKeyLocal(new Date),
-            time: /^\d{2}:\d{2}$/.test(r.time || "") ? r.time : "",
-            done: Boolean(r.done),
-            snoozedUntil: Number(r.snoozedUntil) || 0
-        }),
-        renderCalendar() {
-            ModuleRegistry.get("calendarReminders")?.render();
-        },
-        renderList() {
-            renderCalendarReminderList();
-        },
-        renderDayMenu(ev, date) {
-            showCalendarDayMenu(ev, date, ev?.currentTarget || ev?.target || document.activeElement);
-        },
-        upcoming(days = 7) {
-            const now = Date.now(), cut = now + 864e5 * days;
-            return calReminders.map(r => this.normalize(r)).filter(r => !r.done).filter(r => {
-                const t = r.snoozedUntil || this.parse(r).getTime();
-                return t >= now && t <= cut;
-            }).sort((a, b) => (a.snoozedUntil || this.parse(a)) - (b.snoozedUntil || this.parse(b)));
-        },
-        snooze: (id, minutes) => ModuleCommands.reminderSnooze(id, minutes),
-        done: id => ModuleCommands.reminderDone(id),
-        diagnostics() {
-            const rows = CoreModuleState.calendarReminders.list();
-            return {
-                total: rows.length,
-                upcoming: this.upcoming().length,
-                withoutTime: rows.filter(x => !x.time).length
             };
         }
     };
@@ -12358,32 +12498,7 @@ EventLifecycle.on(window, "error", event => {
         },
 
     };
-    ImportUX.ensureUI(), ImportUX.storageProbe(), 
-    Object.freeze([ {
-        id: "tokens-base-layout",
-        kind: "css",
-        description: "Tokens, reset, typography and layout"
-    }, {
-        id: "components",
-        kind: "css+js",
-        description: "Buttons, cards, lists, modals, sheets and popovers"
-    }, {
-        id: "modules-core",
-        kind: "js",
-        description: "Email, tiles, TODO, journal, notes and calendar"
-    }, {
-        id: "modules-business",
-        kind: "js",
-        description: "Profiles, checklists, cases, phone log, procedures and configuration"
-    }, {
-        id: "storage-schema-import",
-        kind: "js",
-        description: "Schema, validation, migrations, snapshot and restore"
-    }, {
-        id: "utilities-tests",
-        kind: "js",
-        description: "Utilities and operational tools"
-    } ]);
+    ImportUX.ensureUI(), ImportUX.storageProbe();
     const initializeBusinessRuntime = () => {
         ImportUX.ensureUI(), ImportUX.storageProbe();
     };
@@ -12441,6 +12556,78 @@ EventLifecycle.on(window, "error", event => {
             description: "Ustaw limity rekordów i wykorzystania pamięci dla modułów.",
             outsideClick: !1,
             focus: "#storageLimitsModal input, #storageLimitsSave"
+        },
+        unifiedConfirmModal: {
+            description: "Potwierdź operację albo anuluj. Kliknięcie w tło anuluje.",
+            outsideClick: !0,
+            focus: "#unifiedConfirmYes",
+            priority: 95,
+            contextCloseOthers: !1
+        },
+        phoneModal: {
+            description: "Rejestr rozmów telefonicznych i powiązane sprawy.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        casesModal: {
+            description: "Sprawy wymagające odpowiedzi wraz z powiązaniami.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        checklistsModal: {
+            description: "Listy kontrolne powtarzalnych procedur.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        proceduresModal: {
+            description: "Baza instrukcji i wiedzy operacyjnej.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        configModal: {
+            description: "Ustawienia aplikacji: motyw, czas, limity i pulpity.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        tileEditModal: {
+            description: "Edycja kafelka skrótu: nazwa, adres, tagi.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        emailProfilesModal: {
+            description: "Profile nadawcze wiadomości e-mail.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        messageGenModal: {
+            description: "Generator gotowych komunikatów na podstawie danych.",
+            outsideClick: !1,
+            focus: "[data-modal-focus-entry], input:not([type=hidden]), textarea, select"
+        },
+        reminderEditorModal: {
+            description: "Edycja daty, godziny i treści przypomnienia.",
+            outsideClick: !1,
+            focus: "input[type=date]"
+        },
+        upcomingModal: {
+            description: "Nadchodzące przypomnienia.",
+            outsideClick: !0,
+            focus: ".modal-f .btn, [data-close]"
+        },
+        contactQualityModal: {
+            description: "Raport jakości danych kontaktowych.",
+            outsideClick: !0,
+            focus: ".modal-f .btn, [data-close]"
+        },
+        todoArchiveModal: {
+            description: "Archiwum wykonanych zadań.",
+            outsideClick: !0,
+            focus: ".modal-f .btn, [data-close]"
+        },
+        infoDialogModal: {
+            description: "Komunikat informacyjny.",
+            outsideClick: !0,
+            focus: ".modal-f .btn, [data-close]"
         }
     });
     document.documentElement.classList.add("app-shell-overflow-guard");})();
@@ -12519,30 +12706,71 @@ EventLifecycle.on(window, "error", event => {
 (() => {
     "use strict";
     const q = (s, r = document) => r.querySelector(s), qa = (s, r = document) => [ ...r.querySelectorAll(s) ], safeId = (prefix = "a11y") => `${prefix}-${Math.random().toString(36).slice(2, 9)}`, live = document.createElement("div");
-    live.className = "a11y-live", live.id = "a11yLive", live.setAttribute("aria-live", "polite"), 
-    live.setAttribute("aria-atomic", "true"), document.body.appendChild(live), EventLifecycle.on(document, "keydown", function(e) {
-        if (![ "Enter", " " ].includes(e.key)) return;
-        const row = e.target.closest(".ui-row.row--interactive,.ui-row.row--selectable,.filter-badge");
-        row && !e.target.closest("button,a,input,select,textarea") && (e.preventDefault(), 
-        row.click());
-    }), EventLifecycle.on(document, "keydown", () => document.documentElement.dataset.a11yKeyboard = "true", {
+    live.className = "a11y-live", live.id = "a11yLive", live.setAttribute("aria-live", "polite"),
+    live.setAttribute("aria-atomic", "true"), document.body.appendChild(live), EventLifecycle.on(document, "keydown", () => document.documentElement.dataset.a11yKeyboard = "true", {
         once: !0,
         capture: !0
     }), EventLifecycle.on(document, "pointerdown", () => delete document.documentElement.dataset.a11yKeyboard, {
         capture: !0
-    }), UI_ERRORS ||= [], EventLifecycle.on(window, "error", e => UI_ERRORS.push({
-        type: "error",
-        message: e.message,
-        at: Date.now()
-    })), EventLifecycle.on(window, "unhandledrejection", e => UI_ERRORS.push({
-        type: "promise",
-        message: String(e.reason?.message || e.reason),
-        at: Date.now()
-    })), function(root = document) {
+    }), UI_ERRORS ||= [];
+    let uiErrorNoticeArmed = !1;
+    function uiErrorReportText() {
+        const registry = UI_ERROR_REGISTRY.list().slice(0, 10).map(r => `[${r.scope}:${r.name}] ${r.message}`).join("\n") || "—";
+        const runtimeErrors = UI_ERRORS.slice(0, 10).map(e => `[${e.type}] ${e.message}`).join("\n") || "—";
+        const storage = (StorageService.diagnostics?.() || []).slice(0, 5).map(d => `[${d.operation}:${d.key}] ${d.message}`).join("\n") || "—";
+        return `WorkDesk ${APP_VERSION}-${APP_META.buildTag} — opis błędu\nCzas: ${new Date().toISOString()}\nGotowość: ${window.WorkDeskReady === !0 ? "tak" : "nie"} · moduły: ${ModuleRegistry.all().length}\n\nRejestr błędów (UI_ERROR_REGISTRY):\n${registry}\n\nBłędy runtime (window/error, unhandledrejection):\n${runtimeErrors}\n\nDiagnostyka storage:\n${storage}`;
+    }
+    function showUiErrorDetails() {
+        showInfoDialog("Coś nie zadziałało — szczegóły", uiErrorReportText());
+    }
+    function notifyUiError() {
+        if (uiErrorNoticeArmed) return;
+        uiErrorNoticeArmed = !0;
+        try {
+            AttentionCenter.notify({
+                id: "ui-error",
+                priority: "warning",
+                rank: 60,
+                title: t("uierror.title"),
+                message: t("uierror.message"),
+                actions: [ {
+                    id: "details",
+                    label: t("uierror.details"),
+                    run: () => showUiErrorDetails()
+                }, {
+                    id: "copy",
+                    label: t("uierror.copy"),
+                    run: async () => {
+                        const ok = await copyToClipboard(uiErrorReportText());
+                        toast(ok ? "Opis błędu skopiowany — możesz go wkleić w zgłoszeniu." : "Nie udało się skopiować opisu błędu.", ok ? "ok" : "err");
+                    },
+                    keepOpen: !0
+                } ],
+                onDismiss: () => {
+                    SchedulerService.scheduleTimeout(() => {
+                        uiErrorNoticeArmed = !1;
+                    }, 3e4, { owner: "ui-errors", key: "rearm" });
+                }
+            });
+        } catch {}
+    }
+    EventLifecycle.on(window, "error", e => {
+        UI_ERRORS.length < 100 && UI_ERRORS.push({
+            type: "error",
+            message: e.message,
+            at: Date.now()
+        }), notifyUiError();
+    }), EventLifecycle.on(window, "unhandledrejection", e => {
+        UI_ERRORS.length < 100 && UI_ERRORS.push({
+            type: "promise",
+            message: String(e.reason?.message || e.reason),
+            at: Date.now()
+        }), notifyUiError();
+    }), function(root = document) {
         qa('button, [role="button"]', root).forEach((el, i) => {
             (function(el) {
                 return (el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim();
-            })(el) || el.querySelector("svg,use,.ic") && (el.setAttribute("aria-label", `Akcja ${i + 1}`), 
+            })(el) || el.querySelector("svg,use,.ic") && (el.setAttribute("aria-label", `Akcja ${i + 1}`),
             el.dataset.a11yAutolabel = "true");
         });
     }(), function(root = document) {
@@ -12552,46 +12780,41 @@ EventLifecycle.on(window, "error", event => {
             el.matches("button,a,input,select,textarea,[tabindex]") || (el.tabIndex = 0);
         });
     }(), function(root = document) {
-        qa('[role="dialog"]', root).forEach((dialog, i) => {
-            dialog.setAttribute("aria-modal", "true");
-            let titleId = dialog.getAttribute("aria-labelledby"), title = titleId && document.getElementById(titleId);
-            title || (title = dialog.querySelector(".modal-h h1,.modal-h h2,.modal-h h3,[data-modal-title]"), 
-            title && (title.id ||= safeId("dialog-title"), dialog.setAttribute("aria-labelledby", title.id)));
-            let descId = dialog.getAttribute("aria-describedby"), desc = descId && document.getElementById(descId);
-            if (desc || (desc = dialog.querySelector("[data-modal-description],.modal-description,.modal-b p"), 
-            desc && (desc.id ||= safeId("dialog-desc"), dialog.setAttribute("aria-describedby", desc.id))), 
-            !dialog.querySelector("[data-modal-focus-entry]")) {
-                const entry = dialog.querySelector('input:not([disabled]),button:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]');
-                entry?.setAttribute("data-modal-focus-entry", "true");
-            }
+        qa('[role="dialog"]', root).forEach(dialog => {
+            if (dialog.querySelector("[data-modal-focus-entry]")) return;
+            const entry = dialog.querySelector('input:not([disabled]),button:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]');
+            entry?.setAttribute("data-modal-focus-entry", "true");
         });
     }(), qa(".sugg[data-suggest]").forEach(p => {
         const id = p.dataset.suggest, input = document.getElementById(id);
         input && function(input) {
             const popup = document.querySelector(`.sugg[data-suggest="${CSS.escape(input.id)}"]`);
             if (!popup) return;
-            popup.id ||= safeId("suggest"), popup.setAttribute("role", "listbox"), input.setAttribute("role", "combobox"), 
-            input.setAttribute("aria-autocomplete", "list"), input.setAttribute("aria-controls", popup.id), 
+            popup.id ||= safeId("suggest"), popup.setAttribute("role", "listbox"), input.setAttribute("role", "combobox"),
+            input.setAttribute("aria-autocomplete", "list"), input.setAttribute("aria-controls", popup.id),
             input.setAttribute("aria-expanded", popup.classList.contains("open") ? "true" : "false");
             const sync = () => {
                 qa(".item", popup).forEach((it, i) => {
                     it.id ||= `${popup.id}-opt-${i}`, it.setAttribute("role", "option");
                     const active = it.classList.contains("active");
                     it.setAttribute("aria-selected", String(active)), active && input.setAttribute("aria-activedescendant", it.id);
-                }), popup.classList.contains("open") ? input.setAttribute("aria-expanded", "true") : (input.setAttribute("aria-expanded", "false"), 
+                }), popup.classList.contains("open") ? input.setAttribute("aria-expanded", "true") : (input.setAttribute("aria-expanded", "false"),
                 input.removeAttribute("aria-activedescendant"));
             };
             sync();
-            const scheduleSync = () => queueMicrotask(sync);
-            input.addEventListener("input", scheduleSync), input.addEventListener("keydown", e => {
-                "Tab" === e.key && popup.classList.contains("open") && popup.classList.remove("open"), 
+            const scheduleSync = () => queueMicrotask(sync), owner = "combobox-sync", key = input.id;
+            EventLifecycle.on(input, "input", scheduleSync, { owner: owner, key: key + ":input" }),
+            EventLifecycle.on(input, "keydown", e => {
+                "Tab" === e.key && popup.classList.contains("open") && popup.classList.remove("open"),
                 scheduleSync();
-            }), popup.addEventListener("click", scheduleSync), input.addEventListener("blur", () => SchedulerService.scheduleTimeout(sync, 140));
+            }, { owner: owner, key: key + ":keydown" }),
+            EventLifecycle.on(popup, "click", scheduleSync, { owner: owner, key: key + ":click" }),
+            EventLifecycle.on(input, "blur", () => SchedulerService.scheduleTimeout(sync, 140, { owner: owner, key: key + ":blur-sync" }), { owner: owner, key: key + ":blur" });
         }(input);
     }), function() {
         const input = q("#cmdQuery"), list = q("#cmdList");
         if (!input || !list) return;
-        list.id ||= "cmdList", list.setAttribute("role", "listbox"), input.setAttribute("role", "combobox"), 
+        list.id ||= "cmdList", list.setAttribute("role", "listbox"), input.setAttribute("role", "combobox"),
         input.setAttribute("aria-controls", list.id), input.setAttribute("aria-autocomplete", "list");
         const sync = () => {
             qa(".cmd-item", list).forEach((el, i) => {
@@ -12601,16 +12824,19 @@ EventLifecycle.on(window, "error", event => {
             }), input.setAttribute("aria-expanded", String(!q("#cmdModal")?.hidden));
         };
         sync();
-        const scheduleSync = () => queueMicrotask(sync);
-        input.addEventListener("input", scheduleSync), input.addEventListener("keydown", scheduleSync), 
-        list.addEventListener("click", scheduleSync), input.addEventListener("blur", () => {
-            q("#cmdModal")?.contains(document.activeElement) || SchedulerService.scheduleTimeout(() => UIRuntime?.close?.("cmdModal"), 0);
-        });
+        const scheduleSync = () => queueMicrotask(sync), owner = "command-palette";
+        EventLifecycle.on(input, "input", scheduleSync, { owner: owner, key: "sync-input" }),
+        EventLifecycle.on(input, "keydown", scheduleSync, { owner: owner, key: "sync-keydown" }),
+        EventLifecycle.on(list, "click", scheduleSync, { owner: owner, key: "sync-click" }),
+        EventLifecycle.on(input, "blur", () => {
+            q("#cmdModal")?.contains(document.activeElement) || SchedulerService.scheduleTimeout(() => UIRuntime?.close?.("cmdModal"), 0, { owner: owner, key: "blur-close" });
+        }, { owner: owner, key: "sync-blur" });
     }(), announceA11y = msg => {
         live.textContent = "", requestAnimationFrame(() => {
             live.textContent = String(msg || "");
         });
-    };})();
+    };
+})();
 (() => {
     "use strict";
     AppDialog = Object.freeze({
@@ -12645,128 +12871,18 @@ EventLifecycle.on(window, "error", event => {
                 }, {
                     once: !0
                 }), modal.addEventListener("keydown", e => {
-                    (e.ctrlKey || e.metaKey) && "Enter" === e.key && (e.preventDefault(), modal.querySelector("[data-dialog-confirm]")?.click());
+                    (e.ctrlKey || e.metaKey) && "Enter" === e.key && (e.preventDefault(), e.stopPropagation(), modal.querySelector("[data-dialog-confirm]")?.click());
                 }, {
                     once: !0
                 }), UIRuntime?.open("modal", id, {
                     outsideClick: !1,
-                    closeOnEscape: !0
+                    closeOnEscape: !0,
+                    onClose: () => finish(null)
                 }), requestAnimationFrame(() => modal.querySelector(`#${CSS.escape(inputId)}`)?.focus());
             });
         }
     });
-    const RenderContractRuntime = (() => {
-        const records = new Map, structuralHooks = new Set([ "qr-buttons", "pf36-data-actions", "pf1115-todo", "pf1115-journal", "pf1115-notes", "pf1115-calendar", "pf1115-tiles" ]);
-        function localAudit(moduleId, root) {
-            if (!root) return {
-                ok: !1,
-                reason: "missing-root"
-            };
-            root.querySelectorAll?.(".group,.todo-item,.journal-item,.cal-reminder-item,.backup-list .b-row,.flink,.business-row").forEach(el => normalizeRow?.(el)), 
-            labelIconActions?.(root), root.querySelectorAll?.(".modal").forEach(el => ensureModalSemantics?.(el)), 
-            "tiles" === moduleId && $$(".tile.copy-tile", $("#tilesHost")).forEach(el => {
-                if (el.querySelector(".qr-btn")) return;
-                const t = runtimeData.tiles.find(x => x.id === el.dataset.tileId), title = t?.title || el.dataset.title;
-                if (!t) return;
-                const btn = document.createElement("button");
-                btn.className = "qr-btn", btn.setAttribute("aria-label", "Pokaż QR"), btn.title = "Pokaż jako kod QR", 
-                btn.setAttribute("data-testid", "qr-" + title.toLowerCase().replace(/[^a-z0-9]+/g, "-")), 
-                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14h1v1h-1zM14 20h1v1h-1zM18 18h3v3h-3z"/></svg>', 
-                btn.addEventListener("click", e => {
-                    e.preventDefault(), e.stopPropagation(), showQrModal(t.value, t.title);
-                }), el.appendChild(btn);
-            });
-            const unnamed = [ ...root.querySelectorAll?.('button,[role="button"]') || [] ].filter(el => !(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || "").trim());
-            return {
-                ok: 0 === unnamed.length,
-                unnamedActions: unnamed.length
-            };
-        }
-        return {
-            render: function(moduleId, context = {}) {
-                const controller = MODULE_LIFECYCLE?.get(moduleId);
-                if (!controller) return {
-                    ok: !1,
-                    reason: "missing-controller"
-                };
-                const module = ModuleRegistry.get(moduleId), root = {
-                    todo: "#todoList",
-                    journal: "#journalList",
-                    notes: "#notesHost",
-                    calendarReminders: "#calReminderList",
-                    tiles: "#tilesHost"
-                }[moduleId] && document.querySelector({
-                    todo: "#todoList",
-                    journal: "#journalList",
-                    notes: "#notesHost",
-                    calendarReminders: "#calReminderList",
-                    tiles: "#tilesHost"
-                }[moduleId]) || document, state = ensureAppState()?.modules?.[moduleId], checksum = (value => {
-                    let h = 2166136261;
-                    const text = "string" == typeof value ? value : JSON.stringify(value ?? null);
-                    for (let i = 0; i < text.length; i++) h ^= text.charCodeAt(i), h = Math.imul(h, 16777619);
-                    return (h >>> 0).toString(36);
-                })(state), previous = records.get(moduleId);
-                if (previous?.checksum === checksum && root?.dataset?.renderChecksum === checksum && !context.force) return {
-                    ok: !0,
-                    skipped: !0,
-                    checksum: checksum,
-                    stamp: previous.stamp
-                };
-                const started = performance.now();
-                MODULE_LIFECYCLE?.run(moduleId, "beforeRender", {
-                    root: root,
-                    state: state,
-                    context: context
-                });
-                const result = safeAction(`pipeline.render:${moduleId}`, () => module.render(root, state, context), {
-                    context: {
-                        moduleId: moduleId
-                    }
-                });
-                module.bind(root), MODULE_LIFECYCLE?.run(moduleId, "bindEvents", {
-                    root: root,
-                    state: state,
-                    context: context
-                });
-                const audit = localAudit(moduleId, root), stamp = (previous?.stamp || 0) + 1;
-                root && (root.dataset.renderChecksum = checksum, root.dataset.renderStamp = String(stamp));
-                const rec = {
-                    moduleId: moduleId,
-                    checksum: checksum,
-                    stamp: stamp,
-                    durationMs: Math.round(100 * (performance.now() - started)) / 100,
-                    audit: audit,
-                    at: (new Date).toISOString()
-                };
-                return records.set(moduleId, rec), MODULE_LIFECYCLE?.run(moduleId, "afterRender", {
-                    root: root,
-                    state: state,
-                    context: context,
-                    audit: audit,
-                    decorativeOnly: !0
-                }), {
-                    ok: !1 !== result && audit.ok,
-                    result: result,
-                    ...rec
-                };
-            },
-            localAudit: localAudit,
-            auditHooks: function() {
-                const rows = MODULE_LIFECYCLE?.diagnostics?.() || [], violations = [];
-                return rows.forEach(row => (row.hooks?.afterRender || []).forEach(owner => {
-                    structuralHooks.has(owner) && violations.push({
-                        moduleId: row.id,
-                        owner: owner
-                    });
-                })), {
-                    ok: 0 === violations.length,
-                    violations: violations
-                };
-            },
-            records: () => [ ...records.values() ]
-        };
-    })();})();
+})();
 (() => {
     "use strict";
     const q = (s, r = document) => r.querySelector(s), ReminderLifecycle = {
@@ -12815,44 +12931,8 @@ EventLifecycle.on(window, "error", event => {
     SchedulerService.onResume(() => ReminderLifecycle.visibilityNotice());
     const TileActionContract = {
         actions: [ "open", "copy", "pin", "qr", "meta" ],
-        model(t, i) {
-            const m = TilesSubsystem.normalize(t, i);
-            return {
-                ...m,
-                actions: {
-                    open: "link" === m.type,
-                    copy: "copy" === m.type,
-                    pin: !0,
-                    qr: !0,
-                    meta: !0
-                }
-            };
-        },
-        models() {
-            return (runtimeData.tiles || []).map((t, i) => this.model(t, i));
-        },
-        filtered(query = "", filter = "ALL") {
-            const qv = String(query).trim().toLowerCase(), f = String(filter || "ALL").toUpperCase();
-            return this.models().filter(t => (!qv || `${t.title} ${t.desc || ""} ${(t.tags || []).join(" ")}`.toLowerCase().includes(qv)) && ("ALL" === f || (t.tags || []).map(String).map(x => x.toUpperCase()).includes(f)));
-        },
-        sorted: rows => sortTilesByPreferences(rows),
         render() {
             renderTiles();
-        },
-        tests() {
-            const models = TilesSubsystem.models(), sample = models[0];
-            if (!sample) return {
-                ok: !1,
-                reason: "no tiles"
-            };
-            const order = new Map([ [ sample.id, 0 ] ]), pins = new Set([ sample.id ]), sorted = [ ...models ].sort((a, b) => Number(pins.has(b.id)) - Number(pins.has(a.id)) || (order.get(a.id) ?? 9999) - (order.get(b.id) ?? 9999)), filtered = models.filter(x => pins.has(x.id));
-            return {
-                ok: sorted[0]?.id === sample.id && filtered.some(x => x.id === sample.id) && !0,
-                readOnly: !0,
-                orderOk: sorted[0]?.id === sample.id,
-                filterOk: filtered.some(x => x.id === sample.id),
-                qrAvailable: !0
-            };
         }
     };
     const tilesHost = q("#tilesHost");
@@ -12860,7 +12940,7 @@ EventLifecycle.on(window, "error", event => {
         const tileId = tileElement?.dataset.tileId;
         return (runtimeData.tiles || []).find(tile => tile.id === tileId) || null;
     };
-    tilesHost?.addEventListener("click", async event => {
+    tilesHost && EventLifecycle.on(tilesHost, "click", async event => {
         if (!(event.target instanceof Element)) return;
         const actionButton = event.target.closest("[data-tile-action]");
         const tileElement = event.target.closest(".tile");
@@ -12876,8 +12956,13 @@ EventLifecycle.on(window, "error", event => {
         var set;
         "pin" === action ? (pinnedTiles.has(tile.id) ? pinnedTiles.delete(tile.id) : pinnedTiles.add(tile.id), 
         set = pinnedTiles, ensureAppState(), appState.modules.preferences.tilePins = normalizeTilePreferenceIds([ ...set ]), 
-        requestFullSnapshot(), renderTiles()) : "copy" === action ? ClipboardFeedback.copy(tile.value || tile.url || "") : "qr" === action ? showQrModal(tile.value || tile.url || "", tile.title) : "edit" === action ? openTileEditor(tile.id) : "delete" === action ? (await showConfirmModal(`Czy na pewno chcesz usunąć kafelek „${tile.title}”?`, {confirmLabel: "Usuń kafelek"}) ? (() => { const snapshot = AppServices.tiles.remove(tile.id); snapshot && offerUndo(`undo-tile-${tile.id}`, "Usunięto kafelek", `Usunięto „${tile.title}”.`, () => AppServices.tiles.restore(snapshot)); })() : null) : "open" === action && void openTile(tile);
-    });
+        requestFullSnapshot(), renderTiles()) : "copy" === action ? void async function() {
+            const text = String(tile.value || tile.url || "");
+            if (!text) return toast("Brak wartości do skopiowania.", "err");
+            const ok = await copyToClipboard(text);
+            toast(ok ? "Skopiowano do schowka." : "Nie udało się skopiować.", ok ? "ok" : "err");
+        }() : "qr" === action ? showQrModal(tile.value || tile.url || "", tile.title) : "edit" === action ? openTileEditor(tile.id) : "delete" === action ? (await showConfirmModal(`Czy na pewno chcesz usunąć kafelek „${tile.title}”?`, {confirmLabel: "Usuń kafelek"}) ? (() => { const snapshot = AppServices.tiles.remove(tile.id); snapshot && offerUndo(`undo-tile-${tile.id}`, "Usunięto kafelek", `Usunięto „${tile.title}”.`, () => AppServices.tiles.restore(snapshot)); })() : null) : "open" === action && void openTile(tile);
+    }, { owner: "tile-actions", key: "host-click" });
     const EmailWorkbenchMachine = {
         phases: [ "recipients", "template", "body", "signature", "send" ],
         state: () => EmailComposerState.state(),
@@ -12993,21 +13078,10 @@ function openGroupDefaultsRestore() {
 $("#tileDefaultsRestore")?.addEventListener("click", openTileDefaultsRestore);
 (() => {
     "use strict";
-    const q = (s, r = document) => r.querySelector(s);
-    UIRuntime.discover(), EventLifecycle.on(document, "keydown", e => {
-        const target = e.target instanceof Element ? e.target.closest('.filter-badge,.tile,[data-note-id] .note-color,[role="option"]') : null;
-        target && ("Enter" !== e.key && " " !== e.key || target.matches("button,a,input,summary") || (e.preventDefault(), 
-        target.click()));
-    }), ((s, r = document) => [ ...r.querySelectorAll(s) ])(".modal").forEach((modal, index) => {
-        modal.setAttribute("role", "dialog"), modal.setAttribute("aria-modal", "true");
-        let title = q(".modal-h h1,.modal-h h2,.modal-h h3,[data-modal-title]", modal);
-        title && !title.id && (title.id = `modal-title-${index}`), title && modal.setAttribute("aria-labelledby", title.id);
-        let body = q(".modal-b,[data-modal-description]", modal);
-        body && !body.id && (body.id = `modal-description-${index}`), body && modal.setAttribute("aria-describedby", body.id);
-    }), requestAnimationFrame(() => {
+    UIRuntime.discover(), requestAnimationFrame(() => {
         UIRuntime.discover(), UIRuntime.entries().forEach(entry => {
             const opener = entry.opener || document.querySelector(`[aria-controls="${CSS.escape(entry.id)}"]`);
-            opener && (entry.opener = opener, opener.setAttribute("aria-haspopup", entry.modal ? "dialog" : entry.el.getAttribute("role") || "listbox"), 
+            opener && (entry.opener = opener, opener.setAttribute("aria-haspopup", entry.modal ? "dialog" : "listbox" === entry.el.getAttribute("role") ? "listbox" : "true"),
             opener.setAttribute("aria-expanded", String(UIRuntime.opened().some(x => x.id === entry.id))));
         });
     });
@@ -13110,21 +13184,33 @@ MobileUX.bind();
 
 function bootstrapRegisteredModules() {
     for (const module of ModuleRegistry.all()) {
-        module.init();
-        module.teardown();
-        module.bind(document.querySelector(module.hostSelector));
-        module.render();
+        try {
+            module.init();
+            module.teardown();
+            module.bind(document.querySelector(module.hostSelector));
+            module.render();
+        } catch (error) {
+            BootState.fail(error), console.error(`[ModuleBootstrap] Moduł ${module?.id || "?"} nie wystartował:`, error);
+            try {
+                UI_ERROR_REGISTRY.record("bootstrap", module?.id || "unknown", error);
+            } catch {}
+        }
     }
-    updateTileFilterBadges();
-    checkCalendarReminders();
-    updateCharBadge();
-    validateAllRecipients();
-    refreshDataBadge();
-    applyStorageInputLimits();
-    renderStorageDashboard();
+    for (const step of [ updateTileFilterBadges, checkCalendarReminders, updateCharBadge, validateAllRecipients, refreshDataBadge, applyStorageInputLimits, renderStorageDashboard ]) try {
+        step();
+    } catch (error) {
+        BootState.fail(error), console.error("[ModuleBootstrap] Krok po-modułowy nie powiódł się:", error);
+        try {
+            UI_ERROR_REGISTRY.record("bootstrap", step?.name || "post-step", error);
+        } catch {}
+    }
 }
 
-bootstrapRegisteredModules();
+try {
+    bootstrapRegisteredModules();
+} catch (error) {
+    BootState.fail(error), console.error("[ModuleBootstrap] Bootstrap przerwany:", error);
+}
 
 try {
     BootState.mark("modules"), requestAnimationFrame(() => {
@@ -13269,7 +13355,8 @@ const Diagnostics = (() => {
 
 Diagnostics.register("runtime", () => {
     const snapshot = Diagnostics.status();
-    const ok = window.WorkDeskReady === true && snapshot.modules === 17 && snapshot.eventAudit.ok !== false && snapshot.ui.ok !== false;
+    const expectedModules = ModuleRegistry.all().length;
+    const ok = window.WorkDeskReady === true && snapshot.modules === expectedModules && snapshot.eventAudit.ok !== false && snapshot.ui.ok !== false;
     return { ok, metrics: { modules: snapshot.modules, schedulerTasks: snapshot.scheduler.size, listeners: snapshot.events.active }, details: snapshot };
 }, { category: "runtime", release: true });
 

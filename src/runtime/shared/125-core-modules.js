@@ -37,6 +37,14 @@ const ModuleRenderMetrics = (() => {
 
 const {clone: cloneCoreState, now: coreNow, getModuleState, setModuleState, updateArray, find: findCoreRecord} = CoreModuleHelpers;
 
+function unlinkRemovedRecord(linkType, id) {
+    try {
+        BusinessWorkflow?.removeReferences?.(linkType, id);
+    } catch (error) {
+        UI_ERROR_REGISTRY?.record("workflow", "unlink-removed", error, { linkType });
+    }
+}
+
 CoreModuleState = Object.freeze({
         todo: {
             list: () => getModuleState("todo") || [],
@@ -72,8 +80,8 @@ CoreModuleState = Object.freeze({
             },
             remove(id) {
                 let removed = null;
-                return updateArray("todo", rows => rows.filter(record => record.id !== id || (removed = record, 
-                !1))), removed;
+                return updateArray("todo", rows => rows.filter(record => record.id !== id || (removed = record,
+                !1))), removed && unlinkRemovedRecord("todos", id), removed;
             },
             archive(id) {
                 const item = findCoreRecord("todo", id);
@@ -192,7 +200,7 @@ CoreModuleState = Object.freeze({
             list: () => getModuleState("calendarReminders") || [],
             create(payload) {
                 const text = String(payload?.text || "").trim(), date = String(payload?.date || "").trim(), time = String(payload?.time || "09:00").trim();
-                if (!text || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
+                if (!text || !validDateISO(date) || !validTime(time)) return null;
                 const item = {
                     id: payload.id || businessUid(),
                     text: text,
@@ -221,8 +229,8 @@ CoreModuleState = Object.freeze({
             },
             remove(id) {
                 let removed = null;
-                return updateArray("calendarReminders", rows => rows.filter(record => record.id !== id || (removed = record, 
-                !1))), removed;
+                return updateArray("calendarReminders", rows => rows.filter(record => record.id !== id || (removed = record,
+                !1))), removed && unlinkRemovedRecord("reminders", id), removed;
             },
             snooze(id, minutes = 10) {
                 const item = findCoreRecord("calendarReminders", id);
@@ -259,12 +267,14 @@ function renderTodos() {
     const activeFilter = $("#todoFilter")?.value || "all";
     const todayKey = dateKeyLocal(new Date());
     const visibleItems = allItems.filter(todoItem => {
-        if (activeFilter === "today") return todoItem.dueDate === todayKey;
+        if (activeFilter === "today") return !todoItem.done && todoItem.dueDate === todayKey;
         if (activeFilter === "high") return todoItem.priority === "high" && !todoItem.done;
         if (activeFilter === "overdue") return Boolean(todoItem.dueDate) && todoItem.dueDate < todayKey && !todoItem.done;
         if (activeFilter === "done") return todoItem.done;
         return true;
     });
+    const PRIORITY_ORDER = { high: 0, normal: 1, low: 2 };
+    const sortedItems = [ ...visibleItems ].sort((a, b) => Number(!!a.done) - Number(!!b.done) || (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1) || (a.dueDate && b.dueDate ? a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0 : a.dueDate ? 1 : b.dueDate ? -1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
 
     const actionButton = (action, label, text) => SafeDOM.el("button", {
         className: "icon-btn",
@@ -273,7 +283,7 @@ function renderTodos() {
         dataset: { action }
     });
 
-    const nodes = visibleItems.map(todoItem => {
+    const nodes = sortedItems.map(todoItem => {
         const checkbox = SafeDOM.el("input", {
             checked: Boolean(todoItem.done),
             attrs: { type: "checkbox", "aria-label": "Oznacz wykonane" },
@@ -471,10 +481,6 @@ function addJournalEntry() {
         });
         return item && input && (input.value = ""), item;
     }
-
-function removeCalendarReminder(id) {
-    return !!CoreModuleState.calendarReminders.remove(id);
-}
 
 function saveTodos(rows) { return setModuleState("todo", Array.isArray(rows) ? rows : CoreModuleState.todo.list()); }
 function saveNotes(rows) { return setModuleState("notes", Array.isArray(rows) ? rows : CoreModuleState.notes.list()); }

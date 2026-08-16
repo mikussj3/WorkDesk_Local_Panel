@@ -426,13 +426,14 @@ Koordynuje stabilne relacje i konwersje pomiędzy rejestrem telefonów, sprawami
 │   │   ├── 90-design-system.css
 │   │   └── 99-final-overrides.css
 │   └── templates/
-│       ├── production.html
-│       └── diagnostic.html
+│       └── production.html  (tytuł diagnostyczny: marker {{TITLE_DIAG}})
 ├── tools/
 │   ├── build.py
 │   ├── check_build.py
+│   ├── check_undeclared.mjs
 │   ├── dead_code.py
-│   └── browser_smoke.py
+│   ├── browser_smoke.py
+│   └── phase0…3_verify.py  (regresje poprawek z audytu)
 ├── dist/
 │   ├── index_KF64.html
 │   └── index_KF64_DIAG.html
@@ -567,8 +568,7 @@ Browser smoke test jest obowiązkowy. Same kontrole składni nie wykryły regres
 Edytuj:
 
 ```text
-src/templates/production.html
-src/templates/diagnostic.html
+src/templates/production.html  (jeden szablon; build wstawia sufiks tytułu dla wersji diagnostycznej przez {{TITLE_DIAG}})
 ```
 
 Zachowuj stabilne ID używane przez runtime. Dodając kontrolkę:

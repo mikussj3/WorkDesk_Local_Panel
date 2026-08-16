@@ -1,9 +1,14 @@
 
+const BUSINESS_LINK_TYPE_BY_MODULE = Object.freeze({ responseCases: "cases", todo: "todos", calendarReminders: "reminders", journal: "journal" });
+
 function removeBusinessModuleRecord(moduleId, id) {
     const module = MODULE_BY_ID[moduleId], rows = module?.serialize?.() || [], index = rows.findIndex(record => record.id === id);
     if (!module || index < 0) return null;
     const snapshot = { record: cloneData(rows[index]), index };
     module.deserialize(rows.filter(record => record.id !== id));
+    try {
+        BusinessWorkflow?.removeReferences?.(BUSINESS_LINK_TYPE_BY_MODULE[moduleId], id);
+    } catch {}
     module.render({ reason: "business-remove" });
     requestFullSnapshot({ immediate: true });
     return snapshot;
@@ -293,7 +298,7 @@ const AppServices = Object.freeze({
     }
 });
 
-function showConfirmModal(message, {title: title = "Potwierdź operację", confirmLabel: confirmLabel = "Potwierdź", danger: danger = !0} = {}) {
+function showConfirmModal(message, {title: title = t("confirm.title"), confirmLabel: confirmLabel = t("confirm.confirm"), danger: danger = !0} = {}) {
     return new Promise(resolve => {
         let settled = !1, modal = $("#unifiedConfirmModal");
         modal || (modal = document.createElement("div"), modal.className = "modal", modal.id = "unifiedConfirmModal", 
@@ -303,15 +308,16 @@ function showConfirmModal(message, {title: title = "Potwierdź operację", confi
         const yes = $("#unifiedConfirmYes");
         yes.textContent = confirmLabel, yes.className = danger ? "btn danger" : "btn primary";
         const finish = value => {
-            settled || (settled = !0, bindEvent(modal, "click", null), closeModal({
-                notifyCancel: !1
+            settled || (settled = !0, bindEvent(modal, "click", null), UIRuntime.close(modal, {
+                reason: "confirm-finish"
             }), resolve(value));
         };
         bindEvent(modal, "click", e => {
             const b = e.target.closest("[data-answer]");
             b && finish("true" === b.dataset.answer);
         }), showModal(modal, {
-            onCancel: () => finish(!1)
+            onCancel: () => finish(!1),
+            onClose: () => finish(!1)
         }), requestAnimationFrame(() => yes.focus());
     });
 }

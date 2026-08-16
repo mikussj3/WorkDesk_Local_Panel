@@ -1,6 +1,6 @@
 
 const ReminderTimeService = (() => {
-    const timestamp = reminder => [ Number(reminder?.snoozedUntil), Number(reminder?.dueAt) ].find(Number.isFinite) || new Date(`${reminder?.date || localISODate()}T${reminder?.time || ensureAppState().modules.userConfig?.defaultReminder || "09:00"}:00`).getTime();
+    const timestamp = reminder => [ Number(reminder?.snoozedUntil), Number(reminder?.dueAt) ].find(Number.isFinite) || new Date(`${reminder?.date || dateKeyLocal(new Date())}T${reminder?.time || ensureAppState().modules.userConfig?.defaultReminder || "09:00"}:00`).getTime();
     return Object.freeze({
         dueAt: timestamp,
         snooze: function(reminder, minutes = 10) {
@@ -153,7 +153,7 @@ function openReminderEditor(reminder) {
         modal = SafeDOM.el("section", { className: "modal", attrs: { id: "reminderEditorModal", hidden: true, role: "dialog", "aria-label": "Edytuj przypomnienie" } });
         document.getElementById("overlay")?.append(modal);
     }
-    const dateInput = SafeDOM.el("input", { value: reminder.date || localISODate(), attrs: { type: "date", "aria-label": "Data przypomnienia" } });
+    const dateInput = SafeDOM.el("input", { value: reminder.date || dateKeyLocal(new Date()), attrs: { type: "date", "aria-label": "Data przypomnienia" } });
     const timeInput = SafeDOM.el("input", { value: reminder.time || "09:00", attrs: { type: "time", "aria-label": "Godzina przypomnienia" } });
     const textInput = SafeDOM.el("input", { value: reminder.text || "", attrs: { type: "text", maxlength: StorageLimits.current().reminderTextChars, "aria-label": "Treść przypomnienia" } });
     const cancel = SafeDOM.el("button", { className: "btn ghost", text: "Anuluj", attrs: { type: "button", "data-close": "reminderEditorModal" } });
@@ -169,7 +169,7 @@ function openReminderEditor(reminder) {
     ]);
     bindEvent(save, "click", () => {
         const text = textInput.value.trim();
-        if (!text || !/^\d{4}-\d{2}-\d{2}$/.test(dateInput.value) || !/^\d{2}:\d{2}$/.test(timeInput.value)) return toast("Uzupełnij poprawną datę, godzinę i treść.", "err");
+        if (!text || !validDateISO(dateInput.value) || !validTime(timeInput.value)) return toast("Uzupełnij poprawną datę, godzinę i treść.", "err");
         CoreModuleState.calendarReminders.update(reminder.id, { text, date: dateInput.value, time: timeInput.value, snoozedUntil: 0, lastNotifiedAt: 0 });
         closeModal("reminderEditorModal"); toast("Zapisano przypomnienie.");
     });
@@ -206,6 +206,7 @@ function checkCalendarReminders() {
         changed = !0, function(r) {
             const wrap = $("#toasts");
             if (!wrap) return;
+            wrap.querySelector(`[data-reminder-toast="${CSS.escape(r.id)}"]`)?.remove();
             const el = document.createElement("div");
             el.className = "toast reminder ok", el.dataset.reminderToast = r.id;
             const content = document.createElement("div");
@@ -227,8 +228,8 @@ function checkCalendarReminders() {
                 CoreModuleState.calendarReminders.snooze(r.id, 10), el.remove(), toast("Odłożono przypomnienie o 10 minut.");
             }), done.addEventListener("click", () => {
                 CoreModuleState.calendarReminders.done(r.id), el.remove(), toast("Przypomnienie oznaczone jako wykonane.");
-            }), actions.append(snooze, done), content.append(title, message, actions), el.append(content), 
-            wrap.append(el);
+            }), actions.append(snooze, done), content.append(title, message, actions), el.append(content),
+            wrap.append(el), SchedulerService.scheduleTimeout(() => el.remove(), 1e4, { owner: "reminder-toast", key: `auto-remove-${r.id}` });
         }(r));
     }), changed && (saveCalendarReminders(rows), renderCalendarReminderList());
 }

@@ -43,7 +43,7 @@ EventLifecycle.on(window, "error", event => {
         writeForm: form => EmailComposerState.update(form),
         syncGroups: () => EmailComposerState.state().selectedGroups,
         render() {
-            EmailComposerState.render(), renderGroups($("#grpSearch")?.value || ""), renderEmailSelections?.(), 
+            EmailComposerState.render(), renderGroups($("#grpSearch")?.value || ""),
             normalizeA11y(this.root());
         },
         clearField(name) {
@@ -66,136 +66,6 @@ EventLifecycle.on(window, "error", event => {
                 groups: runtimeData?.sections?.reduce((n, s) => n + (s.groups?.length || 0), 0) || 0,
                 templates: runtimeData?.templates?.length || 0,
                 form: this.readForm()
-            };
-        }
-    };
-    EmailSubsystem = EmailSubsystem;
-    const TilesSubsystem = {
-        id: "tiles",
-        normalize(raw, index = 0) {
-            const t = validateTile?.(raw, new Set)?.value || raw || {}, type = t.type || (t.url ? "link" : void 0 !== t.value ? "copy" : "custom");
-            return {
-                ...t,
-                id: t.id || `tile_${index}_${String(t.title || "").toLowerCase().replace(/\W+/g, "_")}`,
-                type: type,
-                hidden: Boolean(t.hidden)
-            };
-        },
-        models() {
-            return (runtimeData.tiles || []).map((t, i) => this.normalize(t, i));
-        },
-        visible({query: query = tileSearchQuery || "", filter: filter = activeTileFilter || "all"} = {}) {
-            const q = String(query).toLowerCase();
-            return this.models().filter(t => !t.hidden).filter(t => !q || `${t.title} ${t.desc || ""} ${(t.tags || []).join(" ")}`.toLowerCase().includes(q)).filter(t => "all" === filter || "pinned" === filter ? "all" === filter || pinnedTiles.has(t.id) : (t.tags || []).includes(filter));
-        },
-        sort(list = this.visible()) {
-            const order = new Map(loadTileOrder().map((id, i) => [ id, i ]));
-            return [ ...list ].sort((a, b) => Number(pinnedTiles.has(b.id)) - Number(pinnedTiles.has(a.id)) || (order.get(a.id) ?? 9999) - (order.get(b.id) ?? 9999) || a.title.localeCompare(b.title, "pl"));
-        },
-        render() {
-            renderTiles(), normalizeA11y($("#tilesHost") || document);
-        },
-        diagnostics() {
-            return {
-                total: this.models().length,
-                visible: this.visible().length,
-                pinned: pinnedTiles.size,
-                types: [ ...new Set(this.models().map(x => x.type)) ]
-            };
-        }
-    };
-    
-    const TaskPipeline = {
-        normalize: t => ({
-            id: t.id || businessUid(),
-            text: String(t.text || "").trim(),
-            priority: [ "low", "normal", "high" ].includes(t.priority) ? t.priority : "normal",
-            dueDate: t.dueDate || "",
-            done: Boolean(t.done),
-            duplicate: Boolean(t.duplicate),
-            archivedAt: Number(t.archivedAt) || 0,
-            createdAt: Number(t.createdAt) || Date.now()
-        }),
-        list(filter = $("#todoFilter")?.value || "all") {
-            const today = dateKeyLocal(new Date);
-            return todos.map(x => this.normalize(x)).filter(t => "all" === filter || "today" === filter && t.dueDate === today || "high" === filter && "high" === t.priority && !t.done || "overdue" === filter && t.dueDate && t.dueDate < today && !t.done || "done" === filter && t.done);
-        },
-        command(action, id, payload = {}) {
-            const item = todos.find(x => x.id === id);
-            return "archive" === action && item ? "function" == typeof deleteTodo && deleteTodo(item) : !("toggle" !== action || !item || (item.done = payload.done ?? !item.done, 
-            saveTodos(todos), renderTodos(), 0));
-        }
-    }, JournalPipeline = {
-        list({query: query = "", type: type = "all"} = {}) {
-            const q = query.toLowerCase();
-            return journal.filter(x => ("all" === type || x.type === type) && (!q || x.text.toLowerCase().includes(q))).sort((a, b) => b.createdAt - a.createdAt);
-        },
-        groups(opts = {}) {
-            return Object.groupBy ? Object.groupBy(this.list(opts), x => dateKeyLocal(new Date(x.createdAt))) : this.list(opts).reduce((a, x) => ((a[dateKeyLocal(new Date(x.createdAt))] ||= []).push(x), 
-            a), {});
-        },
-        summary(opts = {}) {
-            const rows = this.list(opts);
-            return {
-                count: rows.length,
-                days: new Set(rows.map(x => dateKeyLocal(new Date(x.createdAt)))).size,
-                characters: rows.reduce((n, x) => n + x.text.length, 0)
-            };
-        }
-    }, ModuleCommands = {
-        noteToTodo(id) {
-            const n = notes.find(x => x.id === id);
-            return !!n && (DomainServices.todo.create({
-                text: n.text
-            }), !0);
-        },
-        noteToJournal(id) {
-            const n = notes.find(x => x.id === id);
-            return !!n && (DomainServices.journal.create({
-                text: n.text,
-                type: "note"
-            }), !0);
-        },
-        reminderDone: id => removeCalendarReminder(id),
-        reminderSnooze: (id, minutes = 10) => !!CoreModuleState.calendarReminders.snooze(id, minutes)
-    };
-    
-    const CalendarSubsystem = {
-        parse(r) {
-            const time = /^\d{2}:\d{2}$/.test(r.time || "") ? r.time : "00:00", date = /^\d{4}-\d{2}-\d{2}$/.test(r.date || "") ? r.date : dateKeyLocal(new Date);
-            return new Date(`${date}T${time}:00`);
-        },
-        normalize: r => ({
-            ...r,
-            date: /^\d{4}-\d{2}-\d{2}$/.test(r.date || "") ? r.date : dateKeyLocal(new Date),
-            time: /^\d{2}:\d{2}$/.test(r.time || "") ? r.time : "",
-            done: Boolean(r.done),
-            snoozedUntil: Number(r.snoozedUntil) || 0
-        }),
-        renderCalendar() {
-            ModuleRegistry.get("calendarReminders")?.render();
-        },
-        renderList() {
-            renderCalendarReminderList();
-        },
-        renderDayMenu(ev, date) {
-            showCalendarDayMenu(ev, date, ev?.currentTarget || ev?.target || document.activeElement);
-        },
-        upcoming(days = 7) {
-            const now = Date.now(), cut = now + 864e5 * days;
-            return calReminders.map(r => this.normalize(r)).filter(r => !r.done).filter(r => {
-                const t = r.snoozedUntil || this.parse(r).getTime();
-                return t >= now && t <= cut;
-            }).sort((a, b) => (a.snoozedUntil || this.parse(a)) - (b.snoozedUntil || this.parse(b)));
-        },
-        snooze: (id, minutes) => ModuleCommands.reminderSnooze(id, minutes),
-        done: id => ModuleCommands.reminderDone(id),
-        diagnostics() {
-            const rows = CoreModuleState.calendarReminders.list();
-            return {
-                total: rows.length,
-                upcoming: this.upcoming().length,
-                withoutTime: rows.filter(x => !x.time).length
             };
         }
     };
@@ -299,32 +169,7 @@ EventLifecycle.on(window, "error", event => {
         },
 
     };
-    ImportUX.ensureUI(), ImportUX.storageProbe(), 
-    Object.freeze([ {
-        id: "tokens-base-layout",
-        kind: "css",
-        description: "Tokens, reset, typography and layout"
-    }, {
-        id: "components",
-        kind: "css+js",
-        description: "Buttons, cards, lists, modals, sheets and popovers"
-    }, {
-        id: "modules-core",
-        kind: "js",
-        description: "Email, tiles, TODO, journal, notes and calendar"
-    }, {
-        id: "modules-business",
-        kind: "js",
-        description: "Profiles, checklists, cases, phone log, procedures and configuration"
-    }, {
-        id: "storage-schema-import",
-        kind: "js",
-        description: "Schema, validation, migrations, snapshot and restore"
-    }, {
-        id: "utilities-tests",
-        kind: "js",
-        description: "Utilities and operational tools"
-    } ]);
+    ImportUX.ensureUI(), ImportUX.storageProbe();
     const initializeBusinessRuntime = () => {
         ImportUX.ensureUI(), ImportUX.storageProbe();
     };

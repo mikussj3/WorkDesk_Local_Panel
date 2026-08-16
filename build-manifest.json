@@ -16,11 +16,13 @@
   "shared": [
     "src/runtime/shared/00-event-lifecycle.js",
     "src/runtime/shared/00-bootstrap-data.js",
+    "src/runtime/shared/05-i18n.js",
     "src/runtime/shared/10-scheduler-events.js",
     "src/runtime/shared/20-ui-runtime.js",
     "src/runtime/shared/25-accessibility-runtime.js",
     "src/runtime/shared/26-tooltip-runtime.js",
     "src/runtime/shared/27-storage-capability.js",
+    "src/runtime/shared/28-pure-helpers.js",
     "src/runtime/shared/30-email-composer.js",
     "src/runtime/shared/40-storage-core.js",
     "src/runtime/shared/50-todo-tools.js",
@@ -30,6 +32,7 @@
     "src/runtime/shared/90-email-runtime.js",
     "src/runtime/shared/100-calendar-reminders.js",
     "src/runtime/shared/110-utilities-widgets.js",
+    "src/runtime/shared/111-qr-codec.js",
     "src/runtime/shared/120-csv-import.js",
     "src/runtime/shared/121-journal-backup.js",
     "src/runtime/shared/122-id-theme-notes.js",
@@ -38,10 +41,10 @@
     "src/runtime/shared/130-business-foundation.js",
     "src/runtime/shared/131-search-quick-actions.js",
     "src/runtime/shared/132-business-actions-core.js",
-    "src/runtime/shared/132-phone-log.js",
-    "src/runtime/shared/132-business-actions-extra.js",
-    "src/runtime/shared/133-domain-services.js",
-    "src/runtime/shared/134-business-ui-menu.js",
+    "src/runtime/shared/133-phone-log.js",
+    "src/runtime/shared/134-domain-services.js",
+    "src/runtime/shared/135-business-ui-menu.js",
+    "src/runtime/shared/136-business-actions-extra.js",
     "src/runtime/shared/140-app-services.js",
     "src/runtime/shared/140-business-workflow.js",
     "src/runtime/shared/141-business-runtime-core.js",
@@ -61,5 +64,7 @@
   "diagnostic_overlay": [
     "src/diagnostics/diagnostic-overlay.js",
     "src/runtime/entry/diagnostic.js"
-  ]
+  ],
+  "appVersion": "1.66.3",
+  "buildTag": "KF64"
 }

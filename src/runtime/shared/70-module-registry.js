@@ -528,7 +528,7 @@ const MODULE_REGISTRY = Object.freeze([ {
     }
 } ]), MODULE_CONTRACT_METHODS = Object.freeze([ "id", "init", "bind", "render", "serialize", "deserialize", "reset", "teardown", "smokeTest", "getStats" ]);
 ModuleRegistry = (() => {
-    const definitions = new Map, hosts = new Map, listeners = new Map, register = def => {
+    const definitions = new Map, listeners = new Map, register = def => {
         const normalized = (def => {
             if (!def || "string" != typeof def.id || !def.id.trim()) throw new TypeError("ModuleRegistry.register: wymagane id");
             const id = def.id.trim(), hostSelector = def.hostSelector || {
@@ -549,8 +549,7 @@ ModuleRegistry = (() => {
                 version: Number(def.version) || 1
             };
             return wrapped.init = "function" == typeof def.init ? def.init.bind(wrapped) : () => !0, 
-            wrapped.bind = "function" == typeof def.bind ? def.bind.bind(wrapped) : root => (hosts.set(id, root || document.querySelector(hostSelector) || document), 
-            !0), wrapped.render = "function" == typeof def.render ? def.render.bind(wrapped) : () => !0, 
+            wrapped.bind = "function" == typeof def.bind ? def.bind.bind(wrapped) : () => !0, wrapped.render = "function" == typeof def.render ? def.render.bind(wrapped) : () => !0, 
             wrapped.serialize = "function" == typeof def.serialize ? def.serialize.bind(wrapped) : "function" == typeof def.export ? def.export.bind(wrapped) : () => cloneData(ensureAppState().modules[id]), 
             wrapped.deserialize = "function" == typeof def.deserialize ? def.deserialize.bind(wrapped) : "function" == typeof def.import ? def.import.bind(wrapped) : data => {
                 ensureAppState().modules[id] = cloneData(data);

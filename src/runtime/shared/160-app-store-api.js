@@ -127,7 +127,8 @@ const Diagnostics = (() => {
 
 Diagnostics.register("runtime", () => {
     const snapshot = Diagnostics.status();
-    const ok = window.WorkDeskReady === true && snapshot.modules === 17 && snapshot.eventAudit.ok !== false && snapshot.ui.ok !== false;
+    const expectedModules = ModuleRegistry.all().length;
+    const ok = window.WorkDeskReady === true && snapshot.modules === expectedModules && snapshot.eventAudit.ok !== false && snapshot.ui.ok !== false;
     return { ok, metrics: { modules: snapshot.modules, schedulerTasks: snapshot.scheduler.size, listeners: snapshot.events.active }, details: snapshot };
 }, { category: "runtime", release: true });
 

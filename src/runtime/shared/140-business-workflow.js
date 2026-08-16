@@ -43,6 +43,20 @@ const BusinessWorkflow = Object.freeze({
         service.update(recordId, {links});
         return true;
     },
+    removeReferences(linkType, id) {
+        let changed = 0;
+        for (const moduleId of ["phoneLog", "responseCases"]) {
+            const service = AppServices[moduleId];
+            if (!service?.update) continue;
+            for (const record of [...(ensureAppState().modules[moduleId] || [])]) {
+                const links = normalizeWorkflowLinks(record.links);
+                if (!(links[linkType] || []).includes(id)) continue;
+                const next = Object.fromEntries(Object.entries(links).map(([type, ids]) => [type, ids.filter(x => x !== id)]));
+                service.update(record.id, {links: next}), changed += 1;
+            }
+        }
+        return changed;
+    },
     phoneToCase(phoneId) {
         const phone = (ensureAppState().modules.phoneLog || []).find(item => item.id === phoneId);
         if (!phone) return null;
@@ -97,7 +111,7 @@ const BusinessWorkflow = Object.freeze({
         const selectors = {cases: `[data-business-record-id="${CSS.escape(id)}"]`, todos: `[data-todo-id="${CSS.escape(id)}"]`, reminders: `[data-reminder-id="${CSS.escape(id)}"]`, journal: `[data-journal-id="${CSS.escape(id)}"]`};
         if (type === "cases") BusinessActions.run("responseCases");
         else {
-            hideModals();
+            UIRuntime.closeAll({reason: "workflow-open", modal: !0});
             ModuleRegistry.get(type === "todos" ? "todo" : type === "reminders" ? "calendarReminders" : "journal")?.render?.();
         }
         SchedulerService.scheduleTimeout(() => {

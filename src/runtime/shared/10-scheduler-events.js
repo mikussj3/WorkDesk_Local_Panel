@@ -202,9 +202,9 @@ function toggleEmail() {
     $("#emailBar").setAttribute("aria-expanded", open ? "true" : "false"), open || flushPendingWrites();
 }
 
-$("#emailBar").addEventListener("click", toggleEmail), $("#emailBar").addEventListener("keydown", e => {
+EventLifecycle.on($("#emailBar"), "click", toggleEmail, { owner: "email-panel", key: "toggle" }), EventLifecycle.on($("#emailBar"), "keydown", e => {
     "Enter" !== e.key && " " !== e.key || (e.preventDefault(), toggleEmail());
-});
+}, { owner: "email-panel", key: "toggle-keyboard" });
 
 let activeModal = null;
 
@@ -214,7 +214,3 @@ let UIRuntime = null, AccessibilityRuntime = null, BulkMailFlow = null, ModuleRe
 let MODAL_POLICIES = Object.freeze({}), announceA11y = () => {};
 const UI_ERRORS = [];
 const businessUid = () => Date.now().toString(36) + "_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
-const csvSafeCell = value => {
-    const text = String(value ?? "");
-    return /^[=+\-@]/.test(text) ? "'" + text : text;
-};

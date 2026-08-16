@@ -105,24 +105,3 @@ try {
         configurable: !0
     });
 } catch {}
-
-Object.freeze({
-    run() {
-        const key = "__pf97__";
-        try {
-            GuardedStorage.setItem(key, "1");
-            const ok = "1" === GuardedStorage.getItem(key);
-            return GuardedStorage.removeItem(key), {
-                ok: ok,
-                degraded: GuardedStorage.degraded,
-                reason: GuardedStorage.reason,
-                lengthSafe: Number.isFinite(GuardedStorage.length)
-            };
-        } catch (e) {
-            return {
-                ok: !1,
-                error: e?.message || String(e)
-            };
-        }
-    }
-});

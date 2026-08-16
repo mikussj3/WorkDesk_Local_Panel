@@ -72,7 +72,7 @@
             resetFormMode();
             render();
         });
-        bindEvent($("#phCsv"), "click", () => downloadText(`workdesk-phone-${dateKeyLocal(new Date())}.csv`, "Data;Numer;Kontakt;Organizacja;Kierunek;Status;Czas sekund;Oddzwonić;Notatka\n" + ensureAppState().modules.phoneLog.map(item => [new Date(item.at).toISOString(), item.phoneNumber, item.contactName, item.organization, DIRECTION_LABELS[item.direction], STATUS_LABELS[item.status], item.durationSec, item.callbackRequired ? "TAK" : "NIE", item.note].map(value => csvEscape(csvSafeCell(value))).join(";")).join("\n"), "text/csv"));
+        bindEvent($("#phCsv"), "click", () => downloadText(`workdesk-phone-${dateKeyLocal(new Date())}.csv`, "Data;Numer;Kontakt;Organizacja;Kierunek;Status;Czas sekund;Oddzwonić;Notatka\n" + ensureAppState().modules.phoneLog.map(item => [new Date(item.at).toISOString(), item.phoneNumber, item.contactName, item.organization, DIRECTION_LABELS[item.direction], STATUS_LABELS[item.status], item.durationSec, item.callbackRequired ? "TAK" : "NIE", item.note].map(value => csvEscape(value)).join(";")).join("\n"), "text/csv"));
         delegateEvent($("#phList"), "click", "[data-del-ph],[data-edit-ph],[data-copy-phone],[data-call-phone],[data-phone-case]", async (event, button) => {
             const id = button.dataset.delPh || button.dataset.editPh || button.dataset.copyPhone || button.dataset.callPhone || button.dataset.phoneCase;
             const record = requireBusinessRecord("phoneLog", id);

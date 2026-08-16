@@ -5,8 +5,13 @@
     "build": "python tools/build.py --kind all",
     "check": "python tools/check_build.py",
     "dead-code": "python tools/dead_code.py",
-    "browser-smoke": "python tools/browser_smoke.py"
+    "browser-smoke": "python tools/browser_smoke.py",
+    "test:unit": "node --test tools/unit_tests.mjs"
   },
   "version": "1.66.3-kf64",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "acorn": "^8.18.0",
+    "acorn-walk": "^8.3.5"
+  }
 }

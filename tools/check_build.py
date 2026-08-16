@@ -8,6 +8,7 @@ prefixes=[int(re.match(r'(\d+)',Path(path).name).group(1)) for path in MANIFEST[
 assert prefixes==sorted(prefixes), f'shared runtime order is not numeric: {prefixes}'
 subprocess.run([sys.executable,str(ROOT/'tools/build.py'),'--kind','all'],check=True)
 subprocess.run([sys.executable,str(ROOT/'tools/dead_code.py')],check=True)
+subprocess.run(['node',str(ROOT/'tools/check_undeclared.mjs')],check=True,cwd=str(ROOT))
 
 # Global listeners must be owned by the central EventLifecycle.
 for path in MANIFEST['shared']+MANIFEST['production_entry']+MANIFEST['diagnostic_overlay']:
@@ -71,19 +72,28 @@ for name in ('index_KF64.html','index_KF64_DIAG.html'):
     static=s[:s.index('<script>')]
     ids=re.findall(r'\bid="([^"]+)"',static)
     assert len(ids)==len(set(ids)), f'duplicate ids in {name}'
+    id_set=set(ids)
+    for target in sorted(set(re.findall(r'\bfor="([^"]+)"',static))):
+        if target not in id_set:
+            raise SystemExit(f'label[for="{target}"] without matching id in {name}')
+    assert '"/ aria-label' not in static, f'stray self-closing slash before attribute in {name}'
 prod=(ROOT/'dist/index_KF64.html').read_text(encoding='utf-8')
 diag=(ROOT/'dist/index_KF64_DIAG.html').read_text(encoding='utf-8')
-if 'buildTag: \"KF64\"' not in ''.join(x.read_text(encoding='utf-8') for x in (ROOT/'src/runtime/shared').glob('*.js')):
-    raise SystemExit('stale buildTag: expected KF64')
-if '1.66.3-KF64' not in prod or '1.66.3-KF64-D' not in diag:
+version=MANIFEST['appVersion']; tag=MANIFEST['buildTag']   # jedno źródło prawdy: build-manifest.json
+if f'buildTag: "{tag}"' not in prod or f'version: "{version}"' not in prod:
+    raise SystemExit(f'stale build metadata: expected {version}-{tag} in APP_META')
+if f'{version}-{tag}' not in prod or f'{version}-{tag}-D' not in diag:
     raise SystemExit('stale document title/version metadata')
-shared= ''.join((ROOT/p).read_text(encoding='utf-8') for p in MANIFEST['shared'])
+shared= ''.join((ROOT/p).read_text(encoding='utf-8') for p in MANIFEST['shared']).replace('{{APP_VERSION}}',MANIFEST['appVersion']).replace('{{BUILD_TAG}}',MANIFEST['buildTag'])
+shared_n=re.sub(r'\s+','',shared)
+def shared_pin(needle):
+    return re.sub(r'\s+','',needle) in shared_n
 assert shared in prod and shared in diag, 'shared runtime is not embedded identically'
 assert 'WorkDeskDebug' not in prod, 'diagnostic API leaked into production'
 assert 'window.WorkDeskDebug' in diag, 'diagnostic overlay missing'
-assert 'Diagnostics.register("persistence-roundtrip"' in shared, 'persistence roundtrip gate missing'
+assert shared_pin('Diagnostics.register("persistence-roundtrip"'), 'persistence roundtrip gate missing'
 assert 'Diagnostics.register("business-modules"' in diag, 'business modules certification gate missing'
-assert 'const PersistenceRoundtrip = Object.freeze' in shared, 'PersistenceRoundtrip service missing'
+assert shared_pin('const PersistenceRoundtrip = Object.freeze'), 'PersistenceRoundtrip service missing'
 assert 'buildExportArtifact(moduleIds)' in shared and 'prepareImportArtifact(raw)' in shared, 'shared export/import paths missing'
 assert 'function isLocalPath(value)' in shared and 'function localPathForClipboard(value)' in shared, 'local path helpers missing'
 assert 'kind: "local-path"' in shared and 'Ścieżka lokalna została skopiowana do schowka' in shared, 'local path clipboard fallback missing'
@@ -92,7 +102,7 @@ assert 'push("tile-group-management"' in diag, 'tile/group management scenario m
 assert 'data-tile-action="edit"' in shared or 'actionButton("edit"' in shared, 'tile edit action missing'
 assert 'data-tile-action="delete"' in shared or 'actionButton("delete"' in shared, 'tile delete action missing'
 assert 'AppServices.emailGroups' in shared and 'AppServices.tiles' in shared, 'canonical management services missing'
-assert 'function reconcileChecklistItems' in shared, 'checklist ID reconciliation missing'
+assert shared_pin('function reconcileChecklistItems'), 'checklist ID reconciliation missing'
 for control_id in ('clCancel','caseCancel','phCancel','prCancel'):
     assert f'id=\"{control_id}\"' in shared, f'business edit cancel control missing: {control_id}'
 assert shared.count('function resetFormMode()') >= 4, 'business form reset contract incomplete'
@@ -106,28 +116,32 @@ for required in ('renderEmailProfilesModule', 'renderChecklistsModule', 'renderR
         raise SystemExit(f'missing ModuleRegistry business renderer hook: {required}')
 
 search_source = (ROOT / "src/runtime/shared/131-search-quick-actions.js").read_text(encoding="utf-8")
-for token in ["normalizeSearchText", "findGlobalSearchResults", "searchScore", "aria-activedescendant", "Przypomnienia", "Profile e-mail", "Snippety"]:
+search_pure = (ROOT / "src/runtime/shared/28-pure-helpers.js").read_text(encoding="utf-8")
+for token in ["findGlobalSearchResults", "aria-activedescendant", "Przypomnienia", "Profile e-mail", "Snippety"]:
     if token not in search_source:
         raise SystemExit(f"global search contract missing: {token}")
+for token in ["normalizeSearchText", "searchScore"]:
+    if token not in search_pure:
+        raise SystemExit(f"global search scoring contract missing (28-pure-helpers): {token}")
 
 
 # KF57 consistency regressions.
-assert 'flush: () => flushPendingWrites({ commitNow: !0 })' in shared, 'public storage flush must commit immediately'
-assert 'flushPendingWrites({ commitNow: true })' in shared, 'persistence roundtrip must commit immediately'
+assert shared_pin('flush: () => flushPendingWrites({ commitNow: !0 })'), 'public storage flush must commit immediately'
+assert shared_pin('flushPendingWrites({ commitNow: true })'), 'persistence roundtrip must commit immediately'
 assert 'function mirrorPersistentStorage()' in shared and 'memory.set(key, value)' in shared, 'storage fallback mirror missing'
-assert 'identity(tile) === identity(restored)' in shared, 'tile restore semantic deduplication missing'
-assert 'group.name || "").trim().toLowerCase() === groupName.toLowerCase()' in shared, 'email group restore deduplication missing'
-assert 'todo.completedAt || todo.createdAt' in shared, 'TODO retention must use completion time'
-assert 'reminder.doneAt || reminder.createdAt' in shared, 'reminder retention must use completion time'
-assert 'title: profile.label' in shared, 'email profile search title mismatch returned'
-assert 'keywords: item.body || ""' in shared, 'procedure body search missing'
-assert 'todo.completedAt && new Date(todo.completedAt)' in shared, 'day report must use TODO completion time'
-assert 'dataset: { groupId: id }' in shared, 'email group search target missing'
+assert shared_pin('identity(tile) === identity(restored)'), 'tile restore semantic deduplication missing'
+assert shared_pin('group.name || "").trim().toLowerCase() === groupName.toLowerCase()'), 'email group restore deduplication missing'
+assert shared_pin('todo.completedAt || todo.createdAt'), 'TODO retention must use completion time'
+assert shared_pin('reminder.doneAt || reminder.createdAt'), 'reminder retention must use completion time'
+assert shared_pin('title: profile.label'), 'email profile search title mismatch returned'
+assert shared_pin('keywords: item.body || ""'), 'procedure body search missing'
+assert shared_pin('todo.completedAt && new Date(todo.completedAt)'), 'day report must use TODO completion time'
+assert shared_pin('dataset: { groupId: id }'), 'email group search target missing'
 
 # KF64 module hardening regressions.
 assert 'function makeEmailGroupId(' in shared and 'function parseEmailGroupId(' in shared, 'canonical email group id helpers missing'
-assert 'function reconcileSelectedGroupMutation(' in shared, 'selected email group reconciliation missing'
-assert 'function restoreSelectedEmailGroup(' in shared, 'selected email group undo restoration missing'
+assert shared_pin('function reconcileSelectedGroupMutation('), 'selected email group reconciliation missing'
+assert shared_pin('function restoreSelectedEmailGroup('), 'selected email group undo restoration missing'
 assert 'className: "btn sm ghost recent-email-group", text: group.label' in shared and '"aria-label": `Pokaż grupę ${group.label}`' in shared, 'recent email group label must be canonical'
 assert 'row.querySelector(".g-name")?.textContent' not in shared, 'recent email group must not derive name from row textContent'
 assert 'push("email-module-integrity"' in diag, 'email module integrity diagnostic missing'
@@ -180,4 +194,4 @@ for needle in ('data-phone-case', 'data-case-todo', 'data-case-reminder', 'data-
 # KF64 workflow integrity and navigation regressions.
 assert 'existingLinks(record)' in shared and 'reconcileAll({persist = true}' in shared, 'workflow stale-link reconciliation missing'
 assert 'data-workflow-open' in prod and 'workflow-highlight' in prod, 'workflow navigation UI missing'
-assert 'Diagnostics.register("workflow-integrity"' in shared, 'workflow integrity gate missing'
+assert shared_pin('Diagnostics.register("workflow-integrity"'), 'workflow integrity gate missing'

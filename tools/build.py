@@ -8,11 +8,17 @@ def join_files(paths):
     return ''.join((ROOT/p).read_text(encoding='utf-8') for p in paths)
 
 def build(kind, output):
-    template=(ROOT/'src/templates'/('production.html' if kind=='production' else 'diagnostic.html')).read_text(encoding='utf-8')
+    template=(ROOT/'src/templates/production.html').read_text(encoding='utf-8')
     styles=join_files(MANIFEST['styles'])
     scripts=join_files(MANIFEST['shared'])
     scripts+=join_files(MANIFEST['production_entry'] if kind=='production' else MANIFEST['diagnostic_overlay'])
-    html=template.replace('{{STYLES}}',styles).replace('{{SCRIPTS}}',scripts)
+    version=MANIFEST.get('appVersion','0.0.0')
+    tag=MANIFEST.get('buildTag','KF')
+    html=template.replace('{{TITLE_DIAG}}','' if kind=='production' else '-D')
+    html=html.replace('{{STYLES}}',styles).replace('{{SCRIPTS}}',scripts)
+    # wersja z build-manifest.json (jedno źródło prawdy) — wstrzykiwana PO sklejeniu,
+    # więc marker działa i w szablonie (tytuł), i w runtime (APP_META w 40-storage-core)
+    html=html.replace('{{APP_VERSION}}',version).replace('{{BUILD_TAG}}',tag)
     output=Path(output); output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(html,encoding='utf-8')
     digest=hashlib.sha256(html.encode()).hexdigest()
