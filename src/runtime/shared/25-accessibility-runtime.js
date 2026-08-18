@@ -112,8 +112,12 @@ const audit=(root=document)=>{
 AccessibilityRuntime=Object.freeze({normalize,audit,labelText});
 EventLifecycle.on(document,'keydown',event=>{
   const target=event.target instanceof Element?event.target:null;if(!target)return;
-  const role=target.getAttribute('role');
-  if((event.key==='Enter'||event.key===' ')&&['button','checkbox','switch'].includes(role)&&!target.matches('#emailBar,.panel-h,[data-toggle]')){event.preventDefault();target.click();return;}
+  if(event.key==='Enter'||event.key===' '){
+    const activatable=target.closest('.ui-row.row--interactive,.ui-row.row--selectable,.filter-badge,.tile,[data-note-id] .note-color,[role="option"]');
+    const roleTarget=!activatable&&['button','checkbox','switch'].includes(target.getAttribute('role'))?target:null;
+    const hit=activatable||roleTarget;
+    if(hit&&!target.closest('button,a,input,select,textarea,summary')&&!target.closest('#emailBar,.panel-h,[data-toggle]')){event.preventDefault();hit.click();return;}
+  }
   const nav=target.closest('.nav-links');if(nav&&(event.key==='ArrowRight'||event.key==='ArrowLeft')){const links=[...nav.querySelectorAll('a[href],button:not([disabled])')];const current=links.indexOf(document.activeElement);if(links.length){event.preventDefault();links[(current+(event.key==='ArrowRight'?1:-1)+links.length)%links.length].focus();}}
 },{owner:'accessibility',key:'keyboard-contract'});
 "loading"===document.readyState?EventLifecycle.once(document,'DOMContentLoaded',()=>normalize(document),{owner:'accessibility',key:'dom-ready'}):queueMicrotask(()=>normalize(document));

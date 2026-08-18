@@ -171,9 +171,10 @@
       const storageKeysBefore = api.storage.keys().slice().sort();
       const storageSnapshotBefore = Object.fromEntries(storageKeysBefore.map(key => [key, api.storage.get(key, null)]));
 
-      push("bootstrap", window.WorkDeskReady === true && api.modules.list().length === 17, {
+      push("bootstrap", window.WorkDeskReady === true && api.modules.list().length === ModuleRegistry.all().length && api.modules.list().length > 0, {
         ready: window.WorkDeskReady,
-        modules: api.modules.list().length
+        modules: api.modules.list().length,
+        registry: ModuleRegistry.all().length
       });
 
       await withModuleSnapshot(["todo", "notes", "journal", "calendarReminders"], async () => {

@@ -46,44 +46,8 @@
     SchedulerService.onResume(() => ReminderLifecycle.visibilityNotice());
     const TileActionContract = {
         actions: [ "open", "copy", "pin", "qr", "meta" ],
-        model(t, i) {
-            const m = TilesSubsystem.normalize(t, i);
-            return {
-                ...m,
-                actions: {
-                    open: "link" === m.type,
-                    copy: "copy" === m.type,
-                    pin: !0,
-                    qr: !0,
-                    meta: !0
-                }
-            };
-        },
-        models() {
-            return (runtimeData.tiles || []).map((t, i) => this.model(t, i));
-        },
-        filtered(query = "", filter = "ALL") {
-            const qv = String(query).trim().toLowerCase(), f = String(filter || "ALL").toUpperCase();
-            return this.models().filter(t => (!qv || `${t.title} ${t.desc || ""} ${(t.tags || []).join(" ")}`.toLowerCase().includes(qv)) && ("ALL" === f || (t.tags || []).map(String).map(x => x.toUpperCase()).includes(f)));
-        },
-        sorted: rows => sortTilesByPreferences(rows),
         render() {
             renderTiles();
-        },
-        tests() {
-            const models = TilesSubsystem.models(), sample = models[0];
-            if (!sample) return {
-                ok: !1,
-                reason: "no tiles"
-            };
-            const order = new Map([ [ sample.id, 0 ] ]), pins = new Set([ sample.id ]), sorted = [ ...models ].sort((a, b) => Number(pins.has(b.id)) - Number(pins.has(a.id)) || (order.get(a.id) ?? 9999) - (order.get(b.id) ?? 9999)), filtered = models.filter(x => pins.has(x.id));
-            return {
-                ok: sorted[0]?.id === sample.id && filtered.some(x => x.id === sample.id) && !0,
-                readOnly: !0,
-                orderOk: sorted[0]?.id === sample.id,
-                filterOk: filtered.some(x => x.id === sample.id),
-                qrAvailable: !0
-            };
         }
     };
     const tilesHost = q("#tilesHost");
@@ -91,7 +55,7 @@
         const tileId = tileElement?.dataset.tileId;
         return (runtimeData.tiles || []).find(tile => tile.id === tileId) || null;
     };
-    tilesHost?.addEventListener("click", async event => {
+    tilesHost && EventLifecycle.on(tilesHost, "click", async event => {
         if (!(event.target instanceof Element)) return;
         const actionButton = event.target.closest("[data-tile-action]");
         const tileElement = event.target.closest(".tile");
@@ -107,8 +71,13 @@
         var set;
         "pin" === action ? (pinnedTiles.has(tile.id) ? pinnedTiles.delete(tile.id) : pinnedTiles.add(tile.id), 
         set = pinnedTiles, ensureAppState(), appState.modules.preferences.tilePins = normalizeTilePreferenceIds([ ...set ]), 
-        requestFullSnapshot(), renderTiles()) : "copy" === action ? ClipboardFeedback.copy(tile.value || tile.url || "") : "qr" === action ? showQrModal(tile.value || tile.url || "", tile.title) : "edit" === action ? openTileEditor(tile.id) : "delete" === action ? (await showConfirmModal(`Czy na pewno chcesz usunąć kafelek „${tile.title}”?`, {confirmLabel: "Usuń kafelek"}) ? (() => { const snapshot = AppServices.tiles.remove(tile.id); snapshot && offerUndo(`undo-tile-${tile.id}`, "Usunięto kafelek", `Usunięto „${tile.title}”.`, () => AppServices.tiles.restore(snapshot)); })() : null) : "open" === action && void openTile(tile);
-    });
+        requestFullSnapshot(), renderTiles()) : "copy" === action ? void async function() {
+            const text = String(tile.value || tile.url || "");
+            if (!text) return toast("Brak wartości do skopiowania.", "err");
+            const ok = await copyToClipboard(text);
+            toast(ok ? "Skopiowano do schowka." : "Nie udało się skopiować.", ok ? "ok" : "err");
+        }() : "qr" === action ? showQrModal(tile.value || tile.url || "", tile.title) : "edit" === action ? openTileEditor(tile.id) : "delete" === action ? (await showConfirmModal(`Czy na pewno chcesz usunąć kafelek „${tile.title}”?`, {confirmLabel: "Usuń kafelek"}) ? (() => { const snapshot = AppServices.tiles.remove(tile.id); snapshot && offerUndo(`undo-tile-${tile.id}`, "Usunięto kafelek", `Usunięto „${tile.title}”.`, () => AppServices.tiles.restore(snapshot)); })() : null) : "open" === action && void openTile(tile);
+    }, { owner: "tile-actions", key: "host-click" });
     const EmailWorkbenchMachine = {
         phases: [ "recipients", "template", "body", "signature", "send" ],
         state: () => EmailComposerState.state(),

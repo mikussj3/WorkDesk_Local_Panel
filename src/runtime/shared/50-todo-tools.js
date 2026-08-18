@@ -169,20 +169,6 @@ EventLifecycle.on($("#toolClean"), "click", () => {
 }, { owner: "text-tools", key: "copy-code" });
 
 
-function cloneData(value) {
-    if (void 0 !== value) {
-        if (null === value) return null;
-        try {
-            if ("function" == typeof structuredClone) return structuredClone(value);
-        } catch {}
-        try {
-            const json = JSON.stringify(value);
-            return void 0 === json ? void 0 : JSON.parse(json);
-        } catch {
-            return value;
-        }
-    }
-}
 
 
 function byteSize(value) {

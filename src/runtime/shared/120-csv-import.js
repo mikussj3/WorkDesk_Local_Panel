@@ -31,7 +31,7 @@ EventLifecycle.on($("#csvImportFile"), "change", e => {
             let nNew = 0, nDup = 0, nBad = 0;
             const newGroupKeys = new Set, newSectionNames = new Set, existingSecNames = new Set(runtimeData.sections.map(s => s.name));
             for (const r of dataRows) {
-                const sec = (r[0] || "").trim(), grp = (r[1] || "").trim(), email = (r[2] || "").trim();
+                const sec = csvUnguardCell(r[0]), grp = csvUnguardCell(r[1]), email = (r[2] || "").trim();
                 if (!sec && !grp && !email) continue;
                 if (!sec || !grp || !email) {
                     out.push({
@@ -106,7 +106,7 @@ EventLifecycle.on($("#csvImportFile"), "change", e => {
                 }) : null]);
                 $("#csvImportApply").disabled = stats.nNew === 0;
                 $("#csvImportApply").textContent = stats.nNew ? `Zaimportuj (${stats.nNew})` : "Brak nowych do importu";
-            }, showModal("csvImportModal");
+            }(srcName), showModal("csvImportModal");
         }(String(reader.result || ""), file.name), reader.readAsText(file, "utf-8");
     }(f), e.target.value = "";
 }, { owner: "csv-import", key: "file-change" }), EventLifecycle.on($("#csvImportApply"), "click", function() {

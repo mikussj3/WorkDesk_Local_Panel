@@ -156,8 +156,11 @@ function applyAppData(data) {
             merged.modules[id] = cloneData(next.modules[id]);
         }), appState = normalizeCurrentData(merged);
     } else appState = normalizeCurrentData(next);
-    getModuleIds(next.moduleIds).forEach(id => MODULE_BY_ID[id].import(appState.modules[id])), 
+    getModuleIds(next.moduleIds).forEach(id => MODULE_BY_ID[id].import(appState.modules[id])),
     persistData(!0);
+    try {
+        BusinessWorkflow?.reconcileAll({ persist: !0 });
+    } catch {}
 }
 
 function refreshDataBadge() {
@@ -445,8 +448,10 @@ function downloadJSON(snapshot, filename) {
     const blob = new Blob([ JSON.stringify(snapshot, null, 2) ], {
         type: "application/json"
     }), url = URL.createObjectURL(blob), a = document.createElement("a");
-    a.href = url, a.download = filename, document.body.appendChild(a), a.click(), a.remove(), 
-    SchedulerService.scheduleTimeout(() => URL.revokeObjectURL(url), 1e3, { owner: "persistence", key: "revoke-download-url" });
+    a.href = url, a.download = filename, document.body.appendChild(a), a.click(),
+    SchedulerService.scheduleTimeout(() => {
+        a.remove(), URL.revokeObjectURL(url);
+    }, 2e3, { owner: "persistence", key: "cleanup-download-anchor" });
 }
 
 async function exportData(moduleIds) {
@@ -524,18 +529,18 @@ function importDataFromFile(file) {
 }
 
 async function resetData() {
-    if (!await showConfirmModal("Przywrócić dane wbudowane w aplikację?\n\nPrzed zmianą zostanie automatycznie utworzony punkt przywracania. Wszystkie obecne dane modułów zostaną zastąpione.", {
+    if (!await showConfirmModal("Przywrócić dane wbudowane w aplikacji?\n\nPrzed zmianą zostanie automatycznie utworzony punkt przywracania. Wszystkie obecne dane modułów zostaną zastąpione.", {
         confirmLabel: "Utwórz punkt i przywróć",
         danger: !0
     })) return;
     const guard = await savePreviousGoodRestorePoint();
     if (!guard || !1 === guard.ok) return void toast("Nie udało się utworzyć punktu bezpieczeństwa. Operacja została anulowana.", "err");
-    StorageService.remove(DATA_KEY), appState = normalizeCurrentData(defaultDataV3()), applyAppData(appState),
-    StorageService.remove(DATA_KEY), rerenderAllFromData(), await saveCurrentRestorePoint(), renderBackupList(),
+    appState = normalizeCurrentData(defaultDataV3()), applyAppData(appState), LEGACY_SNAPSHOT_KEYS.concat(LEGACY_MODULE_KEYS).forEach(key => StorageService.remove(key)),
+    rerenderAllFromData(), await saveCurrentRestorePoint(), renderBackupList(),
     renderDailyStart(), toast("Przywrócono dane wbudowane. Poprzedni stan zachowano w punktach przywracania.");
 }
 
-EventLifecycle.on($("#dataExport"), "click", () => exportData(), { owner: "persistence-ui", key: "export" }), EventLifecycle.on($("#dataExportPartial"), "click", exportPartialData, { owner: "persistence-ui", key: "export-partial" }), 
+EventLifecycle.on($("#dataExport"), "click", () => exportData(), { owner: "persistence-ui", key: "export" }), EventLifecycle.on($("#emergencyExportBtn"), "click", () => exportData(), { owner: "persistence-ui", key: "emergency-export" }), EventLifecycle.on($("#dataExportPartial"), "click", exportPartialData, { owner: "persistence-ui", key: "export-partial" }), 
 EventLifecycle.on($("#dataResetModule"), "click", async function() {
     const ids = await selectModuleIds("Reset pojedynczego modułu", {
         single: !0

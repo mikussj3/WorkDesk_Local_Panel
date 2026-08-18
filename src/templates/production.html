@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>WorkDesk 1.66.3-KF64 — Panel pracy lokalny</title>
+<title>WorkDesk {{APP_VERSION}}-{{BUILD_TAG}}{{TITLE_DIAG}} — Panel pracy lokalny</title>
 <style>
 {{STYLES}}
 </style>
@@ -48,6 +48,8 @@
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.3 1.8c-.8.8-1.8 1.2-1.8 2.2"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
   </button>
 
+  <!-- Awaryjny eksport (Faza 4 audytu): zawsze dostępny, także przy zdegradowanym storage -->
+  <button type="button" class="btn sm ghost" id="emergencyExportBtn" data-testid="emergency-export" title="Zapisz pełną kopię danych do pliku JSON teraz" aria-label="Eksportuj kopię danych teraz">⤓ Kopia</button>
   <!-- Theme toggle (E4) — klik: light/dark; Alt+klik lub długie przytrzymanie: reset do systemu -->
   <button type="button" class="btn sm ghost" id="themeToggle" data-testid="theme-toggle" title="Motyw: klik = jasny/ciemny, Alt+klik = wg systemu" aria-label="Motyw">
     <svg class="ic theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M5 5l2 2M17 17l2 2M2 12h3M19 12h3M5 19l2-2M17 7l2-2"/></svg>
@@ -144,7 +146,7 @@
     <div class="email-main">
       <div class="tmpl-row">
         <div class="field" style="margin:0">
-          <label for="tmplPick">Szablon wiadomości</label>
+          <label for="tmplSearch">Szablon wiadomości</label>
           <input id="tmplSearch" type="text" placeholder="Szukaj szablonu…" list="tmplList" data-testid="template-search" aria-label="Szukaj szablonu">
           <button type="button" class="clear" data-clear="tmplSearch" aria-label="Wyczyść szablon wiadomości" data-testid="template-clear-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -317,7 +319,7 @@
     <div class="tiles-toolbar">
       <div class="search" style="flex:1;max-width:360px">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search"/ aria-label="Szukaj kafelka">
+        <input id="tileSearch" type="text" placeholder="Szukaj kafelka (tytuł, opis, tag)…" data-testid="tile-search" aria-label="Szukaj kafelka">
       </div>
       <span class="hint-kbd" title="Otwórz wyszukiwarkę akcji">naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd></span>
       <span style="flex:1"></span>
@@ -406,7 +408,7 @@
       </div>
       <div class="panel-b">
         <div class="journal-add">
-          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input"/ aria-label="Nowy wpis dziennika">
+          <input id="journalInput" type="text" placeholder="Wpis (Enter zapisuje)…" data-testid="journal-input" aria-label="Nowy wpis dziennika">
           <button type="button" class="btn sm primary" id="journalAdd" data-testid="journal-add" title="Zapisz wpis z aktualnym timestampem">+</button>
         </div>
         <div class="business-tools" id="journalControls">
@@ -436,6 +438,7 @@
       <div class="panel-b">
         <div class="data-primary-actions">
           <button type="button" class="btn sm primary" id="dataExport" data-testid="data-export" title="Pobierz pełną kopię danych jako plik JSON">Eksportuj backup</button>
+          <button type="button" class="btn sm" id="autoBackupBtn" data-testid="auto-backup" title="Eksperymentalne: automatyczna kopia do wybranego katalogu po każdej istotnej zmianie">Auto-backup do katalogu… (beta)</button>
           <button type="button" class="btn sm" id="dataImport" data-testid="data-import" title="Wczytaj wcześniej zapisany backup JSON">Importuj backup…</button>
           <button type="button" class="btn sm" id="dataBackups" data-testid="data-backups" title="Lokalne punkty przywracania">Punkty przywracania…</button>
         </div>
@@ -611,7 +614,7 @@
     </div>
     <div class="modal-b">
       <div class="pwd-out">
-        <input id="pwdValue" type="text" readonly data-testid="pwd-value"/ aria-label="Wygenerowane hasło">
+        <input id="pwdValue" type="text" readonly data-testid="pwd-value" aria-label="Wygenerowane hasło">
         <button type="button" class="btn primary" id="pwdCopy" data-testid="pwd-copy">Kopiuj</button>
       </div>
       <div class="pwd-row">
@@ -645,7 +648,7 @@
     <div class="modal-b">
       <h4 style="margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Waluty · <span class="manual-rate-label">kurs ręczny</span></h4>
       <div class="conv-row">
-        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt"/ aria-label="Kwota do przeliczenia">
+        <input id="convAmt" type="number" step="0.01" value="100" data-testid="conv-amt" aria-label="Kwota do przeliczenia">
         <select id="convFrom" data-testid="conv-from" aria-label="Waluta źródłowa">
           <option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
         </select>
@@ -653,7 +656,7 @@
         <select id="convTo" data-testid="conv-to" aria-label="Waluta docelowa">
           <option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option>
         </select>
-        <input id="convOut" type="text" readonly data-testid="conv-out"/ aria-label="Wynik przeliczenia">
+        <input id="convOut" type="text" readonly data-testid="conv-out" aria-label="Wynik przeliczenia">
       </div>
       <div class="conv-info" id="convInfo"></div>
 
@@ -685,14 +688,14 @@
 
       <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">VAT</h4>
       <div class="conv-row">
-        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt"/ aria-label="Kwota VAT">
+        <input id="vatAmt" type="number" step="0.01" value="100" data-testid="vat-amt" aria-label="Kwota VAT">
         <select id="vatRate" data-testid="vat-rate" aria-label="Stawka VAT"><option>23</option><option>8</option><option>5</option><option>0</option></select>
         <span class="conv-arrow">%</span>
         <select id="vatDir" data-testid="vat-dir" aria-label="Kierunek przeliczenia VAT">
           <option value="net2gross">netto → brutto</option>
           <option value="gross2net">brutto → netto</option>
         </select>
-        <input id="vatOut" type="text" readonly data-testid="vat-out"/ aria-label="Wynik VAT">
+        <input id="vatOut" type="text" readonly data-testid="vat-out" aria-label="Wynik VAT">
       </div>
       <div class="conv-info" id="vatInfo"></div>
     </div>
@@ -737,11 +740,11 @@
 
       <h4 style="margin:18px 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute)">Data robocza</h4>
       <div class="conv-row" style="grid-template-columns:1fr 90px auto 90px 1fr">
-        <input id="wdStart" type="date" data-testid="wd-start"/ aria-label="Data początkowa">
+        <input id="wdStart" type="date" data-testid="wd-start" aria-label="Data początkowa">
         <select id="wdOp" data-testid="wd-op" aria-label="Operacja na dniach roboczych"><option value="add">+</option><option value="sub">−</option></select>
-        <input id="wdDays" type="number" min="0" value="5" data-testid="wd-days"/ aria-label="Liczba dni roboczych">
+        <input id="wdDays" type="number" min="0" value="5" data-testid="wd-days" aria-label="Liczba dni roboczych">
         <span class="conv-arrow">dni rob.</span>
-        <input id="wdOut" type="text" readonly data-testid="wd-out"/ aria-label="Wynik daty">
+        <input id="wdOut" type="text" readonly data-testid="wd-out" aria-label="Wynik daty">
       </div>
       <div class="conv-info" id="wdInfo">Pomija soboty, niedziele i dni wolne PL.</div>
     </div>
@@ -767,7 +770,7 @@
           <option value="token">Token base32 (16)</option>
           <option value="numeric">Numer 8 cyfr</option>
         </select>
-        <input id="idValue" type="text" readonly data-testid="id-value" style="font-family:ui-monospace,Consolas,monospace"/ aria-label="Wygenerowany identyfikator">
+        <input id="idValue" type="text" readonly data-testid="id-value" style="font-family:ui-monospace,Consolas,monospace" aria-label="Wygenerowany identyfikator">
         <button type="button" class="btn primary" id="idGen" data-testid="id-gen">Generuj</button>
       </div>
       <div class="conv-info" id="idInfo" style="margin-top:8px"></div>
@@ -831,7 +834,7 @@
     </div>
     <div class="cmd-input">
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query"/ aria-label="Wyszukaj polecenie">
+      <input id="cmdQuery" type="text" placeholder="Wyszukaj akcję, szablon, kafelek, grupę, link…" data-testid="cmd-query" aria-label="Wyszukaj polecenie">
     </div>
     <div class="cmd-list" id="cmdList" role="listbox"></div>
     <div class="cmd-foot">

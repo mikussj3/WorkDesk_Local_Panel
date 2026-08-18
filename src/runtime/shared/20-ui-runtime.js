@@ -21,7 +21,7 @@ UIRuntime = (() => {
             open ? el.setAttribute("aria-modal", entry === modalTop ? "true" : "false") : el.removeAttribute("aria-modal"), 
             el.inert = open && entry !== modalTop;
         }), Array.from(document.body.children).forEach(el => {
-            el === ovEl || el.classList.contains("toast-wrap") || el.classList.contains("drop-overlay") || (modalTop ? (el.setAttribute("aria-hidden", "true"), el.inert = !0) : (el.removeAttribute("aria-hidden"), el.inert = !1));
+            el === ovEl || el.classList.contains("toast-wrap") || el.classList.contains("drop-overlay") || "a11yLive" === el.id || "workdeskTooltip" === el.id || (modalTop ? (el.setAttribute("aria-hidden", "true"), el.inert = !0) : (el.removeAttribute("aria-hidden"), el.inert = !1));
         }), activeModal = modalTop?.el || null;
     }, register = def => {
         const el = resolve(def?.el || def?.id);
@@ -62,7 +62,11 @@ UIRuntime = (() => {
         setExpanded(entry.opener, !1), entry.openedAt = 0, entry.onClose?.({
             reason: reason,
             entry: entry
-        }), syncModalLayer(), restoreFocus && entry.opener?.isConnected && "context-switch" !== reason && requestAnimationFrame(() => entry.opener.focus?.()), 
+        }), syncModalLayer(), restoreFocus && ("context-switch" === reason || entry.opener?.isConnected ? entry.opener?.isConnected && "context-switch" !== reason && requestAnimationFrame(() => entry.opener.focus?.()) : requestAnimationFrame(() => {
+            (document.querySelector("main.main") || document.body).focus?.({
+                preventScroll: !0
+            });
+        })),
         !0;
     }, unregister = id => {
         const entry = "string" == typeof id ? entries.get(id) : id?.id ? entries.get(id.id) : stack.find(x => x.el === id);
@@ -144,11 +148,11 @@ UIRuntime = (() => {
                 modal: modal,
                 type: type || entry.type || (modal ? "modal" : "surface")
             }), entry.priority = Number(options.priority ?? entry.priority ?? (modal ? 80 : 10)), 
-            entry.closeOnContextChange && closeAll({
+            entry.closeOnContextChange && !1 !== options.contextCloseOthers && closeAll({
                 reason: "context-switch",
                 belowPriority: entry.priority,
                 except: entry.id
-            }), entry.opener = resolve(options.opener) || entry.opener || (document.activeElement instanceof HTMLElement ? document.activeElement : null), 
+            }), entry.opener = resolve(options.opener) || (document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null) || entry.opener, 
             entry.openedAt = ++sequence, entry.closePolicy = options.closePolicy || entry.closePolicy;
             const old = stack.indexOf(entry);
             if (old >= 0 && stack.splice(old, 1), stack.push(entry), modal) {

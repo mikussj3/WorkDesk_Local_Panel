@@ -62,8 +62,8 @@ const EMAIL_FORM_FIELDS = Object.freeze({
         }), !1 !== options.render && render(changed), !1 !== options.persist && requestFullSnapshot(), 
         read();
     }, groups = kind => state().selectedGroups[kind] || (state().selectedGroups[kind] = []), buildBody = () => {
-        const {body: body, signature: signature} = state().form;
-        return signature ? body.replace(/\s+$/, "") + "\n\n" + signature : body;
+        const {body: body, signature: signature} = state().form, core = body.replace(/\s+$/, "");
+        return signature ? core ? core + "\n\n" + signature : signature : body;
     };
     return Object.freeze({
         state: state,
@@ -108,16 +108,24 @@ const EMAIL_FORM_FIELDS = Object.freeze({
         mailto: (to, overrides = {}) => {
             const form = state().form;
             const params = new URLSearchParams();
-            const toList = formatRecipientsForMailto(to);
-            const ccList = formatRecipientsForMailto(overrides.cc ?? form.cc);
-            const bccList = formatRecipientsForMailto(overrides.bcc ?? form.bcc);
+            const seen = new Set, take = value => {
+                const addresses = uniq(parseEmails(value)).filter(address => {
+                    const key = address.toLowerCase();
+                    return seen.has(key) ? !1 : (seen.add(key), !0);
+                });
+                return addresses.join(",");
+            };
+            const toList = take(to);
+            const ccList = take(overrides.cc ?? form.cc);
+            const bccList = take(overrides.bcc ?? form.bcc);
             const subject = overrides.subject ?? form.subject;
             const body = overrides.body ?? buildBody();
             if (ccList) params.set("cc", ccList);
             if (bccList) params.set("bcc", bccList);
             if (subject) params.set("subject", subject);
             params.set("body", body);
-            return `mailto:${toList}?${params.toString().replace(/\+/g, "%20")}`;
+            const toUri = toList.split(",").filter(Boolean).map(encodeURIComponent).join(",");
+            return `mailto:${toUri}?${params.toString().replace(/\+/g, "%20")}`;
         },
         draft: () => ({
             version: 2,
@@ -375,10 +383,7 @@ function onGroupToggle(e) {
 }
 
 function parseEmails(str) {
-    return String(str || "").split(/[,;\n]/).map(address => address.trim()).filter(Boolean);
-}
-function formatRecipientsForMailto(value) {
-    return uniq(parseEmails(value)).join(",");
+    return String(str || "").split(/[\s,;\n]+/).map(address => address.trim()).filter(Boolean);
 }
 function formatEmailField(value) {
     return uniq(parseEmails(value)).join("; ");
@@ -563,6 +568,8 @@ function prepareEmailSend({ navigate = true } = {}) {
 $("#sendBtn").addEventListener("click", () => prepareEmailSend()), $("#bulkBtn").addEventListener("click", () => {
     const recipients = parseEmails(EmailComposerState.read().to);
     if (recipients.length < 2) return toast("Wpisz co najmniej 2 adresy w polu „Do”.", "err");
+    const invalid = recipients.filter(address => !EMAIL_RE.test(address));
+    if (invalid.length) return toast(`Popraw nieprawidłowe adresy: ${invalid.slice(0, 2).join(", ")}`, "err");
     BulkMailFlow.open(recipients);
 }), $("#fBody").addEventListener("input", () => {
     updateCharBadge(), function() {

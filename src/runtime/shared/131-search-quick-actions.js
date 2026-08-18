@@ -1,16 +1,6 @@
 let globalSearchIndex = [];
 let globalSearchActiveIndex = -1;
 
-function normalizeSearchText(value) {
-    return String(value || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[łŁ]/g, "l")
-        .replace(/[đĐ]/g, "d")
-        .toLocaleLowerCase("pl-PL")
-        .replace(/\s+/g, " ")
-        .trim();
-}
 
 function searchTokens(value) {
     return normalizeSearchText(value).split(" ").filter(Boolean);
@@ -53,7 +43,7 @@ function buildGlobalSearchIndex() {
         id: `todo:${todoItem.id}`,
         category: "TODO",
         title: todoItem.text,
-        subtitle: [todoItem.done ? "wykonane" : "aktywne", todoItem.priority, todoItem.due || ""].filter(Boolean).join(" · "),
+        subtitle: [todoItem.done ? "wykonane" : "aktywne", todoItem.priority, todoItem.dueDate || ""].filter(Boolean).join(" · "),
         keywords: `zadanie ${todoItem.done ? "zrobione zakonczone" : "otwarte"}`,
         action: () => focusSearchResult(`[data-todo-id="${CSS.escape(todoItem.id)}"]`, "#todoList")
     })));
@@ -199,23 +189,6 @@ function buildGlobalSearchIndex() {
     return rows;
 }
 
-function searchScore(entry, queryTokens, normalizedQuery) {
-    let score = 0;
-    if (entry.normalizedTitle === normalizedQuery) score += 120;
-    else if (entry.normalizedTitle.startsWith(normalizedQuery)) score += 80;
-    else if (entry.normalizedTitle.includes(normalizedQuery)) score += 55;
-    if (entry.normalizedCategory === normalizedQuery) score += 45;
-    else if (entry.normalizedCategory.startsWith(normalizedQuery)) score += 25;
-    for (const token of queryTokens) {
-        if (entry.normalizedTitle.startsWith(token)) score += 24;
-        else if (entry.normalizedTitle.includes(token)) score += 16;
-        if (entry.normalizedSubtitle.includes(token)) score += 8;
-        if (entry.normalizedCategory.includes(token)) score += 6;
-        if (entry.normalizedKeywords.includes(token)) score += 4;
-        if (![entry.normalizedTitle, entry.normalizedSubtitle, entry.normalizedCategory, entry.normalizedKeywords].some(field => field.includes(token))) return -1;
-    }
-    return score;
-}
 
 function findGlobalSearchResults(query, limit = 30) {
     const normalizedQuery = normalizeSearchText(query);

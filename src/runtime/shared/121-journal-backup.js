@@ -181,3 +181,37 @@ EventLifecycle.on($("#dataConfidenceBackup"), "click", async () => {
     renderBackupList(), renderStorageDashboard(), renderDailyStart();
     toast(!1 === result?.ok ? "Nie udało się utworzyć punktu przywracania." : "Utworzono punkt przywracania.", !1 === result?.ok ? "err" : "ok");
 }, { owner: "journal-backup", key: "confidence-backup" });
+
+// Auto-backup do katalogu (Faza 4 audytu, eksperymentalne) — File System Access API.
+// Zgodne z offline-first: katalog wybiera użytkownik, nic nie opuszcza jego maszyny.
+// Uchytu nie da się trwale przechować bez IndexedDB, więc działa do zamknięcia karty;
+// kopia zapisuje się po każdej istotnej zmianie (min. 5 min przerwy) i przy pagehide.
+let autoBackupHandle = null, autoBackupLastAt = 0;
+
+async function writeAutoBackup() {
+    if (!autoBackupHandle) return !1;
+    const snap = await buildExportArtifact();
+    const file = await autoBackupHandle.getFileHandle("workdesk-autobackup.json", { create: !0 });
+    const writable = await file.createWritable();
+    await writable.write(JSON.stringify(snap, null, 2)), await writable.close();
+    return autoBackupLastAt = Date.now(), !0;
+}
+
+EventLifecycle.on($("#autoBackupBtn"), "click", async () => {
+    if ("function" != typeof window.showDirectoryPicker) return toast("Ta przeglądarka nie obsługuje wyboru katalogu (File System Access API).", "err");
+    try {
+        autoBackupHandle = await window.showDirectoryPicker({ id: "workdesk-autobackup", mode: "readwrite", startIn: "documents" });
+        await writeAutoBackup();
+        toast("Auto-backup włączony — kopia zapisuje się do workdesk-autobackup.json po zmianach (do zamknięcia karty).", "ok");
+    } catch (error) {
+        "AbortError" === error?.name || toast("Nie udało się włączyć auto-backup: " + (error?.message || error), "err");
+    }
+}, { owner: "auto-backup", key: "enable" });
+
+SchedulerService.scheduleInterval(() => {
+    autoBackupHandle && lastFullSnapshotAt > autoBackupLastAt && Date.now() - autoBackupLastAt > 3e5 && writeAutoBackup().catch(() => {});
+}, 6e4, { owner: "auto-backup", key: "tick" });
+
+EventLifecycle.on(window, "pagehide", () => {
+    autoBackupHandle && lastFullSnapshotAt > autoBackupLastAt && writeAutoBackup().catch(() => {});
+}, { owner: "auto-backup", key: "pagehide" });

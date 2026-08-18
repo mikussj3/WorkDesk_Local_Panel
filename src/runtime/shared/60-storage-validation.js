@@ -79,10 +79,6 @@ function getRetentionMeta() {
     }), prefs.retentionMeta;
 }
 
-function parseTimestamp(value) {
-    const n = "number" == typeof value ? value : Date.parse(value);
-    return Number.isFinite(n) ? n : null;
-}
 
 function restorePointAgeCandidate(key, label, now) {
     const read = StorageService.getJSON(key, null, {
@@ -98,12 +94,12 @@ function restorePointAgeCandidate(key, label, now) {
         apply: () => StorageService.remove(key)
     };
     const snap = read.value, ts = parseTimestamp(snap.createdAt || snap.exportedAt);
-    return null === ts || now - ts <= 864e5 * RETENTION_RULES.restorePointDays ? null : {
+    return null !== ts && now - ts <= 864e5 * RETENTION_RULES.restorePointDays ? null : {
         id: `restore-old-${label}`,
         category: "Punkt przywracania",
         count: 1,
-        label: `Punkt ${label} starszy niż ${RETENTION_RULES.restorePointDays} dni`,
-        size: byteSize(raw),
+        label: `Punkt ${label} ${null === ts ? "bez znacznika czasu" : `starszy niż ${RETENTION_RULES.restorePointDays} dni`}`,
+        size: byteSize(StorageService.get(key) || ""),
         apply: () => StorageService.remove(key)
     };
 }
@@ -270,7 +266,7 @@ function normalizeFxState(raw) {
 
 const IMPORT_LIMITS = Object.freeze({
     id: 120,
-    todoText: 2e3,
+    todoText: StorageLimits.DEFAULTS.todoTextChars,
     journalText: 5e3,
     reminderText: 2e3,
     noteText: 2e4,
@@ -322,20 +318,13 @@ function cleanString(value, max, required = !1) {
     };
 }
 
-function isValidTimestamp(value) {
-    const n = Number(value);
-    return Number.isFinite(n) && n >= 0 && !Number.isNaN(new Date(n).getTime());
+
+function droppedFieldsWarning(value, knownFields) {
+    const dropped = Object.keys(value || {}).filter(key => !knownFields.includes(key));
+    return dropped.length ? `usunięto nieznane pola: ${dropped.join(", ")}` : null;
 }
 
-function validDateISO(value) {
-    if ("string" != typeof value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return !1;
-    const [y, m, d] = value.split("-").map(Number), dt = new Date(y, m - 1, d);
-    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
-}
 
-function validTime(value) {
-    return "string" == typeof value && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
-}
 
 function createImportId(prefix, seed) {
     let h = 2166136261;
@@ -366,46 +355,97 @@ function validateKnownMail(value) {
     c.warning && r.warnings.push(c.warning), r) : invalidResult(value, "niepoprawny adres e-mail");
 }
 
+const TODO_KNOWN_FIELDS = Object.freeze([ "id", "text", "done", "archived", "priority", "dueDate", "createdAt", "updatedAt", "completedAt" ]);
+
 function validateTodoItem(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "rekord TODO musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.todoText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    "boolean" != typeof value.done && (r.value.done = !!value.done, r.repaired = !0, 
-    r.warnings.push("naprawiono pole done")), isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), 
-    r.repaired = !0, r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("todo", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `TODO.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.todoText, !0);
+    if (!text.valid) return invalidResult(value, `TODO.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, TODO_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    r.value.done = !!value.done, "boolean" != typeof value.done && (r.repaired = !0,
+    r.warnings.push("naprawiono pole done"));
+    r.value.archived = !!value.archived;
+    r.value.priority = [ "low", "normal", "high" ].includes(value.priority) ? value.priority : "normal";
+    void 0 !== value.priority && r.value.priority !== value.priority && (r.repaired = !0, r.warnings.push("naprawiono priorytet"));
+    r.value.dueDate = validDateISO(value.dueDate) ? value.dueDate : "", value.dueDate && !r.value.dueDate && (r.repaired = !0,
+    r.warnings.push("naprawiono termin"));
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    const updated = normalizeTimestamp(value.updatedAt);
+    r.value.updatedAt = null !== updated ? updated : r.value.createdAt;
+    r.value.completedAt = normalizeTimestamp(value.completedAt);
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("todo", text.value + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const JOURNAL_KNOWN_FIELDS = Object.freeze([ "id", "text", "type", "createdAt" ]);
 
 function validateJournalEntry(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "wpis journalu musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.journalText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), r.repaired = !0, 
-    r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("journal", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `journal.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.journalText, !0);
+    if (!text.valid) return invalidResult(value, `journal.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, JOURNAL_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    const type = cleanString(value.type, 32, !1);
+    r.value.type = type.value || "info", type.value !== (value.type || "") && (r.repaired = !0, r.warnings.push("naprawiono typ wpisu"));
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("journal", text.value + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const REMINDER_KNOWN_FIELDS = Object.freeze([ "id", "text", "date", "time", "done", "doneAt", "createdAt", "lastNotifiedAt", "snoozedUntil" ]);
 
 function validateReminder(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "przypomnienie musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.reminderText, !0);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    validDateISO(value.date) ? (validTime(value.time) || (r.value.time = "09:00", r.repaired = !0, 
-    r.warnings.push("naprawiono godzinę na 09:00")), "boolean" != typeof value.done && (r.value.done = !!value.done, 
-    r.repaired = !0, r.warnings.push("naprawiono pole done")), [ "createdAt", "lastNotifiedAt", "snoozedUntil" ].forEach(k => {
-        isValidTimestamp(value[k]) || (r.value[k] = "createdAt" === k ? Date.now() : 0, 
-        r.repaired = !0, r.warnings.push(`naprawiono ${k}`));
-    }), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("rem", value.date + value.time + text.value), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, "reminder.date ma niepoprawny format lub datę")) : invalidResult(value, `reminder.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.reminderText, !0);
+    if (!text.valid) return invalidResult(value, `reminder.text: ${text.error}`);
+    if (!validDateISO(value.date)) return invalidResult(value, "reminder.date ma niepoprawny format lub datę");
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, REMINDER_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    r.value.date = value.date;
+    r.value.time = validTime(value.time) ? value.time : "09:00", validTime(value.time) || (r.repaired = !0,
+    r.warnings.push("naprawiono godzinę na 09:00"));
+    r.value.done = !!value.done, "boolean" != typeof value.done && (r.repaired = !0,
+    r.warnings.push("naprawiono pole done"));
+    r.value.doneAt = normalizeTimestamp(value.doneAt);
+    [ "createdAt", "lastNotifiedAt", "snoozedUntil" ].forEach(k => {
+        const ts = normalizeTimestamp(value[k]);
+        null === ts ? (r.value[k] = "createdAt" === k ? Date.now() : 0, r.repaired = !0,
+        r.warnings.push(`naprawiono ${k}`)) : r.value[k] = ts;
+    });
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("rem", value.date + value.time + text.value),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
+
+const NOTE_KNOWN_FIELDS = Object.freeze([ "id", "title", "text", "color", "pinned", "createdAt", "updatedAt" ]);
 
 function validateNote(value) {
     if (!value || "object" != typeof value || Array.isArray(value)) return invalidResult(value, "notatka musi być obiektem");
-    const r = validationResult(value), text = cleanString(value.text, IMPORT_LIMITS.noteText, !1);
-    return text.valid ? (r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning), 
-    ALLOWED_NOTE_COLORS.includes(value.color) || (r.value.color = "amber", r.repaired = !0, 
-    r.warnings.push("naprawiono kolor notatki")), isValidTimestamp(value.createdAt) || (r.value.createdAt = Date.now(), 
-    r.repaired = !0, r.warnings.push("naprawiono createdAt")), ("string" != typeof value.id || !value.id.trim() || value.id.length > IMPORT_LIMITS.id) && (r.value.id = createImportId("note", text.value + value.createdAt), 
-    r.repaired = !0, r.warnings.push("nadano poprawne ID")), r) : invalidResult(value, `note.text: ${text.error}`);
+    const r = validationResult({}), text = cleanString(value.text, IMPORT_LIMITS.noteText, !1);
+    if (!text.valid) return invalidResult(value, `note.text: ${text.error}`);
+    r.value.text = text.value, r.repaired |= text.repaired, text.warning && r.warnings.push(text.warning);
+    const dropped = droppedFieldsWarning(value, NOTE_KNOWN_FIELDS);
+    dropped && (r.repaired = !0, r.warnings.push(dropped));
+    const title = cleanString(value.title, 100, !1);
+    r.value.title = title.value;
+    ALLOWED_NOTE_COLORS.includes(value.color) || (r.value.color = "amber", r.repaired = !0,
+    r.warnings.push("naprawiono kolor notatki")), ALLOWED_NOTE_COLORS.includes(value.color) && (r.value.color = value.color);
+    r.value.pinned = !!value.pinned;
+    const created = normalizeTimestamp(value.createdAt);
+    null === created ? (r.value.createdAt = Date.now(), r.repaired = !0, r.warnings.push("naprawiono createdAt")) : r.value.createdAt = created;
+    const updated = normalizeTimestamp(value.updatedAt);
+    r.value.updatedAt = null !== updated ? updated : r.value.createdAt;
+    if ("string" == typeof value.id && value.id.trim() && value.id.length <= IMPORT_LIMITS.id) r.value.id = value.id; else r.value.id = createImportId("note", (title.value || text.value) + r.value.createdAt),
+    r.repaired = !0, r.warnings.push("nadano poprawne ID");
+    return r;
 }
 
 function validateTile(value) {

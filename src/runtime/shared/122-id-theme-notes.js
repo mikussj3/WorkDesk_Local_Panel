@@ -1,6 +1,6 @@
 let idHistory = [];
 
-EventLifecycle.on(window, "pagehide", () => {
+EventLifecycle.on(window, "pagehide", event => {
     try {
         flushPendingWrites({
             commitNow: !0
@@ -8,6 +8,7 @@ EventLifecycle.on(window, "pagehide", () => {
     } catch (error) {
         console.error("Nie udało się zapisać danych przy zamknięciu.", error);
     }
+    if (event?.persisted) return;
     !function() {
         idHistory = [];
         const host = $("#idHistory");
@@ -16,6 +17,10 @@ EventLifecycle.on(window, "pagehide", () => {
 }, {
     capture: !0
 });
+
+EventLifecycle.on(window, "pageshow", event => {
+    event?.persisted && (checkCalendarReminders(), "function" == typeof renderDataConfidence && renderDataConfidence());
+}, { owner: "id-theme-notes", key: "pageshow-bfcache" });
 
 const BASE32_ALPHA = "ABCDEFGHJKMNPQRSTVWXYZ23456789";
 
@@ -261,7 +266,7 @@ $("#storageLimitsSave").addEventListener("click", function() {
             replaceArrayContents(todos, todos.filter(x => !ids.has(x.id)));
         }), addExcess("journal-excess", "Journal ponad limit", journal, l.journalRecords, protectedJournalIds, ids => {
             replaceArrayContents(journal, journal.filter(x => !ids.has(x.id)));
-        }), addExcess("notes-excess", "Notatki ponad limit", notes, l.notesRecords, new Set, ids => {
+        }), addExcess("notes-excess", "Notatki ponad limit", notes, l.notesRecords, new Set(notes.filter(x => x.pinned).map(x => x.id)), ids => {
             replaceArrayContents(notes, notes.filter(x => !ids.has(x.id)));
         }), addExcess("reminders-excess", "Przypomnienia ponad limit", calReminders, l.remindersRecords, protectedReminderIds, ids => {
             replaceArrayContents(calReminders, calReminders.filter(x => !ids.has(x.id)));

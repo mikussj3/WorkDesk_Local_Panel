@@ -92,6 +92,33 @@ const StorageService = (() => {
     function isQuotaExceeded(error) {
         return !!error && ("QuotaExceededError" === error.name || "NS_ERROR_DOM_QUOTA_REACHED" === error.name || 22 === error.code || 1014 === error.code);
     }
+    let storageDegradedSignalled = !1;
+    function signalStorageDegraded(key) {
+        if (storageDegradedSignalled) return;
+        storageDegradedSignalled = !0;
+        recordDiagnostic("safeCommit", key, new Error("Pamięć ulotna — zapis trwały niedostępny"), {
+            degraded: !0
+        });
+        try {
+            AttentionCenter.notify({
+                id: "storage-degraded",
+                priority: "danger",
+                rank: 100,
+                title: t("storage.degraded.title"),
+                message: t("storage.degraded.message"),
+                actions: [ {
+                    id: "export",
+                    label: t("storage.degraded.export"),
+                    primary: !0,
+                    run: () => {
+                        try {
+                            exportData();
+                        } catch {}
+                    }
+                } ]
+            });
+        } catch {}
+    }
     function rawUsage() {
         let bytes = 0;
         const perKey = {};
@@ -138,11 +165,18 @@ const StorageService = (() => {
     }
     function safeCommit(key, value) {
         const raw = String(value), tempKey = key + ".__tmp__";
+        if (GuardedStorage.degraded) return signalStorageDegraded(key), {
+            ok: !1,
+            key: key,
+            reason: "degraded",
+            degraded: !0
+        };
         let previous = null, hadPrevious = !1;
         try {
-            if (previous = GuardedStorage.getItem(key), hadPrevious = null !== previous, 
+            if (previous = GuardedStorage.getItem(key), hadPrevious = null !== previous,
             preflight(key, raw), GuardedStorage.setItem(tempKey, raw), GuardedStorage.getItem(tempKey) !== raw) throw new Error("Weryfikacja zapisu tymczasowego nie powiodła się.");
             if (GuardedStorage.setItem(key, raw), GuardedStorage.getItem(key) !== raw) throw new Error("Weryfikacja zapisu docelowego nie powiodła się.");
+            if (GuardedStorage.degraded) throw new Error("Pamięć ulotna — zapis trwały niedostępny.");
             return GuardedStorage.removeItem(tempKey), {
                 ok: !0,
                 key: key,
@@ -157,13 +191,15 @@ const StorageService = (() => {
             } catch (rollbackError) {
                 recordDiagnostic("rollback", key, rollbackError);
             }
+            GuardedStorage.degraded && signalStorageDegraded(key);
             return recordDiagnostic("safeCommit", key, error, {
                 attemptedBytes: new Blob([ raw ]).size
-            }), notify(isQuotaExceeded(error) ? "Brak miejsca w pamięci lokalnej. Dane nie zostały nadpisane." : "Nie udało się bezpiecznie zapisać danych. Poprzednia wersja została zachowana."), 
+            }), notify(isQuotaExceeded(error) ? "Brak miejsca w pamięci lokalnej. Dane nie zostały nadpisane." : "Nie udało się bezpiecznie zapisać danych. Poprzednia wersja została zachowana."),
             {
                 ok: !1,
                 key: key,
                 error: error,
+                reason: GuardedStorage.degraded ? "degraded" : void 0,
                 quotaExceeded: isQuotaExceeded(error)
             };
         }
@@ -280,6 +316,7 @@ const StorageService = (() => {
             return this.snapshot();
         },
         safeCommit: safeCommit,
+        isPersistent: () => !GuardedStorage.degraded,
         safeCommitJSON: function(key, value) {
             let raw;
             try {
@@ -361,9 +398,9 @@ const StorageService = (() => {
     });
 })(), APP_META = Object.freeze({
     name: "WorkDesk",
-    version: "1.66.3",
+    version: "{{APP_VERSION}}",
     schemaVersion: 5,
-    buildTag: "KF64",
+    buildTag: "{{BUILD_TAG}}",
     builtAt: "2026-07-23T00:30:00Z"
 }), APP_NAME = APP_META.name, APP_VERSION = APP_META.version, SCHEMA_VERSION = APP_META.schemaVersion, DATA_SCHEMA_VERSION = SCHEMA_VERSION, BUILD_INFO = Object.freeze({
     appName: APP_NAME,
@@ -377,8 +414,10 @@ const StorageService = (() => {
 
 
 function applyBuildMetadata() {
-    document.title = `${APP_NAME} ${APP_VERSION}-${APP_META.buildTag} — Panel pracy lokalny`, 
-    document.querySelectorAll("[data-app-name]").forEach(el => {
+    const documentTitle = () => `${APP_NAME} ${APP_VERSION}-${APP_META.buildTag}${"diagnostic" === document.documentElement.dataset.workdeskBuild ? "-D" : ""} — Panel pracy lokalny`;
+    document.title = documentTitle(), queueMicrotask(() => {
+        document.title = documentTitle();
+    }), document.querySelectorAll("[data-app-name]").forEach(el => {
         el.textContent = APP_NAME;
     }), document.querySelectorAll("[data-app-version]").forEach(el => {
         el.textContent = APP_VERSION;

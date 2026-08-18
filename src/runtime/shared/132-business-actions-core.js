@@ -100,13 +100,12 @@ const BusinessActions = (() => {
     $(".email-main")?.prepend(tools), bindEvent($("#emailProfilesBtn"), "click", () => {
         ModuleRegistry.get("emailProfiles").render(), showModal("emailProfilesModal"), SchedulerService.scheduleTimeout(() => bindEvent($("#epSave"), "click", save));
     }), bindEvent($("#emailPreviewBtn"), "click", function() {
-        const form = EmailComposerState.read(), previewValues_subject = replaceVars(form.subject), previewValues_body = replaceVars(form.body), emails = (replaceVars(form.signature), 
-        [ ...parseEmails(form.to), ...parseEmails(form.cc), ...parseEmails(form.bcc) ]), bad = emails.filter(x => !isValidEmail(x)), placeholders = (form.subject + " " + form.body).match(/\{\{[^}]+\}\}|\[[^\]]+\]/g) || [];
+        const form = EmailComposerState.read(), previewValues_subject = replaceVars(form.subject), previewValues_body = replaceVars(form.body), emails = [ ...parseEmails(form.to), ...parseEmails(form.cc), ...parseEmails(form.bcc) ], bad = emails.filter(x => !EMAIL_RE.test(x)), placeholders = (form.subject + " " + form.body).match(/\{\{[^}]+\}\}|\[[^\]]+\]/g) || [];
         showInfoDialog("Kontrola wiadomości", `Odbiorcy: ${new Set(emails.map(x => x.toLowerCase())).size}\nBłędne adresy: ${bad.length}\nTemat: ${form.subject ? "jest" : "BRAK"}\nTreść: ${form.body.trim() ? "jest" : "BRAK"}\nPozostawione placeholdery: ${placeholders.length}\n\nTemat po podstawieniu:\n` + previewValues_subject + "\n\nTreść po podstawieniu:\n" + previewValues_body);
     });
 }(), delegateEvent($("#calendarReminderTools"), "click", "[data-days]", (event, button) => {
     const d = new Date;
-    d.setDate(d.getDate() + Number(button.dataset.days)), openCalendarDayMenu?.(d, button);
+    d.setDate(d.getDate() + Number(button.dataset.days)), showCalendarDayMenu(null, d, button);
 }), $("#upcomingBtn")?.addEventListener("click", () => {
     !function() {
         if ($("#upcomingModal")) return;

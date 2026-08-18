@@ -36,11 +36,11 @@ function latestBackupAge() {
 }
 
 function dataConfidenceState() {
-    const usage = StorageService.usage(), age = latestBackupAge(), blocked = !!storageLoadBlocked;
-    const state = blocked || usage.level === "danger" ? "danger" : age === null || age >= 7 || usage.level === "warning" ? "warning" : "ok";
+    const usage = StorageService.usage(), age = latestBackupAge(), blocked = !!storageLoadBlocked, degraded = usage.persistent !== !0;
+    const state = blocked || degraded || usage.level === "danger" ? "danger" : age === null || age >= 7 || usage.level === "warning" ? "warning" : "ok";
     const saved = lastFullSnapshotAt ? new Date(lastFullSnapshotAt).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }) : "w tej sesji jeszcze nie zapisano zmian";
     const backup = age === null ? "brak punktu przywracania" : age === 0 ? "backup dzisiaj" : `backup ${age} dni temu`;
-    return { state, age, usage, text: blocked ? "Zapis zablokowany — sprawdź komunikaty o danych" : `Dane zapisane: ${saved} · ${backup} · pamięć ${Math.round(usage.percent)}%` };
+    return { state, age, usage, text: blocked ? "Zapis zablokowany — sprawdź komunikaty o danych" : degraded ? "Pamięć ulotna — dane nie są zapisywane. Wyeksportuj kopię do pliku JSON." : `Dane zapisane: ${saved} · ${backup} · pamięć ${Math.round(usage.percent)}%` };
 }
 
 function renderDataConfidence() {
@@ -53,7 +53,7 @@ function renderDataConfidence() {
 
 function renderDailyStart() {
     if (!$("#dailyStart")) return;
-    const now = new Date(), today = now.toDateString(), activeRows = todos.filter(x => !x.done), overdue = activeRows.filter(x => x.due && new Date(x.due).getTime() < now.setHours(0, 0, 0, 0)).length, todayTodos = activeRows.filter(x => x.due && new Date(x.due).toDateString() === today).length, rem = (calReminders || []).filter(x => !x.done && new Date(x.date).toDateString() === today).length, age = latestBackupAge(), draft = !!readMeaningfulDraft(), usage = StorageService.usage();
+    const now = new Date(), today = now.toDateString(), todayKey = dateKeyLocal(now), activeRows = todos.filter(x => !x.done), overdue = activeRows.filter(x => x.dueDate && x.dueDate < todayKey).length, todayTodos = activeRows.filter(x => x.dueDate && x.dueDate === todayKey).length, rem = (calReminders || []).filter(x => !x.done && new Date(x.date).toDateString() === today).length, age = latestBackupAge(), draft = !!readMeaningfulDraft(), usage = StorageService.usage();
     const card = (value, label, alert = false) => SafeDOM.el("div", { className: `daily-card${alert ? " is-alert" : ""}` }, [ SafeDOM.el("div", { className: "v", text: value }), SafeDOM.el("div", { className: "l", text: label }) ]);
     SafeDOM.replace($("#dailyStart"), [
         card(todayTodos, "zadania na dziś", overdue > 0),
@@ -71,7 +71,7 @@ _draft && (pendingDraftRestore = _draft, AttentionCenter.notify({
         { id: "discard", label: "Odrzuć", run: () => discardPendingDraft() }
     ]
 })), EventLifecycle.on(window, "keydown", e => {
-    "cmdModal" !== UIRuntime.top()?.id && ((e.ctrlKey || e.metaKey) && "Enter" === e.key ? (e.preventDefault(), 
-    $("#sendBtn").click()) : !e.ctrlKey && !e.metaKey || "e" !== e.key.toLowerCase() || e.shiftKey || [ "INPUT", "TEXTAREA" ].includes(document.activeElement?.tagName) || (e.preventDefault(), 
+    "cmdModal" !== UIRuntime.top()?.id && ((e.ctrlKey || e.metaKey) && "Enter" === e.key ? (e.target instanceof Element && e.target.closest("#email") && (e.preventDefault(),
+    $("#sendBtn").click())) : !e.ctrlKey && !e.metaKey || "e" !== e.key.toLowerCase() || e.shiftKey || [ "INPUT", "TEXTAREA" ].includes(document.activeElement?.tagName) || (e.preventDefault(),
     toggleEmail()));
 });

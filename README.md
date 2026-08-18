@@ -12,7 +12,7 @@
 ![UI language](https://img.shields.io/badge/UI-Polish%20only-orange)
 
 > [!IMPORTANT]
-> The current application interface is available **only in Polish**. This README is provided in English for developers and international visitors, but the application does not currently include an English language pack or a complete i18n layer.
+> The current application interface is available **only in Polish**. An i18n foundation has been added to centralize UI strings, but no English language pack exists yet. This README is provided in English for developers and international visitors.
 
 ## Table of contents
 
@@ -241,6 +241,18 @@ Advanced and destructive operations are separated from routine backup actions.
 
 In addition to the production file, the project can generate a diagnostic build containing additional runtime checks and the `WorkDeskDebug` interface. The diagnostic build is for verification and development, not normal daily use.
 
+### Error reporting
+
+Unhandled runtime errors trigger an AttentionCenter notice ("ui-error") with two actions: **Details** (opens a dialog showing the full report: version, description, stack trace) and **Copy report** (copies a formatted report to the clipboard with a confirmation toast). The notice is armed on first display with a 30-second re-arm delay to prevent spam.
+
+### Emergency export
+
+A persistent **Export data** button (download icon) is always visible in the navigation bar. It downloads the complete application state as a JSON backup file regardless of module state or storage health, providing a one-click safety net even during storage degradation.
+
+### Auto-backup (experimental)
+
+On browsers that support the File System Access API (Chromium 86+), WorkDesk can optionally auto-save a backup to a user-chosen directory after each significant data change. This is an experimental feature — the application remains fully functional without it, and the offline-first model is preserved.
+
 ## How to use the application
 
 ### Option A: use the ready production file
@@ -408,21 +420,48 @@ Coordinates stable relationships and conversions between phone log records, resp
 │   │   │   └── diagnostic.js
 │   │   └── shared/
 │   │       ├── 00-event-lifecycle.js
+│   │       ├── 00-bootstrap-data.js
+│   │       ├── 05-i18n.js
 │   │       ├── 10-scheduler-events.js
 │   │       ├── 20-ui-runtime.js
 │   │       ├── 25-accessibility-runtime.js
+│   │       ├── 26-tooltip-runtime.js
 │   │       ├── 27-storage-capability.js
+│   │       ├── 28-pure-helpers.js
 │   │       ├── 30-email-composer.js
 │   │       ├── 40-storage-core.js
+│   │       ├── 50-todo-tools.js
 │   │       ├── 60-storage-validation.js
 │   │       ├── 70-module-registry.js
 │   │       ├── 80-persistence-import.js
+│   │       ├── 90-email-runtime.js
 │   │       ├── 100-calendar-reminders.js
+│   │       ├── 110-utilities-widgets.js
+│   │       ├── 111-qr-codec.js
+│   │       ├── 120-csv-import.js
+│   │       ├── 121-journal-backup.js
+│   │       ├── 122-id-theme-notes.js
+│   │       ├── 123-bootstrap-recovery.js
 │   │       ├── 125-core-modules.js
 │   │       ├── 130-business-foundation.js
 │   │       ├── 131-search-quick-actions.js
+│   │       ├── 132-business-actions-core.js
+│   │       ├── 133-phone-log.js
+│   │       ├── 134-domain-services.js
+│   │       ├── 135-business-ui-menu.js
+│   │       ├── 136-business-actions-extra.js
+│   │       ├── 140-app-services.js
 │   │       ├── 140-business-workflow.js
-│   │       └── ...
+│   │       ├── 141-business-runtime-core.js
+│   │       ├── 142-modal-policies.js
+│   │       ├── 143-clipboard-actions.js
+│   │       ├── 144-module-lifecycle-hardening.js
+│   │       ├── 145-import-ui-runtime.js
+│   │       ├── 146-design-contracts.js
+│   │       ├── 147-final-runtime-audit.js
+│   │       ├── 148-mobile-ux.js
+│   │       ├── 150-module-bootstrap.js
+│   │       └── 160-app-store-api.js
 │   ├── styles/
 │   │   ├── 00-tokens-navbar.css
 │   │   ├── 10-email.css
@@ -430,13 +469,15 @@ Coordinates stable relationships and conversions between phone log records, resp
 │   │   ├── 90-design-system.css
 │   │   └── 99-final-overrides.css
 │   └── templates/
-│       ├── production.html
-│       └── diagnostic.html
+│       └── production.html  (tytuł diagnostyczny: marker {{TITLE_DIAG}})
 ├── tools/
 │   ├── build.py
 │   ├── check_build.py
+│   ├── check_undeclared.mjs
 │   ├── dead_code.py
-│   └── browser_smoke.py
+│   ├── browser_smoke.py
+│   ├── unit_tests.mjs
+│   └── phase0…4_verify.py  (regresje poprawek z audytu)
 ├── dist/
 │   ├── index_KF64.html
 │   └── index_KF64_DIAG.html
@@ -514,7 +555,8 @@ The checker validates, among other things:
 - required persistence and module contracts;
 - storage and workflow regressions;
 - accessibility and lifecycle regressions;
-- current build/version markers.
+- current build/version markers (read from `build-manifest.json`);
+- undeclared identifiers and TDZ violations via `check_undeclared.mjs` (Acorn AST scan).
 
 ### Dead-code scan
 
@@ -527,6 +569,14 @@ or:
 ```bash
 npm run dead-code
 ```
+
+### Unit tests
+
+```bash
+node tools/unit_tests.mjs
+```
+
+A suite of 20 unit tests for pure functions (dates, CSV parsing, email validation, QR encoding, search scoring, storage limits). Tests use `node:test` with `vm.runInThisContext` to load source files in manifest order with minimal DOM shims. No npm runtime dependencies.
 
 ### Browser smoke test
 
@@ -571,8 +621,7 @@ A browser smoke test is essential. Static syntax checks alone did not catch the 
 Edit:
 
 ```text
-src/templates/production.html
-src/templates/diagnostic.html
+src/templates/production.html  (jeden szablon; build wstawia sufiks tytułu dla wersji diagnostycznej przez {{TITLE_DIAG}})
 ```
 
 Keep stable IDs when runtime modules depend on them. When adding an interactive control:
@@ -616,6 +665,7 @@ After changes:
 python tools/build.py --kind all
 python tools/check_build.py
 python tools/dead_code.py
+node tools/unit_tests.mjs
 python tools/browser_smoke.py
 ```
 
@@ -779,6 +829,8 @@ The version format currently combines an application version and an internal KF 
 1.66.3-KF64
 ```
 
+Version and build tag are defined in a single source of truth: `build-manifest.json` (`appVersion` and `buildTag`). Source files use `{{APP_VERSION}}` and `{{BUILD_TAG}}` markers that `build.py` replaces during the build. Verification scripts read the version from the manifest, not from hardcoded literals.
+
 Recommended release contents:
 
 - production HTML;
@@ -843,7 +895,7 @@ No. WorkDesk is currently a single-user local application.
 
 ### Is an English interface available?
 
-Not yet. Only the documentation is bilingual; the UI is currently Polish.
+Not yet. The application UI is currently Polish only. An i18n foundation (`src/runtime/shared/05-i18n.js`) has been added that centralizes UI strings into a dictionary object, opening the path to an English language pack. However, no English translations have been implemented yet — only the documentation is bilingual.
 
 ### Can I edit the generated HTML directly?
 
